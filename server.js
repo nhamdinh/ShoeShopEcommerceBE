@@ -8,6 +8,7 @@ const multer = require("multer");
 const path = require("path");
 const connectDatabase = require("./config/MongoDb");
 const ImportData = require("./Routes/DataImport");
+const productRoute = require("./Routes/ProductRoutes");
 
 const app = express();
 app.use(
@@ -32,6 +33,8 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/import", ImportData);
+app.use("/api/products", productRoute);
+
 /* API */
 
 
