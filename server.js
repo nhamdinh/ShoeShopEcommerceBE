@@ -9,6 +9,7 @@ const path = require("path");
 const connectDatabase = require("./config/MongoDb");
 const ImportData = require("./Routes/DataImport");
 const productRoute = require("./Routes/ProductRoutes");
+const userRoutes = require("./Routes/UserRoutes");
 
 const app = express();
 app.use(
@@ -34,6 +35,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/import", ImportData);
 app.use("/api/products", productRoute);
+app.use("/api/users", userRoutes);
 
 /* API */
 
