@@ -10,6 +10,7 @@ const connectDatabase = require("./config/MongoDb");
 const ImportData = require("./Routes/DataImport");
 const productRoute = require("./Routes/ProductRoutes");
 const userRoutes = require("./Routes/UserRoutes");
+const orderRoutes = require("./Routes/OrderRoutes");
 
 const app = express();
 app.use(
@@ -36,9 +37,9 @@ app.get("/", (req, res) => {
 app.use("/api/import", ImportData);
 app.use("/api/products", productRoute);
 app.use("/api/users", userRoutes);
+app.use("/api/orders", orderRoutes);
 
 /* API */
-
 
 const PORT = process.env.PORT || 1000;
 app.listen(PORT, console.log(`server run in port ${PORT}`));
