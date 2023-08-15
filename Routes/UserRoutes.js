@@ -92,7 +92,7 @@ userRouter.put(
   "/update-profile",
   protect,
   asyncHandler(async (req, res) => {
-    console.log("req req req        ",req)
+    console.log("req req req        ", req);
     const user = await User.findById(req.user._id);
 
     if (user) {
@@ -127,5 +127,17 @@ userRouter.get(
     res.json(users);
   })
 );
+// GET ALL USER
+userRouter.get(
+  "/get-all",
+  asyncHandler(async (req, res) => {
+    const count = await User.countDocuments({});
+
+    const users = await User.find({});
+    res.json({ count, users });
+  })
+);
+
+
 
 module.exports = userRouter;
