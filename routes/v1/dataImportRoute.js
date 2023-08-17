@@ -1,10 +1,11 @@
 const express = require("express");
 const asyncHandler = require("express-async-handler");
 
-const users = require("../data/users");
-const User = require("../Models/UserModel");
-const products = require("../data/products");
-const Product = require("../Models/ProductModel");
+const users = require("../../data/users");
+const User = require("../../Models/UserModel");
+
+const products = require("../../data/products");
+const Product = require("../../Models/ProductModel");
 
 const ImportData = express.Router();
 
