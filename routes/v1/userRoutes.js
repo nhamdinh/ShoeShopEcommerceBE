@@ -1,11 +1,11 @@
 const express = require("express");
 const asyncHandler = require("express-async-handler");
 
-const protect = require("../Middleware/AuthMiddleware");
-const admin = require("../Middleware/AuthMiddleware");
+const protect = require("../../Middleware/AuthMiddleware");
+const admin = require("../../Middleware/AuthMiddleware");
 
-const generateToken = require("../utils/generateToken");
-const User = require("../Models/UserModel");
+const generateToken = require("../../utils/generateToken");
+const User = require("../../Models/UserModel");
 
 const userRouter = express.Router();
 
@@ -137,7 +137,5 @@ userRouter.get(
     res.json({ count, users });
   })
 );
-
-
 
 module.exports = userRouter;
