@@ -18,12 +18,13 @@ addressRoute.get(
 );
 
 // CHECK EXIST ADDRESS
-addressRoute.post(
+
+addressRoute.get(
   "/check-address",
   protect,
   asyncHandler(async (req, res) => {
     const addressArr = await Address.find({ user: req.user._id });
-    let createAddress;
+    let createAddress = {};
     if (addressArr.length > 0) {
       createAddress = addressArr[0];
     } else {
