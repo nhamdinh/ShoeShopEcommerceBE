@@ -5,20 +5,21 @@ const protect = require("../../Middleware/AuthMiddleware");
 const admin = require("../../Middleware/AuthMiddleware");
 
 const Order = require("../../Models/OrderModel");
+const Cart = require("../../Models/CartModel");
 
 const orderRouter = express.Router();
 
 // CREATE ORDER
 orderRouter.post(
-  "/",
+  "/create-order",
   protect,
   asyncHandler(async (req, res) => {
     const {
       orderItems,
       shippingAddress,
       paymentMethod,
-      itemsPrice,
       taxPrice,
+      cart,
       shippingPrice,
       totalPrice,
     } = req.body;
@@ -33,13 +34,24 @@ orderRouter.post(
         user: req.user._id,
         shippingAddress,
         paymentMethod,
-        itemsPrice,
         taxPrice,
+        cart,
         shippingPrice,
         totalPrice,
       });
-
       const createOrder = await order.save();
+      const cart1 = await Cart.findById(cart);
+
+      console.log(cart1);
+
+      if (cart1) {
+        cart1.deletedAt = Date.now();
+        const updatedCart = await cart1.save();
+      } else {
+        res.status(404);
+        throw new Error("User not found");
+      }
+
       res.status(201).json(createOrder);
     }
   })
@@ -53,7 +65,9 @@ orderRouter.get(
   asyncHandler(async (req, res) => {
     const orders = await Order.find({})
       .sort({ _id: -1 })
-      .populate("user", "id name email");
+      .populate("user", "id name email")
+      .populate("shippingAddress", "id street city postalCode country");
+
     res.json(orders);
   })
 );
@@ -132,14 +146,15 @@ orderRouter.put(
   })
 );
 
-// GET ALL USER
+// GET ALL ORDERS
 orderRouter.get(
   "/get-all",
   asyncHandler(async (req, res) => {
     const count = await Order.countDocuments({});
     const orders = await Order.find({})
       .sort({ _id: -1 })
-      .populate("user", "id name email");
+      .populate("user", "id name email")
+      .populate("shippingAddress", "id street city postalCode country");
     res.json({ count, orders });
   })
 );

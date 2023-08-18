@@ -92,7 +92,6 @@ userRouter.put(
   "/update-profile",
   protect,
   asyncHandler(async (req, res) => {
-    console.log("req req req        ", req);
     const user = await User.findById(req.user._id);
 
     if (user) {
