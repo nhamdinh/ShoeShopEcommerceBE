@@ -21,6 +21,7 @@ orderRouter.post(
       taxPrice,
       cart,
       shippingPrice,
+      totalPriceItems,
       totalPrice,
     } = req.body;
 
@@ -37,6 +38,7 @@ orderRouter.post(
         taxPrice,
         cart,
         shippingPrice,
+        totalPriceItems,
         totalPrice,
       });
       const createOrder = await order.save();
@@ -73,7 +75,7 @@ orderRouter.get(
 );
 // USER LOGIN ORDERS
 orderRouter.get(
-  "/",
+  "/all",
   protect,
   asyncHandler(async (req, res) => {
     const order = await Order.find({ user: req.user._id }).sort({ _id: -1 });
@@ -86,10 +88,9 @@ orderRouter.get(
   "/detail/:id",
   protect,
   asyncHandler(async (req, res) => {
-    const order = await Order.findById(req.params.id).populate(
-      "user",
-      "name email"
-    );
+    const order = await Order.findById(req.params.id)
+      .populate("user", "name email")
+      .populate("shippingAddress", "id street city postalCode country");
 
     if (order) {
       res.json(order);
