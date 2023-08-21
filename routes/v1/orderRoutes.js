@@ -1,8 +1,7 @@
 const express = require("express");
 const asyncHandler = require("express-async-handler");
 
-const protect = require("../../Middleware/AuthMiddleware");
-const admin = require("../../Middleware/AuthMiddleware");
+const { protect, admin } = require("../../Middleware/AuthMiddleware");
 
 const Order = require("../../Models/OrderModel");
 const Cart = require("../../Models/CartModel");
@@ -61,7 +60,7 @@ orderRouter.post(
 
 // ADMIN GET ALL ORDERS
 orderRouter.get(
-  "/all",
+  "/all-admin",
   protect,
   admin,
   asyncHandler(async (req, res) => {

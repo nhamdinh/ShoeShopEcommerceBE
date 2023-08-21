@@ -3,7 +3,7 @@ const asyncHandler = require("express-async-handler");
 
 const PAGE_SIZE = require("../../common/constant");
 const Cart = require("../../Models/CartModel");
-const protect = require("../../Middleware/AuthMiddleware");
+const { protect } = require("../../Middleware/AuthMiddleware");
 
 const cartRoute = express.Router();
 

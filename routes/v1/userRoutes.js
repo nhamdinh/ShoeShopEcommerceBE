@@ -1,8 +1,7 @@
 const express = require("express");
 const asyncHandler = require("express-async-handler");
 
-const protect = require("../../Middleware/AuthMiddleware");
-const admin = require("../../Middleware/AuthMiddleware");
+const { admin, protect } = require("../../Middleware/AuthMiddleware");
 
 const generateToken = require("../../utils/generateToken");
 const User = require("../../Models/UserModel");
@@ -118,12 +117,14 @@ userRouter.put(
 
 // GET ALL USER ADMIN
 userRouter.get(
-  "/",
+  "/all",
   protect,
   admin,
   asyncHandler(async (req, res) => {
+    const count = await User.countDocuments({});
+
     const users = await User.find({});
-    res.json(users);
+    res.json({ count, users });
   })
 );
 // GET ALL USER
