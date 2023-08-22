@@ -128,6 +128,7 @@ orderRouter.put(
 orderRouter.put(
   "/:id/delivered",
   protect,
+  admin,
   asyncHandler(async (req, res) => {
     const order = await Order.findById(req.params.id);
 
