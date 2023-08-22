@@ -43,14 +43,12 @@ orderRouter.post(
       const createOrder = await order.save();
       const cart1 = await Cart.findById(cart);
 
-      console.log(cart1);
-
       if (cart1) {
         cart1.deletedAt = Date.now();
         const updatedCart = await cart1.save();
       } else {
         res.status(404);
-        throw new Error("User not found");
+        throw new Error("Cart not found");
       }
 
       res.status(201).json(createOrder);
@@ -65,14 +63,14 @@ orderRouter.get(
   admin,
   asyncHandler(async (req, res) => {
     const orders = await Order.find({})
-      .sort({ _id: -1 })
+      .sort({ createdAt: -1 })
       .populate("user", "id name email")
       .populate("shippingAddress", "id street city postalCode country");
 
     res.json(orders);
   })
 );
-// USER LOGIN ORDERS
+// USER GET ALL ORDERS
 orderRouter.get(
   "/all",
   protect,
@@ -152,7 +150,7 @@ orderRouter.get(
   asyncHandler(async (req, res) => {
     const count = await Order.countDocuments({});
     const orders = await Order.find({})
-      .sort({ _id: -1 })
+      .sort({ createdAt: -1 })
       .populate("user", "id name email")
       .populate("shippingAddress", "id street city postalCode country");
     res.json({ count, orders });

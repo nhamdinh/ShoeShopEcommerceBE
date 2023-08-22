@@ -55,6 +55,7 @@ const productSchema = mongoose.Schema(
       required: true,
       default: 0,
     },
+    deletedAt: { type: Date, required: false, default: null },
   },
   {
     timestamps: true,

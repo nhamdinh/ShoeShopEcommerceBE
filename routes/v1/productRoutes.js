@@ -1,6 +1,6 @@
 const express = require("express");
 const asyncHandler = require("express-async-handler");
-const { protect } = require("../../Middleware/AuthMiddleware");
+const { protect, admin } = require("../../Middleware/AuthMiddleware");
 
 const PAGE_SIZE = require("../../common/constant");
 const Product = require("../../Models/ProductModel");
@@ -29,6 +29,19 @@ productRoute.get(
   })
 );
 
+// ADMIN GET ALL PRODUCT WITHOUT SEARCH AND PEGINATION
+productRoute.get(
+  "/all-admin",
+  protect,
+  admin,
+  asyncHandler(async (req, res) => {
+    const products = await Product.find({ deletedAt: null }).sort({
+      createdAt: -1,
+    });
+    res.json(products);
+  })
+);
+
 // GET SINGLE PRODUCT
 productRoute.get(
   "/:id",
@@ -36,6 +49,24 @@ productRoute.get(
     const product = await Product.findById(req.params.id);
     if (product) {
       res.json(product);
+    } else {
+      res.status(404);
+      throw new Error("Product not Found");
+    }
+  })
+);
+
+// DELETE PRODUCT
+productRoute.post(
+  "/delete/:id",
+  protect,
+  admin,
+  asyncHandler(async (req, res) => {
+    const product = await Product.findById(req.params.id);
+    if (product) {
+      product.deletedAt = Date.now();
+      await product.save();
+      res.json({ message: "Product deleted" });
     } else {
       res.status(404);
       throw new Error("Product not Found");

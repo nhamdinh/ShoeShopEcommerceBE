@@ -115,15 +115,14 @@ userRouter.put(
   })
 );
 
-// GET ALL USER ADMIN
+// ADMIN GET ALL USER 
 userRouter.get(
-  "/all",
+  "/all-admin",
   protect,
   admin,
   asyncHandler(async (req, res) => {
     const count = await User.countDocuments({});
-
-    const users = await User.find({});
+    const users = await User.find({}).sort({ createdAt: -1 });
     res.json({ count, users });
   })
 );
@@ -132,7 +131,6 @@ userRouter.get(
   "/get-all",
   asyncHandler(async (req, res) => {
     const count = await User.countDocuments({});
-
     const users = await User.find({});
     res.json({ count, users });
   })
