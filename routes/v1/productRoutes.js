@@ -1,7 +1,6 @@
-
 const express = require("express");
 const asyncHandler = require("express-async-handler");
-const protect = require("../../Middleware/AuthMiddleware");
+const { protect, admin } = require("../../Middleware/AuthMiddleware");
 
 const PAGE_SIZE = require("../../common/constant");
 const Product = require("../../Models/ProductModel");
@@ -26,7 +25,20 @@ productRoute.get(
       .limit(PAGE_SIZE)
       .skip(PAGE_SIZE * (page - 1))
       .sort({ _id: -1 });
-    res.json({count, products, page, pages: Math.ceil(count / PAGE_SIZE) });
+    res.json({ count, products, page, pages: Math.ceil(count / PAGE_SIZE) });
+  })
+);
+
+// ADMIN GET ALL PRODUCT WITHOUT SEARCH AND PEGINATION
+productRoute.get(
+  "/all-admin",
+  protect,
+  admin,
+  asyncHandler(async (req, res) => {
+    const products = await Product.find({ deletedAt: null }).sort({
+      createdAt: -1,
+    });
+    res.json(products);
   })
 );
 
@@ -44,6 +56,23 @@ productRoute.get(
   })
 );
 
+// DELETE PRODUCT
+productRoute.post(
+  "/delete/:id",
+  protect,
+  admin,
+  asyncHandler(async (req, res) => {
+    const product = await Product.findById(req.params.id);
+    if (product) {
+      product.deletedAt = Date.now();
+      await product.save();
+      res.json({ message: "Product deleted" });
+    } else {
+      res.status(404);
+      throw new Error("Product not Found");
+    }
+  })
+);
 
 // PRODUCT REVIEW
 productRoute.post(
@@ -67,12 +96,13 @@ productRoute.post(
         comment,
         user: req.user._id,
       };
-      console.log("review ========= ",review)
+      console.log("review ========= ", review);
       product.reviews.push(review);
       product.numReviews = product.reviews.length;
-      product.rating =
-        (product.reviews.reduce((acc, item) => item.rating + acc, 0) /
-        product.reviews.length).toFixed(1);
+      product.rating = (
+        product.reviews.reduce((acc, item) => item.rating + acc, 0) /
+        product.reviews.length
+      ).toFixed(1);
 
       await product.save();
       res.status(201).json({ message: "Reviewed Added" });
@@ -84,4 +114,3 @@ productRoute.post(
 );
 
 module.exports = productRoute;
-
