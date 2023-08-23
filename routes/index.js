@@ -8,5 +8,6 @@ routes.use("/api/orders", require("./v1/orderRoutes"));
 routes.use("/api/users", require("./v1/userRoutes"));
 routes.use("/api/carts", require("./v1/cartRoutes"));
 routes.use("/api/address", require("./v1/addressRoutes"));
+routes.use("/api/categorys", require("./v1/categoryRoutes"));
 
 module.exports = routes;

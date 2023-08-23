@@ -9,6 +9,11 @@ const products = [
     stock: 648,
     rating: 4,
     numReviews: 4,
+    category: {
+      name: "shoe",
+      brand: "GUCCI",
+      category: "64e5de99ea3ee0a7d0f5cfdd",
+    },
   },
   {
     name: "Velcro Sneakers For Boys & Girls  (Blue)",
@@ -20,6 +25,11 @@ const products = [
     stock: 449,
     rating: 2,
     numReviews: 2,
+    category: {
+      name: "shoe",
+      brand: "GUCCI",
+      category: "64e5de99ea3ee0a7d0f5cfdd",
+    },
   },
   {
     name: "Sesame Street Unisex-Child ELMO Puppet Slipper",
@@ -31,6 +41,11 @@ const products = [
     stock: 938,
     rating: 3.5,
     numReviews: 3,
+    category: {
+      name: "shoe",
+      brand: "GUCCI",
+      category: "64e5de99ea3ee0a7d0f5cfdd",
+    },
   },
   {
     name: "Lace Casual Boots For Boys & Girls  (Tan)",
@@ -42,6 +57,11 @@ const products = [
     stock: 810,
     rating: 5,
     numReviews: 9,
+    category: {
+      name: "shoe",
+      brand: "GUCCI",
+      category: "64e5de99ea3ee0a7d0f5cfdd",
+    },
   },
   {
     name: "Lace Walking Shoes For Boys & Girls  (Pink)",
@@ -53,6 +73,11 @@ const products = [
     stock: 833,
     rating: 2,
     numReviews: 2,
+    category: {
+      name: "shoe",
+      brand: "GUCCI",
+      category: "64e5de99ea3ee0a7d0f5cfdd",
+    },
   },
   {
     name: "Women Red Heels Sandal",
@@ -64,6 +89,11 @@ const products = [
     stock: 741,
     rating: 0,
     numReviews: 0,
+    category: {
+      name: "shoe",
+      brand: "GUCCI",
+      category: "64e5de99ea3ee0a7d0f5cfdd",
+    },
   },
 ];
 
