@@ -64,7 +64,7 @@ orderRouter.get(
   asyncHandler(async (req, res) => {
     const orders = await Order.find({})
       .sort({ createdAt: -1 })
-      .populate("user", "id name email")
+      .populate("user", "id name email phone")
       .populate("shippingAddress", "id street city postalCode country");
 
     res.json(orders);
@@ -86,7 +86,7 @@ orderRouter.get(
   protect,
   asyncHandler(async (req, res) => {
     const order = await Order.findById(req.params.id)
-      .populate("user", "name email")
+      .populate("user", "name email phone")
       .populate("shippingAddress", "id street city postalCode country");
 
     if (order) {
@@ -152,7 +152,7 @@ orderRouter.get(
     const count = await Order.countDocuments({});
     const orders = await Order.find({})
       .sort({ createdAt: -1 })
-      .populate("user", "id name email")
+      .populate("user", "id name email phone")
       .populate("shippingAddress", "id street city postalCode country");
     res.json({ count, orders });
   })

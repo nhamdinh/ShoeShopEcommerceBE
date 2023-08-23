@@ -7,6 +7,9 @@ const User = require("../../Models/UserModel");
 const products = require("../../data/products");
 const Product = require("../../Models/ProductModel");
 
+const categorys = require("../../data/categorys");
+const Category = require("../../Models/CategoryModel");
+
 const ImportData = express.Router();
 
 ImportData.post(
@@ -24,6 +27,14 @@ ImportData.post(
     await Product.remove({});
     const importProducts = await Product.insertMany(products);
     res.send({ importProducts });
+  })
+);
+ImportData.post(
+  "/categorys",
+  asyncHandler(async (req, res) => {
+    await Category.remove({});
+    const importCategorys = await Category.insertMany(categorys);
+    res.send({ importCategorys });
   })
 );
 
