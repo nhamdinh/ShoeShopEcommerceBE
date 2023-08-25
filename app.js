@@ -35,15 +35,22 @@ app.use(morgan("common"));
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "public/images/products");
+    let folder = req?.query?.folder;
+    if (folder === "products") {
+      cb(null, "public/images/products");
+    } else if (folder === "categorys") {
+      cb(null, "public/images/categorys");
+    } else {
+      cb(null, "public/images/commons");
+    }
   },
   filename: (req, file, cb) => {
     cb(null, req.body.name);
   },
 });
 
-const upload = multer({ storage: storage });
-app.post("/api/upload", upload.single("file"), (req, res) => {
+const storageUpload = multer({ storage: storage });
+app.post("/api/upload", storageUpload.single("file"), (req, res) => {
   try {
     let url = URL_SERVER + req?.file?.filename;
     return res.status(200).json({ url });
