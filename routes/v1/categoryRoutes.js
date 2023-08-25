@@ -28,6 +28,7 @@ categoryRoutes.get(
     res.json({ count, categorys, page, pages: Math.ceil(count / PAGE_SIZE) });
   })
 );
+
 // ADMIN GET ALL CATEGORY WITHOUT SEARCH AND PEGINATION
 categoryRoutes.get(
   "/all-admin",
@@ -79,6 +80,37 @@ categoryRoutes.get(
       .skip(PAGE_SIZE * (page - 1))
       .sort({ _id: -1 });
     res.json({ count, brands, page, pages: Math.ceil(count / PAGE_SIZE) });
+  })
+);
+
+// ADMIN GET ALL BRAND WITHOUT SEARCH AND PEGINATION
+categoryRoutes.get(
+  "/all-admin/brand",
+  protect,
+  admin,
+  asyncHandler(async (req, res) => {
+    const brands = await Brand.find({ deletedAt: null }).sort({
+      createdAt: -1,
+    });
+    res.json({ brands });
+  })
+);
+
+// DELETE BRAND
+categoryRoutes.post(
+  "/delete/:id/brand",
+  protect,
+  admin,
+  asyncHandler(async (req, res) => {
+    const brands = await Brand.findById(req.params.id);
+    if (brands) {
+      brands.deletedAt = Date.now();
+      await brands.save();
+      res.json({ message: "Brand deleted" });
+    } else {
+      res.status(404);
+      throw new Error("Brand not Found");
+    }
   })
 );
 
