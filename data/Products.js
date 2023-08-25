@@ -12,7 +12,6 @@ const products = [
     category: {
       name: "shoe",
       brand: "GUCCI",
-      category: "64e5de99ea3ee0a7d0f5cfdd",
     },
   },
   {
@@ -28,7 +27,6 @@ const products = [
     category: {
       name: "shoe",
       brand: "GUCCI",
-      category: "64e5de99ea3ee0a7d0f5cfdd",
     },
   },
   {
@@ -44,7 +42,6 @@ const products = [
     category: {
       name: "shoe",
       brand: "GUCCI",
-      category: "64e5de99ea3ee0a7d0f5cfdd",
     },
   },
   {
@@ -60,7 +57,6 @@ const products = [
     category: {
       name: "shoe",
       brand: "GUCCI",
-      category: "64e5de99ea3ee0a7d0f5cfdd",
     },
   },
   {
@@ -76,7 +72,6 @@ const products = [
     category: {
       name: "shoe",
       brand: "GUCCI",
-      category: "64e5de99ea3ee0a7d0f5cfdd",
     },
   },
   {
@@ -92,7 +87,6 @@ const products = [
     category: {
       name: "shoe",
       brand: "GUCCI",
-      category: "64e5de99ea3ee0a7d0f5cfdd",
     },
   },
 ];

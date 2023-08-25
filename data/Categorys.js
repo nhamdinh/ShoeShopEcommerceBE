@@ -1,11 +1,18 @@
 const categorys = [
   {
-    name: "shoe",
-    brand: "GUCCI",
+    category: "shoe",
   },
   {
-    name: "t-shirt",
-    brand: "PRADA",
+    category: "ao",
+  },
+  {
+    category: "quan",
+  },
+  {
+    category: "hat",
+  },
+  {
+    category: "t-shirt",
   },
 ];
 

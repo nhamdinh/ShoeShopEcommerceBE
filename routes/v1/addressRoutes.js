@@ -1,7 +1,7 @@
 const express = require("express");
 const asyncHandler = require("express-async-handler");
 
-const PAGE_SIZE = require("../../common/constant");
+const { PAGE_SIZE } = require("../../common/constant");
 const Address = require("../../Models/Address");
 const { protect } = require("../../Middleware/AuthMiddleware");
 
