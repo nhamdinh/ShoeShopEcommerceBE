@@ -10,6 +10,9 @@ const Product = require("../../Models/ProductModel");
 const categorys = require("../../data/categorys");
 const Category = require("../../Models/CategoryModel");
 
+const brands = require("../../data/brands");
+const Brand = require("../../Models/BrandModel");
+
 const ImportData = express.Router();
 
 ImportData.post(
@@ -29,12 +32,22 @@ ImportData.post(
     res.send({ importProducts });
   })
 );
+
 ImportData.post(
   "/categorys",
   asyncHandler(async (req, res) => {
     await Category.remove({});
     const importCategorys = await Category.insertMany(categorys);
     res.send({ importCategorys });
+  })
+);
+
+ImportData.post(
+  "/brands",
+  asyncHandler(async (req, res) => {
+    await Brand.remove({});
+    const importBrands = await Brand.insertMany(brands);
+    res.send({ importBrands });
   })
 );
 

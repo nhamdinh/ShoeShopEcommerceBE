@@ -7,6 +7,7 @@ const multer = require("multer");
 const path = require("path");
 
 const connectDatabase = require("./config/MongoDb");
+const { URL_SERVER } = require("./common/constant");
 connectDatabase();
 
 const app = express();
@@ -17,11 +18,39 @@ app.use(
   })
 );
 
+app.use(
+  "/commons",
+  express.static(path.join(__dirname, "public/images/commons"))
+); // server images
+app.use(
+  "/products-img",
+  express.static(path.join(__dirname, "public/images/products"))
+); // server images
+
 /* middleware */
 app.use(express.json());
 app.use(helmet());
 app.use(morgan("common"));
 /* middleware */
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "public/images/products");
+  },
+  filename: (req, file, cb) => {
+    cb(null, req.body.name);
+  },
+});
+
+const upload = multer({ storage: storage });
+app.post("/api/upload", upload.single("file"), (req, res) => {
+  try {
+    let url = URL_SERVER + req?.file?.filename;
+    return res.status(200).json({ url });
+  } catch (error) {
+    console.error(error);
+  }
+});
 
 /* API */
 app.get("/", (req, res) => {

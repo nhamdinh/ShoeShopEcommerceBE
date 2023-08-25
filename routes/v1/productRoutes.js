@@ -2,7 +2,7 @@ const express = require("express");
 const asyncHandler = require("express-async-handler");
 const { protect, admin } = require("../../Middleware/AuthMiddleware");
 
-const PAGE_SIZE = require("../../common/constant");
+const { PAGE_SIZE } = require("../../common/constant");
 const Product = require("../../Models/ProductModel");
 
 const productRoute = express.Router();
@@ -80,7 +80,8 @@ productRoute.post(
   protect,
   admin,
   asyncHandler(async (req, res) => {
-    const { name, price, description, image, countInStock } = req.body;
+    const { name, price, description, image, countInStock, category } =
+      req.body;
     const productExist = await Product.findOne({ name });
     if (productExist) {
       res.status(400);
@@ -92,6 +93,7 @@ productRoute.post(
         description,
         image,
         countInStock,
+        category,
         user: req.user._id,
       });
       if (product) {
@@ -111,8 +113,7 @@ productRoute.put(
   protect,
   admin,
   asyncHandler(async (req, res) => {
-    const { name, price, description, image, countInStock } = req.body;
-    console.log("body =======    ",req.body)
+    const { name, price, description, image, countInStock, category } = req.body;
     const product = await Product.findById(req.params.id);
     if (product) {
       product.name = name || product.name;
@@ -120,6 +121,7 @@ productRoute.put(
       product.description = description || product.description;
       product.image = image || product.image;
       product.countInStock = countInStock || product.countInStock;
+      product.category = category || product.category;
 
       const updatedProduct = await product.save();
       res.json(updatedProduct);
