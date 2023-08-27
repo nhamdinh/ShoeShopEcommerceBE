@@ -3,10 +3,10 @@ const http = require("http");
 const helmet = require("helmet");
 const morgan = require("morgan");
 const cors = require("cors");
-const multer = require("multer");
 const path = require("path");
 
 const connectDatabase = require("./config/MongoDb");
+const storageUpload = require("./config/storageUpload");
 const { URL_SERVER } = require("./common/constant");
 connectDatabase();
 
@@ -26,38 +26,16 @@ app.use(
   "/products-img",
   express.static(path.join(__dirname, "public/images/products"))
 ); // server images
+app.use(
+  "/categorys-img",
+  express.static(path.join(__dirname, "public/images/categorys"))
+); // server images
 
 /* middleware */
 app.use(express.json());
 app.use(helmet());
 app.use(morgan("common"));
 /* middleware */
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    let folder = req?.query?.folder;
-    if (folder === "products") {
-      cb(null, "public/images/products");
-    } else if (folder === "categorys") {
-      cb(null, "public/images/categorys");
-    } else {
-      cb(null, "public/images/commons");
-    }
-  },
-  filename: (req, file, cb) => {
-    cb(null, req.body.name);
-  },
-});
-
-const storageUpload = multer({ storage: storage });
-app.post("/api/upload", storageUpload.single("file"), (req, res) => {
-  try {
-    let url = URL_SERVER + req?.file?.filename;
-    return res.status(200).json({ url });
-  } catch (error) {
-    console.error(error);
-  }
-});
 
 /* API */
 app.get("/", (req, res) => {
@@ -66,6 +44,22 @@ app.get("/", (req, res) => {
 app.use(require("./routes"));
 app.get("/api/config/paypal", (req, res) => {
   res.send(process.env.PAYPAL_CLIENT_ID);
+});
+app.post("/api/upload", storageUpload.single("file"), (req, res) => {
+  let folder = req?.query?.folder;
+  let url = "";
+  try {
+    if (folder === "products") {
+      url = URL_SERVER + "products-img/" + req?.file?.filename;
+    } else if (folder === "categorys") {
+      url = URL_SERVER + "categorys-img/" + req?.file?.filename;
+    } else {
+      url = URL_SERVER + "commons/" + req?.file?.filename;
+    }
+    return res.status(200).json({ url });
+  } catch (error) {
+    console.error(error);
+  }
 });
 /* API */
 
