@@ -69,7 +69,7 @@ categoryRoutes.post(
     const { category } = req.body;
     const categoryExist = await Category.findOne({ category });
     if (categoryExist) {
-      res.status(400);
+      res.status(400).json({ message: "Category name already exist" });;
 
       throw new Error("Category name already exist");
     } else {
@@ -81,7 +81,7 @@ categoryRoutes.post(
         const createCategory = await category1.save();
         res.status(201).json(createCategory);
       } else {
-        res.status(400);
+        res.status(400).json({ message: "Invalid category data" });;
         throw new Error("Invalid category data");
       }
     }
@@ -151,7 +151,7 @@ categoryRoutes.post(
     const { brand, image } = req.body;
     const brandExist = await Brand.findOne({ brand });
     if (brandExist) {
-      res.status(400);
+      res.status(400).json({ message: "Brand name already exist" });;
 
       throw new Error("Brand name already exist");
     } else {
@@ -164,7 +164,7 @@ categoryRoutes.post(
         const createBrand = await brand1.save();
         res.status(201).json(createBrand);
       } else {
-        res.status(400);
+        res.status(400).json({ message: "Invalid brand data" });;
         throw new Error("Invalid brand data");
       }
     }

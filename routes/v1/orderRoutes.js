@@ -5,6 +5,7 @@ const { protect, admin } = require("../../Middleware/AuthMiddleware");
 
 const Order = require("../../Models/OrderModel");
 const Cart = require("../../Models/CartModel");
+const User = require("../../Models/UserModel");
 
 const orderRouter = express.Router();
 
@@ -22,16 +23,21 @@ orderRouter.post(
       shippingPrice,
       totalPriceItems,
       totalPrice,
+      user,
     } = req.body;
 
     if (orderItems && orderItems.length === 0) {
-      res.status(400);
+      res.status(400).json({ message: "No order items" });;
       throw new Error("No order items");
       return;
     } else {
       const order = new Order({
         orderItems,
-        user: req.user._id,
+        user: {
+          ...user,
+          user: req.user._id,
+        },
+        userId: req.user._id,
         shippingAddress,
         paymentMethod,
         taxPrice,
@@ -75,7 +81,7 @@ orderRouter.get(
   "/all",
   protect,
   asyncHandler(async (req, res) => {
-    const order = await Order.find({ user: req.user._id }).sort({ _id: -1 });
+    const order = await Order.find({ userId: req.user._id }).sort({ _id: -1 });
     res.json(order);
   })
 );
@@ -86,7 +92,7 @@ orderRouter.get(
   protect,
   asyncHandler(async (req, res) => {
     const order = await Order.findById(req.params.id)
-      .populate("user", "name email phone")
+      // .populate("user", "name email phone")
       .populate("shippingAddress", "id street city postalCode country");
 
     if (order) {
@@ -116,6 +122,18 @@ orderRouter.put(
       };
 
       const updatedOrder = await order.save();
+      /* ADD  product TO user.buyer*/
+      const user = await User.findById(req.user._id);
+      const buyerArr = user?.buyer;
+      let orderItems = [];
+      order?.orderItems?.map((or) => {
+        orderItems.push(or?.product);
+      });
+
+      const arr = Array.from(new Set([...buyerArr, ...orderItems]));
+      user.buyer = [...arr];
+      await user.save();
+
       res.json(updatedOrder);
     } else {
       res.status(404);
@@ -152,7 +170,7 @@ orderRouter.get(
     const count = await Order.countDocuments({});
     const orders = await Order.find({})
       .sort({ createdAt: -1 })
-      .populate("user", "id name email phone")
+      // .populate("user", "id name email phone")
       .populate("shippingAddress", "id street city postalCode country");
     res.json({ count, orders });
   })

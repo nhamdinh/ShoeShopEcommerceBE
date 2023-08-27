@@ -4,6 +4,7 @@ const { protect, admin } = require("../../Middleware/AuthMiddleware");
 
 const { PAGE_SIZE } = require("../../common/constant");
 const Product = require("../../Models/ProductModel");
+const User = require("../../Models/UserModel");
 
 const productRoute = express.Router();
 
@@ -84,7 +85,7 @@ productRoute.post(
       req.body;
     const productExist = await Product.findOne({ name });
     if (productExist) {
-      res.status(400);
+      res.status(400).json({ message: "Product name already exist" });
       throw new Error("Product name already exist");
     } else {
       const product = new Product({
@@ -100,7 +101,7 @@ productRoute.post(
         const createdproduct = await product.save();
         res.status(201).json(createdproduct);
       } else {
-        res.status(400);
+        res.status(400).json({ message: "Invalid product data" });
         throw new Error("Invalid product data");
       }
     }
@@ -113,7 +114,8 @@ productRoute.put(
   protect,
   admin,
   asyncHandler(async (req, res) => {
-    const { name, price, description, image, countInStock, category } = req.body;
+    const { name, price, description, image, countInStock, category } =
+      req.body;
     const product = await Product.findById(req.params.id);
     if (product) {
       product.name = name || product.name;
@@ -145,7 +147,7 @@ productRoute.post(
         (r) => r.user.toString() === req.user._id.toString()
       );
       if (alreadyReviewed) {
-        res.status(400);
+        res.status(400).json({ message: "Product already Reviewed" });
         throw new Error("Product already Reviewed");
       }
       const review = {
@@ -167,6 +169,46 @@ productRoute.post(
     } else {
       res.status(404);
       throw new Error("Product not Found");
+    }
+  })
+);
+
+// GET ALL PRODUCT REVIEW
+productRoute.get(
+  "/all-admin/reviews",
+  // protect,
+  // admin,
+  asyncHandler(async (req, res) => {
+    const products = await Product.find({ deletedAt: null }).sort({
+      createdAt: -1,
+    });
+    let reviews = [];
+    products?.map((product) => {
+      product?.reviews?.map((review) => {
+        reviews.push(review);
+      });
+    });
+    res.json(reviews);
+  })
+);
+
+// CHECK USER IS BUY PRODUCT?
+productRoute.get(
+  "/:id/user-buyer",
+  protect,
+  asyncHandler(async (req, res) => {
+    const user = await User.findById(req.user._id);
+
+    if (user) {
+      const buyerArr = user?.buyer;
+      let hasBuyer = false;
+      buyerArr?.map((buyer) => {
+        if (req.params.id === buyer) hasBuyer = true;
+      });
+      res.status(201).json({ hasBuyer });
+    } else {
+      res.status(404);
+      throw new Error("User not Found");
     }
   })
 );
