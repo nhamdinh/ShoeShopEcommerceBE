@@ -6,6 +6,7 @@ const { protect, admin } = require("../../Middleware/AuthMiddleware");
 const Order = require("../../Models/OrderModel");
 const Cart = require("../../Models/CartModel");
 const User = require("../../Models/UserModel");
+const Product = require("../../Models/ProductModel");
 
 const orderRouter = express.Router();
 
@@ -27,7 +28,7 @@ orderRouter.post(
     } = req.body;
 
     if (orderItems && orderItems.length === 0) {
-      res.status(400).json({ message: "No order items" });;
+      res.status(400).json({ message: "No order items" });
       throw new Error("No order items");
       return;
     } else {
@@ -53,7 +54,7 @@ orderRouter.post(
         cart1.deletedAt = Date.now();
         const updatedCart = await cart1.save();
       } else {
-        res.status(404);
+        res.status(404).json({ message: "Cart not Found" });
         throw new Error("Cart not found");
       }
 
@@ -98,7 +99,7 @@ orderRouter.get(
     if (order) {
       res.json(order);
     } else {
-      res.status(404);
+      res.status(404).json({ message: "Order not Found" });
       throw new Error("Order Not Found");
     }
   })
@@ -122,7 +123,8 @@ orderRouter.put(
       };
 
       const updatedOrder = await order.save();
-      /* ADD  product TO user.buyer*/
+
+      /* ADD  product TO user.buyer */
       const user = await User.findById(req.user._id);
       const buyerArr = user?.buyer;
       let orderItems = [];
@@ -133,10 +135,31 @@ orderRouter.put(
       const arr = Array.from(new Set([...buyerArr, ...orderItems]));
       user.buyer = [...arr];
       await user.save();
+      /* ADD  product TO user.buyer */
 
-      res.json(updatedOrder);
+      let productList = [];
+
+      /* UPDATE countInStock product */
+      order?.orderItems?.map((or) => {
+        productList.push({
+          id: or?.product,
+          qty: or?.qty,
+        });
+      });
+
+      for (let i = 0; i < productList.length; i++) {
+        const product = await Product.findById(productList[i]?.id);
+        if (product) {
+          product.countInStock =
+            Number(product?.countInStock) - Number(productList[i]?.qty);
+          await product.save();
+        }
+      }
+      /* UPDATE countInStock product */
+
+      res.status(201).json(updatedOrder);
     } else {
-      res.status(404);
+      res.status(404).json({ message: "Order not Found" });
       throw new Error("Order Not Found");
     }
   })
@@ -157,7 +180,7 @@ orderRouter.put(
       const updatedOrder = await order.save();
       res.json(updatedOrder);
     } else {
-      res.status(404);
+      res.status(404).json({ message: "Order not Found" });
       throw new Error("Order Not Found");
     }
   })

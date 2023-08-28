@@ -73,7 +73,7 @@ addressRoute.get(
     if (address) {
       res.json(address);
     } else {
-      res.status(404);
+      res.status(404).json({ message: "Address not Found" });
       throw new Error("Address not Found");
     }
   })

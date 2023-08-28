@@ -26,7 +26,7 @@ userRouter.post(
         createdAt: user.createdAt,
       });
     } else {
-      res.status(401);
+      res.status(401).json({ message: "Invalid Email or Password" });
       throw new Error("Invalid Email or Password");
     }
   })
@@ -85,7 +85,7 @@ userRouter.get(
         createdAt: user.createdAt,
       });
     } else {
-      res.status(404);
+      res.status(404).json({ message: "User not Found" });
       throw new Error("User not found");
     }
   })
@@ -116,7 +116,7 @@ userRouter.put(
         token: generateToken(updatedUser._id),
       });
     } else {
-      res.status(404);
+      res.status(404).json({ message: "User not Found" });
       throw new Error("User not found");
     }
   })

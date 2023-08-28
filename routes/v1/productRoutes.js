@@ -21,8 +21,8 @@ productRoute.get(
           },
         }
       : {};
-    const count = await Product.countDocuments({ ...keyword });
-    const products = await Product.find({ ...keyword })
+    const count = await Product.countDocuments({ ...keyword,deletedAt: null });
+    const products = await Product.find({ ...keyword,deletedAt: null })
       .limit(PAGE_SIZE)
       .skip(PAGE_SIZE * (page - 1))
       .sort({ _id: -1 });
@@ -51,7 +51,7 @@ productRoute.get(
     if (product) {
       res.json(product);
     } else {
-      res.status(404);
+      res.status(404).json({ message: "Product not Found" });
       throw new Error("Product not Found");
     }
   })
@@ -69,7 +69,7 @@ productRoute.post(
       await product.save();
       res.json({ message: "Product deleted" });
     } else {
-      res.status(404);
+      res.status(404).json({ message: "Product not Found" });
       throw new Error("Product not Found");
     }
   })
@@ -128,7 +128,7 @@ productRoute.put(
       const updatedProduct = await product.save();
       res.json(updatedProduct);
     } else {
-      res.status(404);
+      res.status(404).json({ message: "Product not Found" });
       throw new Error("Product not found");
     }
   })
@@ -156,7 +156,6 @@ productRoute.post(
         comment,
         user: req.user._id,
       };
-      console.log("review ========= ", review);
       product.reviews.push(review);
       product.numReviews = product.reviews.length;
       product.rating = (
@@ -167,28 +166,55 @@ productRoute.post(
       await product.save();
       res.status(201).json({ message: "Reviewed Added" });
     } else {
-      res.status(404);
+      res.status(404).json({ message: "Product not Found" });
       throw new Error("Product not Found");
     }
   })
 );
 
-// GET ALL PRODUCT REVIEW
-productRoute.get(
-  "/all-admin/reviews",
-  // protect,
-  // admin,
+// // GET ALL PRODUCT REVIEW
+// productRoute.get(
+//   "/all-admin/reviews",
+//   // protect,
+//   // admin,
+//   asyncHandler(async (req, res) => {
+//     const products = await Product.find({ deletedAt: null }).sort({
+//       createdAt: -1,
+//     });
+//     let reviews = [];
+//     products?.map((product) => {
+//       product?.reviews?.map((rew) => {
+//         reviews.push(rew);
+//       });
+//     });
+//     res.json(reviews);
+//   })
+// );
+
+// UPDATE REVIEW
+productRoute.put(
+  "/:id/update-review",
+  protect,
+  admin,
   asyncHandler(async (req, res) => {
-    const products = await Product.find({ deletedAt: null }).sort({
-      createdAt: -1,
-    });
-    let reviews = [];
-    products?.map((product) => {
-      product?.reviews?.map((review) => {
-        reviews.push(review);
+    const { comment, productId } = req.body;
+    const product = await Product.findById(productId);
+
+    if (product) {
+      let reviews = product?.reviews;
+
+      reviews?.map((review) => {
+        if (review?._id.toString() === req.params.id) {
+          review.comment = comment;
+        }
       });
-    });
-    res.json(reviews);
+      product.reviews = reviews;
+      const updatedProduct = await product.save();
+      res.json(updatedProduct);
+    } else {
+      res.status(404).json({ message: "Product not Found" });
+      throw new Error("Product not found");
+    }
   })
 );
 
@@ -207,7 +233,7 @@ productRoute.get(
       });
       res.status(201).json({ hasBuyer });
     } else {
-      res.status(404);
+      res.status(404).json({ message: "User not Found" });
       throw new Error("User not Found");
     }
   })
