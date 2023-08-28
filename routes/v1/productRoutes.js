@@ -21,8 +21,8 @@ productRoute.get(
           },
         }
       : {};
-    const count = await Product.countDocuments({ ...keyword });
-    const products = await Product.find({ ...keyword })
+    const count = await Product.countDocuments({ ...keyword,deletedAt: null });
+    const products = await Product.find({ ...keyword,deletedAt: null })
       .limit(PAGE_SIZE)
       .skip(PAGE_SIZE * (page - 1))
       .sort({ _id: -1 });

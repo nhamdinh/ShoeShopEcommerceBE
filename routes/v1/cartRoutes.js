@@ -23,7 +23,7 @@ cartRoute.get(
   protect,
   asyncHandler(async (req, res) => {
     const cartArr = await Cart.find({ user: req.user._id, deletedAt: null });
-    let createCart = {};
+    let createCart = { cartItems: [] };
     if (cartArr.length > 0) {
       createCart = cartArr[0];
     }
@@ -68,6 +68,31 @@ cartRoute.get(
     const cart = await Cart.findById(req.params.id);
     if (cart) {
       res.json(cart);
+    } else {
+      res.status(404).json({ message: "Cart not Found" });
+      throw new Error("Cart not Found");
+    }
+  })
+);
+// REMOVE ITEM FROM CART
+cartRoute.put(
+  "/:id/remove",
+  protect,
+  asyncHandler(async (req, res) => {
+    const { product } = req.body;
+    const cart = await Cart.findById(req.params.id);
+    if (cart) {
+      let cartItems = cart?.cartItems;
+      let cartItems_temp = [];
+      cartItems?.map((it) => {
+        if (it?.product.toString() !== product?.toString()) {
+          cartItems_temp.push(it);
+        }
+      });
+      cart.cartItems = cartItems_temp;
+      const updateCart = await cart.save();
+
+      res.json(updateCart);
     } else {
       res.status(404).json({ message: "Cart not Found" });
       throw new Error("Cart not Found");
