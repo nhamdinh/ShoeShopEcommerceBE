@@ -69,7 +69,7 @@ cartRoute.get(
     if (cart) {
       res.json(cart);
     } else {
-      res.status(404);
+      res.status(404).json({ message: "Cart not Found" });
       throw new Error("Cart not Found");
     }
   })

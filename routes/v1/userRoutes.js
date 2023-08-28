@@ -85,7 +85,7 @@ userRouter.get(
         createdAt: user.createdAt,
       });
     } else {
-      res.status(404);
+      res.status(404).json({ message: "User not Found" });
       throw new Error("User not found");
     }
   })
@@ -116,7 +116,7 @@ userRouter.put(
         token: generateToken(updatedUser._id),
       });
     } else {
-      res.status(404);
+      res.status(404).json({ message: "User not Found" });
       throw new Error("User not found");
     }
   })

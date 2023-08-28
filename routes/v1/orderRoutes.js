@@ -53,7 +53,7 @@ orderRouter.post(
         cart1.deletedAt = Date.now();
         const updatedCart = await cart1.save();
       } else {
-        res.status(404);
+        res.status(404).json({ message: "Cart not Found" });
         throw new Error("Cart not found");
       }
 
@@ -98,7 +98,7 @@ orderRouter.get(
     if (order) {
       res.json(order);
     } else {
-      res.status(404);
+      res.status(404).json({ message: "Order not Found" });
       throw new Error("Order Not Found");
     }
   })
@@ -136,7 +136,7 @@ orderRouter.put(
 
       res.json(updatedOrder);
     } else {
-      res.status(404);
+      res.status(404).json({ message: "Order not Found" });
       throw new Error("Order Not Found");
     }
   })
@@ -157,7 +157,7 @@ orderRouter.put(
       const updatedOrder = await order.save();
       res.json(updatedOrder);
     } else {
-      res.status(404);
+      res.status(404).json({ message: "Order not Found" });
       throw new Error("Order Not Found");
     }
   })
