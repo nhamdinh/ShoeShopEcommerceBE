@@ -1,19 +1,19 @@
 const brands = [
   {
-    brand: "GUCCI",
-    image: "",
+    brand: "ASUS",
+    image: "http://localhost:5000/categorys-img/10.png",
   },
   {
-    brand: "Louis Vuitton",
-    image: "",
+    brand: "MSI",
+    image: "http://localhost:5000/categorys-img/9.png",
   },
   {
-    brand: "Hermes",
-    image: "",
+    brand: "ACER",
+    image: "http://localhost:5000/categorys-img/8.png",
   },
   {
-    brand: "PRADA",
-    image: "",
+    brand: "LENOVO",
+    image: "http://localhost:5000/categorys-img/7.png",
   },
 ];
 

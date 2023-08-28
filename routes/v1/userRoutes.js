@@ -36,11 +36,11 @@ userRouter.post(
 userRouter.post(
   "/register",
   asyncHandler(async (req, res) => {
-    const { name, email, password, phone } = req.body;
+    const { name, email, password, phone,isAdmin } = req.body;
     const userExists = await User.findOne({ email });
 
     if (userExists) {
-      res.status(400);
+      res.status(400).json({ message: "User already exists" });;
       throw new Error("User already exists");
     }
 
@@ -49,6 +49,7 @@ userRouter.post(
       email,
       phone,
       password,
+      isAdmin
     });
 
     if (user) {
@@ -61,7 +62,7 @@ userRouter.post(
         token: generateToken(user._id),
       });
     } else {
-      res.status(400);
+      res.status(400).json({ message: "Invalid User Data" });;
       throw new Error("Invalid User Data");
     }
   })

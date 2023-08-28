@@ -26,6 +26,11 @@ const userSchema = mongoose.Schema(
       required: true,
       default: false,
     },
+    buyer: {
+      type: Array,
+      required: false,
+      default: [],
+    },
   },
   {
     timestamps: true,
@@ -48,6 +53,4 @@ userSchema.pre("save", async function (next) {
 
 const User = mongoose.model("User", userSchema);
 
-
 module.exports = User;
-

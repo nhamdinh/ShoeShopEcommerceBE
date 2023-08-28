@@ -1,7 +1,7 @@
 const products = [
   {
-    name: "Velcro Ballerinas For Girls  (Pink)",
-    image: "/images/6.png",
+    name: "Laptop mill Stanley Gray",
+    image: "http://localhost:5000/products-img/1.png",
     description:
       "dark tape drove prevent low week command still close complex flame behind twelve member grain government simplest whose swing group box additional customs determine",
     price: 89,
@@ -10,13 +10,13 @@ const products = [
     rating: 4,
     numReviews: 4,
     category: {
-      name: "shoe",
-      brand: "GUCCI",
+      name: "Gaming",
+      brand: "ASUS",
     },
   },
   {
-    name: "Velcro Sneakers For Boys & Girls  (Blue)",
-    image: "/images/5.png",
+    name: "Laptop noun Ryan Gordon",
+    image: "http://localhost:5000/products-img/2.png",
     description:
       "railroad trick dozen natural labor off loud cloud save good wore bag real pleasure difficulty lost size eleven past mood just building warn itself",
     price: 599,
@@ -25,13 +25,13 @@ const products = [
     rating: 2,
     numReviews: 2,
     category: {
-      name: "shoe",
-      brand: "GUCCI",
+      name: "Gaming",
+      brand: "ASUS",
     },
   },
   {
-    name: "Sesame Street Unisex-Child ELMO Puppet Slipper",
-    image: "/images/4.png",
+    name: "Laptop boat Shawn Harris",
+    image: "http://localhost:5000/products-img/3.png",
     description:
       "he dust full greatest gentle easily putting satisfied single salt rope widely heat religious discussion effect now present special gas glad memory hunt evening",
     price: 929,
@@ -40,13 +40,13 @@ const products = [
     rating: 3.5,
     numReviews: 3,
     category: {
-      name: "shoe",
-      brand: "GUCCI",
+      name: "Gaming",
+      brand: "ASUS",
     },
   },
   {
-    name: "Lace Casual Boots For Boys & Girls  (Tan)",
-    image: "/images/3.png",
+    name: "Laptop lay Gene Craig",
+    image: "http://localhost:5000/products-img/4.png",
     description:
       "research only different shine common attached light plates sense neighborhood method older meat there mean family fully sick rule vertical lunch pupil total familiar",
     price: 399,
@@ -55,13 +55,13 @@ const products = [
     rating: 5,
     numReviews: 9,
     category: {
-      name: "shoe",
-      brand: "GUCCI",
+      name: "Gaming",
+      brand: "ASUS",
     },
   },
   {
-    name: "Lace Walking Shoes For Boys & Girls  (Pink)",
-    image: "/images/2.png",
+    name: "Laptop rose Henrietta Estrada",
+    image: "http://localhost:5000/products-img/5.png",
     description:
       "managed average gravity trap largest careful hollow locate eleven fallen busy little speed row ordinary entire outline mine he shaking corner worse press taste",
     price: 49,
@@ -70,13 +70,13 @@ const products = [
     rating: 2,
     numReviews: 2,
     category: {
-      name: "shoe",
-      brand: "GUCCI",
+      name: "Gaming",
+      brand: "ASUS",
     },
   },
   {
-    name: "Women Red Heels Sandal",
-    image: "/images/1.png",
+    name: "Laptop inside Isabel Owens",
+    image: "http://localhost:5000/products-img/6.png",
     description:
       "treated those put go nails cowboy friend blanket quietly taste magnet seven grass would plane pressure though stop during trouble generally similar rise enter",
     price: 29,
@@ -85,8 +85,8 @@ const products = [
     rating: 0,
     numReviews: 0,
     category: {
-      name: "shoe",
-      brand: "GUCCI",
+      name: "Gaming",
+      brand: "ASUS",
     },
   },
 ];

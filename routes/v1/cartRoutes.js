@@ -43,15 +43,15 @@ cartRoute.post(
     let createCart;
     if (cartArr.length > 0) {
       let hasItem = false;
-      cartArr[0].cartItems.map((caDb) => {
+      cartArr[0].cartItems?.map((caDb) => {
         if (caDb?.product === cartItems[0]?.product) {
           caDb.qty = cartItems[0]?.qty;
           hasItem = true;
         }
       });
-
       if (!hasItem)
         cartArr[0].cartItems = [...cartItems, ...cartArr[0].cartItems];
+
       createCart = await cartArr[0].save();
     } else {
       const cart = new Cart({ user: req.user._id, cartItems });

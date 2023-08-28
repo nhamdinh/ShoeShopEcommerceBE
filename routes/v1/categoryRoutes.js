@@ -60,6 +60,34 @@ categoryRoutes.post(
   })
 );
 
+// CREATE CATEGORY
+categoryRoutes.post(
+  "/create",
+  protect,
+  admin,
+  asyncHandler(async (req, res) => {
+    const { category } = req.body;
+    const categoryExist = await Category.findOne({ category });
+    if (categoryExist) {
+      res.status(400).json({ message: "Category name already exist" });;
+
+      throw new Error("Category name already exist");
+    } else {
+      const category1 = new Category({
+        category,
+        user: req.user._id,
+      });
+      if (category) {
+        const createCategory = await category1.save();
+        res.status(201).json(createCategory);
+      } else {
+        res.status(400).json({ message: "Invalid category data" });;
+        throw new Error("Invalid category data");
+      }
+    }
+  })
+);
+
 /* --------------------------------------------------------------------------------------------------------------- */
 // GET ALL BRAND
 categoryRoutes.get(
@@ -110,6 +138,35 @@ categoryRoutes.post(
     } else {
       res.status(404);
       throw new Error("Brand not Found");
+    }
+  })
+);
+
+// CREATE BRAND
+categoryRoutes.post(
+  "/create-brand",
+  protect,
+  admin,
+  asyncHandler(async (req, res) => {
+    const { brand, image } = req.body;
+    const brandExist = await Brand.findOne({ brand });
+    if (brandExist) {
+      res.status(400).json({ message: "Brand name already exist" });;
+
+      throw new Error("Brand name already exist");
+    } else {
+      const brand1 = new Brand({
+        brand,
+        image,
+        user: req.user._id,
+      });
+      if (brand) {
+        const createBrand = await brand1.save();
+        res.status(201).json(createBrand);
+      } else {
+        res.status(400).json({ message: "Invalid brand data" });;
+        throw new Error("Invalid brand data");
+      }
     }
   })
 );

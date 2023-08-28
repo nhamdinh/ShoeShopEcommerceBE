@@ -1,18 +1,15 @@
 const categorys = [
   {
-    category: "shoe",
+    category: "Ultrabook",
   },
   {
-    category: "ao",
+    category: "Workstation",
   },
   {
-    category: "quan",
+    category: "Gaming",
   },
   {
-    category: "hat",
-  },
-  {
-    category: "t-shirt",
+    category: "Tablet",
   },
 ];
 
