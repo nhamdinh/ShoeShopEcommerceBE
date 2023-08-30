@@ -1,19 +1,19 @@
 const brands = [
   {
     brand: "ASUS",
-    image: "http://localhost:5000/categorys-img/10.png",
+    image: "https://inkythuatso.com/uploads/thumbnails/800/2021/11/logo-asus-inkythuatso-2-01-26-09-21-11.jpg",
   },
   {
     brand: "MSI",
-    image: "http://localhost:5000/categorys-img/9.png",
+    image: "https://wallpaperaccess.com/full/112314.jpg",
   },
   {
     brand: "ACER",
-    image: "http://localhost:5000/categorys-img/8.png",
+    image: "https://inkythuatso.com/uploads/thumbnails/800/2021/11/logo-acer-inkythuatso-2-01-27-15-50-00.jpg",
   },
   {
     brand: "LENOVO",
-    image: "http://localhost:5000/categorys-img/7.png",
+    image: "https://thumbs.dreamstime.com/b/lenovo-logo-vector-format-available-illustrator-ai-149074793.jpg",
   },
 ];
 

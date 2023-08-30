@@ -14,11 +14,16 @@ productRoute.get(
     const page = Number(req.query.page) || 1;
     const PAGE_SIZE = Number(req.query.limit) || 6;
     const orderBy = req.query.orderBy || "createdAt";
-    const brand = req.query.brand
-      ? {
-          "category.brand": req.query.brand,
-        }
-      : {};
+    let brand = req.query.brand ?? "";
+
+    if (brand === "" || brand === "All") {
+      brand = {};
+    } else {
+      brand = {
+        "category.brand": brand,
+      };
+    }
+
     const keyword = req.query.keyword
       ? {
           name: {
@@ -72,6 +77,16 @@ productRoute.get(
     const page = Number(req.query.page) || 1;
     const PAGE_SIZE = Number(req.query.limit) || 6;
     const orderBy = req.query.orderBy || "createdAt";
+    let brand = req.query.brand ?? "";
+
+    if (brand === "" || brand === "All") {
+      brand = {};
+    } else {
+      brand = {
+        "category.brand": brand,
+      };
+    }
+
     const keyword = req.query.keyword
       ? {
           name: {
@@ -80,9 +95,17 @@ productRoute.get(
           },
         }
       : {};
-
-    const count = await Product.countDocuments({ ...keyword, deletedAt: null });
-    const products = await Product.find({ ...keyword, deletedAt: null })
+    console.log("brand ::::: ", brand);
+    const count = await Product.countDocuments({
+      ...keyword,
+      ...brand,
+      deletedAt: null,
+    });
+    const products = await Product.find({
+      ...keyword,
+      ...brand,
+      deletedAt: null,
+    })
       .limit(PAGE_SIZE)
       .skip(PAGE_SIZE * (page - 1))
       .sort({ _id: -1 });
@@ -91,6 +114,7 @@ productRoute.get(
       products,
       page,
       totalPages: Math.ceil(count / PAGE_SIZE),
+      limit: PAGE_SIZE,
     });
   })
 );
