@@ -14,6 +14,11 @@ productRoute.get(
     const page = Number(req.query.page) || 1;
     const PAGE_SIZE = Number(req.query.limit) || 6;
     const orderBy = req.query.orderBy || "createdAt";
+    const brand = req.query.brand
+      ? {
+          "category.brand": req.query.brand,
+        }
+      : {};
     const keyword = req.query.keyword
       ? {
           name: {
@@ -22,9 +27,17 @@ productRoute.get(
           },
         }
       : {};
-
-    const count = await Product.countDocuments({ ...keyword, deletedAt: null });
-    const products = await Product.find({ ...keyword, deletedAt: null })
+    console.log("brand ::::: ", brand);
+    const count = await Product.countDocuments({
+      ...keyword,
+      ...brand,
+      deletedAt: null,
+    });
+    const products = await Product.find({
+      ...keyword,
+      ...brand,
+      deletedAt: null,
+    })
       .limit(PAGE_SIZE)
       .skip(PAGE_SIZE * (page - 1))
       .sort({ _id: -1 });
@@ -33,6 +46,7 @@ productRoute.get(
       products,
       page,
       totalPages: Math.ceil(count / PAGE_SIZE),
+      limit: PAGE_SIZE,
     });
   })
 );
@@ -55,10 +69,29 @@ productRoute.get(
   protect,
   admin,
   asyncHandler(async (req, res) => {
-    const products = await Product.find({ deletedAt: null }).sort({
-      createdAt: -1,
+    const page = Number(req.query.page) || 1;
+    const PAGE_SIZE = Number(req.query.limit) || 6;
+    const orderBy = req.query.orderBy || "createdAt";
+    const keyword = req.query.keyword
+      ? {
+          name: {
+            $regex: req.query.keyword,
+            $options: "i",
+          },
+        }
+      : {};
+
+    const count = await Product.countDocuments({ ...keyword, deletedAt: null });
+    const products = await Product.find({ ...keyword, deletedAt: null })
+      .limit(PAGE_SIZE)
+      .skip(PAGE_SIZE * (page - 1))
+      .sort({ _id: -1 });
+    res.json({
+      count,
+      products,
+      page,
+      totalPages: Math.ceil(count / PAGE_SIZE),
     });
-    res.json(products);
   })
 );
 
