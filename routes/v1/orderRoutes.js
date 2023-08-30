@@ -72,7 +72,7 @@ orderRouter.get(
     const orders = await Order.find({})
       .sort({ createdAt: -1 })
       .populate("user", "id name email phone")
-      .populate("shippingAddress", "id street city postalCode country");
+      // .populate("shippingAddress", "id street city postalCode country");
 
     res.json(orders);
   })
@@ -94,7 +94,7 @@ orderRouter.get(
   asyncHandler(async (req, res) => {
     const order = await Order.findById(req.params.id)
       // .populate("user", "name email phone")
-      .populate("shippingAddress", "id street city postalCode country");
+      // .populate("shippingAddress", "id street city postalCode country");
 
     if (order) {
       res.json(order);
@@ -194,7 +194,7 @@ orderRouter.get(
     const orders = await Order.find({})
       .sort({ createdAt: -1 })
       // .populate("user", "id name email phone")
-      .populate("shippingAddress", "id street city postalCode country");
+      // .populate("shippingAddress", "id street city postalCode country");
     res.json({ count, orders });
   })
 );

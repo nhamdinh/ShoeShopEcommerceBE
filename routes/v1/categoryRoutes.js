@@ -29,11 +29,10 @@ categoryRoutes.get(
   })
 );
 
-// ADMIN GET ALL CATEGORY WITHOUT SEARCH AND PEGINATION
+// ADMIN GET ALL CATEGORY WITHOUT SEARCH AND PAGINATION
 categoryRoutes.get(
   "/all-admin",
   protect,
-  admin,
   asyncHandler(async (req, res) => {
     const categorys = await Category.find({ deletedAt: null }).sort({
       createdAt: -1,
@@ -93,25 +92,14 @@ categoryRoutes.post(
 categoryRoutes.get(
   "/get-all-brands",
   asyncHandler(async (req, res) => {
-    const page = Number(req.query.pageNumber) || 1;
-    const keyword = req.query.keyword
-      ? {
-          name: {
-            $regex: req.query.keyword,
-            $options: "i",
-          },
-        }
-      : {};
-    const count = await Brand.countDocuments({ ...keyword });
-    const brands = await Brand.find({ ...keyword })
-      .limit(PAGE_SIZE)
-      .skip(PAGE_SIZE * (page - 1))
-      .sort({ _id: -1 });
-    res.json({ count, brands, page, pages: Math.ceil(count / PAGE_SIZE) });
+    const brands = await Brand.find({ deletedAt: null }).sort({
+      createdAt: -1,
+    });
+    res.json({ brands });
   })
 );
 
-// ADMIN GET ALL BRAND WITHOUT SEARCH AND PEGINATION
+// ADMIN GET ALL BRAND WITHOUT SEARCH AND PAGINATION
 categoryRoutes.get(
   "/all-admin/brand",
   protect,

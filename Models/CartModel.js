@@ -20,6 +20,11 @@ const cartSchema = mongoose.Schema(
         },
       },
     ],
+    paymentMethod: {
+      type: String,
+      required: false,
+      default: "Paypal",
+    },
     deletedAt: { type: Date, required: false, default: null },
   },
   {
