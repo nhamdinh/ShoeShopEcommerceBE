@@ -29,7 +29,7 @@ categoryRoutes.get(
   })
 );
 
-// ADMIN GET ALL CATEGORY WITHOUT SEARCH AND PEGINATION
+// ADMIN GET ALL CATEGORY WITHOUT SEARCH AND PAGINATION
 categoryRoutes.get(
   "/all-admin",
   protect,
@@ -111,7 +111,7 @@ categoryRoutes.get(
   })
 );
 
-// ADMIN GET ALL BRAND WITHOUT SEARCH AND PEGINATION
+// ADMIN GET ALL BRAND WITHOUT SEARCH AND PAGINATION
 categoryRoutes.get(
   "/all-admin/brand",
   protect,

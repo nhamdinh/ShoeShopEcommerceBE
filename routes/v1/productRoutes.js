@@ -2,7 +2,6 @@ const express = require("express");
 const asyncHandler = require("express-async-handler");
 const { protect, admin } = require("../../Middleware/AuthMiddleware");
 
-const { PAGE_SIZE } = require("../../common/constant");
 const Product = require("../../Models/ProductModel");
 const User = require("../../Models/UserModel");
 
@@ -12,7 +11,9 @@ const productRoute = express.Router();
 productRoute.get(
   "/get-all",
   asyncHandler(async (req, res) => {
-    const page = Number(req.query.pageNumber) || 1;
+    const page = Number(req.query.page) || 1;
+    const PAGE_SIZE = Number(req.query.limit) || 6;
+    const orderBy = req.query.orderBy || "createdAt";
     const keyword = req.query.keyword
       ? {
           name: {
@@ -21,16 +22,34 @@ productRoute.get(
           },
         }
       : {};
-    const count = await Product.countDocuments({ ...keyword,deletedAt: null });
-    const products = await Product.find({ ...keyword,deletedAt: null })
+
+    const count = await Product.countDocuments({ ...keyword, deletedAt: null });
+    const products = await Product.find({ ...keyword, deletedAt: null })
       .limit(PAGE_SIZE)
       .skip(PAGE_SIZE * (page - 1))
       .sort({ _id: -1 });
-    res.json({ count, products, page, pages: Math.ceil(count / PAGE_SIZE) });
+    res.json({
+      count,
+      products,
+      page,
+      totalPages: Math.ceil(count / PAGE_SIZE),
+    });
   })
 );
 
-// ADMIN GET ALL PRODUCT WITHOUT SEARCH AND PEGINATION
+// USER GET ALL PRODUCT WITHOUT SEARCH AND PAGINATION
+productRoute.get(
+  "/all-user",
+  asyncHandler(async (req, res) => {
+    const count = await Product.countDocuments({ deletedAt: null });
+    const products = await Product.find({ deletedAt: null }).sort({
+      createdAt: -1,
+    });
+    res.json({ count, products });
+  })
+);
+
+// ADMIN GET ALL PRODUCT WITHOUT SEARCH AND PAGINATION
 productRoute.get(
   "/all-admin",
   protect,

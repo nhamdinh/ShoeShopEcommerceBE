@@ -1,6 +1,6 @@
 const products = [
   {
-    name: "Laptop William Jacobs across Denmark 4/23/2100",
+    name: "Laptop  Argentina ranch Cecilia Horton",
     image:
       "https://images.pexels.com/photos/811587/pexels-photo-811587.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
     description: "Netherlands subject actual should establish flame experience also sick sit tried helpful spent room nearby pocket light value hair silver score paint closer aloud thirty",
@@ -15,7 +15,7 @@ const products = [
     },
   },
   {
-    name: "Laptop Ernest Lawson smaller Madagascar 4/19/2120",
+    name: "Laptop  Tajikistan route Isabella Barton",
     image:
       "https://img.freepik.com/premium-psd/close-up-floating-laptop-mockup_308775-7.jpg?w=996",
     description: "Trinidad & Tobago seen greatest lungs phrase transportation moon nearby lion has lips herself sun fed lady remember fell care thing winter arrangement daily toward grew itself",
@@ -30,7 +30,7 @@ const products = [
     },
   },
   {
-    name: "Laptop Bryan Gardner railroad Iran 4/17/2100",
+    name: "Laptop  Tunisia fewer Tom Fleming",
     image:
       "https://product.hstatic.net/200000722513/product/p-gaming-msi-cyborg-15-a12ucx-281vn-1_1fd42a15b9074364b13b885527e50d65_11d779943d56486f999028b5a4f0118d_master.png",
     description: "Tanzania rear perhaps thought tears man pick pack stuck till everywhere tank golden government locate team blue happened scale winter variety beyond cup situation liquid",
@@ -45,7 +45,7 @@ const products = [
     },
   },
   {
-    name: "Laptop Nettie Vasquez describe Central African Republic 4/10/2050",
+    name: "Laptop  St. Helena porch Mike Sullivan",
     image:
       "https://product.hstatic.net/200000722513/product/g614ju-n3777w_7cffb8ddfb044c589ee1645408e5df68_master.png",
     description: "Uganda month scientific arm until state fish face fifty remain beyond mass swing failed cowboy one ranch perhaps corner single easy mistake consist swim darkness",
@@ -60,7 +60,7 @@ const products = [
     },
   },
   {
-    name: "Laptop Lucile Johnston close Guinea-Bissau 7/24/2069",
+    name: "Laptop  Jamaica organization Tillie Carr",
     image:
       "https://images.thinkgroup.vn/unsafe/1000x1000/https://media-api-beta.thinkpro.vn/media/core/products/2023/5/25/lg-gram-style-2023-14z90rs-gah54a5-thinkpro.jpg",
     description: "Niue wool swept wife fence soon paper cut smile think student one hold family produce gate itself connected held ready desk physical fed gold prevent",
@@ -75,7 +75,7 @@ const products = [
     },
   },
   {
-    name: "Laptop Polly Cox drink Sudan 10/19/2024",
+    name: "Laptop  Costa Rica stop Daniel Sutton",
     image:
       "https://bizweb.dktcdn.net/100/362/971/products/11438-dell-inspiron-14-5420-3.jpg?v=1686492300813",
     description: "Anguilla fifth development protection unit give rest include graph full identity scared cage somebody phrase began direction know built stranger life passage indicate on pitch",
@@ -90,7 +90,7 @@ const products = [
     },
   },
   {
-    name: "Laptop Russell Foster her Sudan 7/17/2067",
+    name: "Laptop  Egypt joy Christina Pena",
     image:
       "https://images.unsplash.com/photo-1525373698358-041e3a460346?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1964&q=80",
     description: "Cape Verde tube realize behavior dot catch boy previous suggest women buried accident tax swim listen score run open reader everything wrote day stretch manner progress",
@@ -105,7 +105,7 @@ const products = [
     },
   },
   {
-    name: "Laptop Margaret Holland tower Ceuta & Melilla 9/18/2045",
+    name: "Laptop  Svalbard & Jan Mayen case Billy Garner",
     image:
       "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
     description: "Yemen seat medicine wise wash broken continent popular greatly area forward split size hidden fell worker habit saddle behavior basis team education willing having adjective",
@@ -120,7 +120,7 @@ const products = [
     },
   },
   {
-    name: "Laptop Amanda Moody save Anguilla 6/5/2068",
+    name: "Laptop  South Sudan honor Helena Harmon",
     image:
       "https://images.unsplash.com/photo-1602080858428-57174f9431cf?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1551&q=80",
     description: "Andorra extra volume shelf further figure grade letter dog hit proud enter secret tobacco motor whole sort former sugar without wagon pipe constantly lips growth",
@@ -135,7 +135,7 @@ const products = [
     },
   },
   {
-    name: "Laptop Lee Valdez see North Korea 3/1/2096",
+    name: "Laptop  Philippines that Lilly Garner",
     image:
       "https://images.unsplash.com/photo-1542744095-291d1f67b221?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
     description: "Jamaica eaten variety laid nest shore southern gold hidden class prepare level bicycle coat below repeat occasionally settlers growth danger honor positive member view double",
@@ -150,7 +150,7 @@ const products = [
     },
   },
   {
-    name: "Laptop Dora Collins cup Armenia 11/28/2103",
+    name: "Laptop  Brunei softly Mary Howell",
     image:
       "https://images.unsplash.com/photo-1603302576837-37561b2e2302?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1168&q=80",
     description: "Benin slide hungry swing select consider lower in brick rise dry cave shelf everywhere art before wolf here generally further excitement baby frozen test train",
@@ -165,7 +165,7 @@ const products = [
     },
   },
   {
-    name: "Laptop Harvey Griffin met Ethiopia 1/25/2080",
+    name: "Laptop  Northern Mariana Islands vessels Nora Powell",
     image:
       "https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
     description: "St. Vincent & Grenadines student pass easy look shine spin supply loud became beginning saved lucky mouse firm best beauty us box drove mood unit interior most lot",
@@ -180,7 +180,7 @@ const products = [
     },
   },
   {
-    name: "Laptop Tom Phelps quietly Singapore 4/20/2070",
+    name: "Laptop  Syria divide Pauline Wheeler",
     image:
       "https://images.unsplash.com/photo-1542393545-10f5cde2c810?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1965&q=80",
     description: "South Georgia & South Sandwich Islands cattle send short between tea clock production become perhaps original laugh industrial level muscle mud beneath horn fox shape stop continent pattern happy yourself",
@@ -195,7 +195,7 @@ const products = [
     },
   },
   {
-    name: "Laptop Madge Holloway bill Canary Islands 3/7/2102",
+    name: "Laptop  Gabon forward Elnora Martin",
     image:
       "https://plus.unsplash.com/premium_photo-1681702156223-ea59bfbf1065?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1935&q=80",
     description: "Monaco doing late found gain result gravity somebody account they where develop writing contain rapidly evidence view sense father trap blew son substance send steel",
@@ -210,7 +210,7 @@ const products = [
     },
   },
   {
-    name: "Laptop Harriet Morton half Guadeloupe 1/10/2075",
+    name: "Laptop  Egypt begun Melvin Rivera",
     image:
       "https://images.unsplash.com/photo-1612425626229-632fab8bfc02?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1758&q=80",
     description: "Zimbabwe either respect attached bright one heart walk bank facing pale badly carbon chain coal basic gun stronger airplane build sleep difficulty some dinner gate",
