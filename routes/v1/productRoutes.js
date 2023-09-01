@@ -11,10 +11,10 @@ const productRoute = express.Router();
 productRoute.get(
   "/get-all",
   asyncHandler(async (req, res) => {
-    const page = Number(req.query.page) || 1;
-    const PAGE_SIZE = Number(req.query.limit) || 6;
-    const orderBy = req.query.orderBy || "createdAt";
-    let brand = req.query.brand ?? "";
+    const page = Number(req.query?.page) || 1;
+    const PAGE_SIZE = Number(req.query?.limit) || 6;
+    const orderBy = req.query?.orderBy || "createdAt";
+    let brand = req.query?.brand ?? "";
 
     if (brand === "" || brand === "All") {
       brand = {};
@@ -24,15 +24,14 @@ productRoute.get(
       };
     }
 
-    const keyword = req.query.keyword
+    const keyword = req.query?.keyword
       ? {
           name: {
-            $regex: req.query.keyword,
+            $regex: req.query?.keyword,
             $options: "i",
           },
         }
       : {};
-    console.log("brand ::::: ", brand);
     const count = await Product.countDocuments({
       ...keyword,
       ...brand,
@@ -74,10 +73,10 @@ productRoute.get(
   protect,
   admin,
   asyncHandler(async (req, res) => {
-    const page = Number(req.query.page) || 1;
-    const PAGE_SIZE = Number(req.query.limit) || 6;
-    const orderBy = req.query.orderBy || "createdAt";
-    let brand = req.query.brand ?? "";
+    const page = Number(req.query?.page) || 1;
+    const PAGE_SIZE = Number(req.query?.limit) || 6;
+    const orderBy = req.query?.orderBy || "createdAt";
+    let brand = req.query?.brand ?? "";
 
     if (brand === "" || brand === "All") {
       brand = {};
@@ -87,15 +86,14 @@ productRoute.get(
       };
     }
 
-    const keyword = req.query.keyword
+    const keyword = req.query?.keyword
       ? {
           name: {
-            $regex: req.query.keyword,
+            $regex: req.query?.keyword,
             $options: "i",
           },
         }
       : {};
-    console.log("brand ::::: ", brand);
     const count = await Product.countDocuments({
       ...keyword,
       ...brand,

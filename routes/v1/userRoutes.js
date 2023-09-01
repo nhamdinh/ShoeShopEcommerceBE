@@ -5,6 +5,7 @@ const { admin, protect } = require("../../Middleware/AuthMiddleware");
 
 const generateToken = require("../../utils/generateToken");
 const User = require("../../Models/UserModel");
+const ChatStory = require("../../Models/ChatStoryModel");
 
 const userRouter = express.Router();
 
@@ -36,11 +37,11 @@ userRouter.post(
 userRouter.post(
   "/register",
   asyncHandler(async (req, res) => {
-    const { name, email, password, phone,isAdmin } = req.body;
+    const { name, email, password, phone, isAdmin } = req.body;
     const userExists = await User.findOne({ email });
 
     if (userExists) {
-      res.status(400).json({ message: "User already exists" });;
+      res.status(400).json({ message: "User already exists" });
       throw new Error("User already exists");
     }
 
@@ -49,7 +50,7 @@ userRouter.post(
       email,
       phone,
       password,
-      isAdmin
+      isAdmin,
     });
 
     if (user) {
@@ -62,7 +63,7 @@ userRouter.post(
         token: generateToken(user._id),
       });
     } else {
-      res.status(400).json({ message: "Invalid User Data" });;
+      res.status(400).json({ message: "Invalid User Data" });
       throw new Error("Invalid User Data");
     }
   })
@@ -75,6 +76,9 @@ userRouter.get(
   asyncHandler(async (req, res) => {
     const user = await User.findById(req.user._id);
 
+    const admins = await User.find({ isAdmin: true })
+      .select("email")
+      .select("phone");
     if (user) {
       res.json({
         _id: user._id,
@@ -83,6 +87,7 @@ userRouter.get(
         phone: user.phone,
         isAdmin: user.isAdmin,
         createdAt: user.createdAt,
+        admins,
       });
     } else {
       res.status(404).json({ message: "User not Found" });
@@ -133,6 +138,7 @@ userRouter.get(
     res.json({ count, users });
   })
 );
+
 // GET ALL USER
 userRouter.get(
   "/get-all",
@@ -140,6 +146,53 @@ userRouter.get(
     const count = await User.countDocuments({});
     const users = await User.find({});
     res.json({ count, users });
+  })
+);
+/* =======================  CHAT STORIES ======================= */
+// GET ALL CHAT STORIES
+userRouter.get(
+  "/get-all-chats",
+  asyncHandler(async (req, res) => {
+    const count = await ChatStory.countDocuments({});
+    const chatStorys = await ChatStory.find({});
+    res.json({ count, chatStorys });
+  })
+);
+
+userRouter.get(
+  "/get-story",
+  protect,
+  asyncHandler(async (req, res) => {
+    console.log("req ::: ", req.query);
+
+    let chatStories = await ChatStory.find({
+      fromTo: [req.query?.user1, req.query?.user2],
+    });
+
+    if (chatStories?.length === 0) {
+      chatStories = await ChatStory.find({
+        fromTo: [req.query?.user2, req.query?.user1],
+      });
+    }
+
+    if (chatStories?.length === 0) {
+      res.json({ count, chatStorys });
+    } else {
+
+    }
+
+    try {
+      token = req.headers.authorization.split(" ")[1];
+
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      req.user = await User.findById(decoded.id).select("-password");
+      next();
+    } catch (error) {
+      console.error(error);
+      res.status(401).json({ message: "Not authorized, token failed" });
+      throw new Error("Not authorized, token failed");
+    }
+
   })
 );
 

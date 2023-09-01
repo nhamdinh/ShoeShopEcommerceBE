@@ -4,7 +4,7 @@ const User = require("../Models/UserModel");
 
 module.exports = {
   admin: (req, res, next) => {
-    console.log("admin xxx =====================================");
+    // console.log("admin xxx =====================================");
 
     if (req.user && req.user.isAdmin) {
       next();
@@ -16,7 +16,7 @@ module.exports = {
 
   protect: asyncHandler(async (req, res, next) => {
     let token;
-    console.log("protect  xxx =====================================");
+    // console.log("protect  xxx =====================================");
 
     if (
       req.headers.authorization &&
