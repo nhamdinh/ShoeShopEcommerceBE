@@ -69,10 +69,27 @@ orderRouter.get(
   protect,
   admin,
   asyncHandler(async (req, res) => {
-    const orders = await Order.find({})
-      .sort({ createdAt: -1 })
-      .populate("user", "id name email phone")
-      // .populate("shippingAddress", "id street city postalCode country");
+    const searchBy = req.query?.searchBy || "email";
+
+    const keyword = req.query?.keyword
+      ? searchBy === "email"
+        ? {
+            "user.email": {
+              $regex: req.query?.keyword,
+              $options: "i",
+            },
+          }
+        : {
+            "user.phone": {
+              $regex: req.query?.keyword,
+              $options: "i",
+            },
+          }
+      : {};
+
+    const orders = await Order.find({ ...keyword }).sort({ createdAt: -1 });
+    // .populate("user", "id name email phone")
+    // .populate("shippingAddress", "id street city postalCode country");
 
     res.json(orders);
   })
@@ -92,9 +109,9 @@ orderRouter.get(
   "/detail/:id",
   protect,
   asyncHandler(async (req, res) => {
-    const order = await Order.findById(req.params.id)
-      // .populate("user", "name email phone")
-      // .populate("shippingAddress", "id street city postalCode country");
+    const order = await Order.findById(req.params.id);
+    // .populate("user", "name email phone")
+    // .populate("shippingAddress", "id street city postalCode country");
 
     if (order) {
       res.json(order);
@@ -191,10 +208,9 @@ orderRouter.get(
   "/get-all",
   asyncHandler(async (req, res) => {
     const count = await Order.countDocuments({});
-    const orders = await Order.find({})
-      .sort({ createdAt: -1 })
-      // .populate("user", "id name email phone")
-      // .populate("shippingAddress", "id street city postalCode country");
+    const orders = await Order.find({}).sort({ createdAt: -1 });
+    // .populate("user", "id name email phone")
+    // .populate("shippingAddress", "id street city postalCode country");
     res.json({ count, orders });
   })
 );
