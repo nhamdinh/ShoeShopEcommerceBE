@@ -133,8 +133,30 @@ userRouter.get(
   protect,
   admin,
   asyncHandler(async (req, res) => {
-    const count = await User.countDocuments({});
-    const users = await User.find({})
+    const searchBy = req.query?.searchBy || "email";
+
+    const keyword = req.query?.keyword
+      ? searchBy === "email"
+        ? {
+            email: {
+              $regex: req.query?.keyword,
+              $options: "i",
+            },
+          }
+        : {
+            phone: {
+              $regex: req.query?.keyword,
+              $options: "i",
+            },
+          }
+      : {};
+
+    const count = await User.countDocuments({
+      ...keyword,
+    });
+    const users = await User.find({
+      ...keyword,
+    })
       .select("-password")
       .sort({ createdAt: -1 });
     res.json({ count, users });
