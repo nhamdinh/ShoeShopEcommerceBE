@@ -1,6 +1,7 @@
 const http = require("http");
 const app = require("./app");
 const ChatStory = require("./Models/ChatStoryModel");
+const User = require("./Models/UserModel");
 
 const server = http.createServer(app);
 const socketIo = require("socket.io")(server, {
@@ -33,13 +34,22 @@ socketIo.on("connection", (socket) => {
         });
       } else {
         chatStories[0].story = [...chatStories[0]?.story, data];
-        const upStory = await chatStories[0].save();
-        console.log("updateStory  ::::::  ", upStory);
+        await chatStories[0].save();
       }
     };
 
-    updateStory();
+    const updateUser = async () => {
+      let users = await User.find({
+        email: data?.sendFrom,
+      });
+      if (users?.length > 0) {
+        users[0].countChat = +users[0].countChat + 1;
+      }
+      await users[0].save();
+    };
 
+    updateStory();
+    updateUser();
     socketIo.emit("serverSendData", data);
   });
 

@@ -134,7 +134,9 @@ userRouter.get(
   admin,
   asyncHandler(async (req, res) => {
     const count = await User.countDocuments({});
-    const users = await User.find({}).sort({ createdAt: -1 });
+    const users = await User.find({})
+      .select("-password")
+      .sort({ createdAt: -1 });
     res.json({ count, users });
   })
 );
@@ -163,36 +165,50 @@ userRouter.get(
   "/get-story",
   protect,
   asyncHandler(async (req, res) => {
-    console.log("req ::: ", req.query);
-
-    let chatStories = await ChatStory.find({
-      fromTo: [req.query?.user1, req.query?.user2],
-    });
-
-    if (chatStories?.length === 0) {
-      chatStories = await ChatStory.find({
-        fromTo: [req.query?.user2, req.query?.user1],
-      });
-    }
-
-    if (chatStories?.length === 0) {
-      res.json({ count, chatStorys });
-    } else {
-
-    }
-
     try {
-      token = req.headers.authorization.split(" ")[1];
+      let chatStories = await ChatStory.find({
+        fromTo: [req.query?.user1, req.query?.user2],
+      });
 
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      req.user = await User.findById(decoded.id).select("-password");
-      next();
+      if (chatStories?.length === 0) {
+        chatStories = await ChatStory.find({
+          fromTo: [req.query?.user2, req.query?.user1],
+        });
+      }
+
+      if (chatStories?.length === 0) {
+        res.json({ chatStories: {} });
+      } else {
+        res.json({ chatStories: chatStories[0] });
+      }
     } catch (error) {
       console.error(error);
-      res.status(401).json({ message: "Not authorized, token failed" });
-      throw new Error("Not authorized, token failed");
+      res.status(401).json({ message: "chatStories not found" });
+      throw new Error("chatStories not found");
     }
+  })
+);
 
+userRouter.put(
+  "/clear-count-chat",
+  protect,
+  admin,
+  asyncHandler(async (req, res) => {
+    try {
+      let users = await User.find({
+        email: req.body.email,
+      });
+      console.log("users :::", users);
+      if (users?.length > 0) {
+        users[0].countChat = 0;
+      }
+      const user = await users[0].save();
+      res.json({ user });
+    } catch (error) {
+      console.error(error);
+      res.status(401).json({ message: "User not found" });
+      throw new Error("User not found");
+    }
   })
 );
 

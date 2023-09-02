@@ -21,6 +21,11 @@ const userSchema = mongoose.Schema(
       type: String,
       required: true,
     },
+    countChat: {
+      type: Number,
+      required: false,
+      default: 0,
+    },
     isAdmin: {
       type: Boolean,
       required: true,
