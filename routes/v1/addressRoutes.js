@@ -1,9 +1,8 @@
 const express = require("express");
 const asyncHandler = require("express-async-handler");
 
-const { PAGE_SIZE } = require("../../common/constant");
-const Address = require("../../Models/Address");
-const { protect } = require("../../Middleware/AuthMiddleware");
+const Address = require("../../src/api/v1/Models/Address");
+const { protect } = require("../../src/api/v1/Middleware/AuthMiddleware");
 
 const addressRoute = express.Router();
 

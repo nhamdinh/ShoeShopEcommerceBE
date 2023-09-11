@@ -1,7 +1,7 @@
 const express = require("express");
 const asyncHandler = require("express-async-handler");
 
-const Address = require("../../Models/Address");
+const Address = require("../../src/api/v1/Models/Address");
 
 const nodemailer = require("nodemailer");
 

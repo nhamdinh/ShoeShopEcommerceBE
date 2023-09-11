@@ -1,9 +1,9 @@
 const express = require("express");
 const asyncHandler = require("express-async-handler");
-const { protect, admin } = require("../../Middleware/AuthMiddleware");
+const { protect, admin } = require("../../src/api/v1/Middleware/AuthMiddleware");
 
-const Product = require("../../Models/ProductModel");
-const User = require("../../Models/UserModel");
+const Product = require("../../src/api/v1/Models/ProductModel");
+const User = require("../../src/api/v1/Models/UserModel");
 
 const productRoute = express.Router();
 

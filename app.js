@@ -5,9 +5,9 @@ const morgan = require("morgan");
 const cors = require("cors");
 const path = require("path");
 
-const connectDatabase = require("./config/MongoDb");
-const storageUpload = require("./config/storageUpload");
-const { URL_SERVER } = require("./common/constant");
+const connectDatabase = require("./src/config/MongoDb");
+const storageUpload = require("./src/config/storageUpload");
+const { URL_SERVER } = require("./src/api/v1/utils/constant");
 
 const bodyParser = require("body-parser");
 
