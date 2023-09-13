@@ -1,27 +1,19 @@
-const express = require("express");
 const asyncHandler = require("express-async-handler");
 
-const Address = require("../../src/api/v1/Models/Address");
-const { protect } = require("../../src/api/v1/Middleware/AuthMiddleware");
+const Address = require("../Models/Address");
 
-const addressRoute = express.Router();
-
-// GET ALL ADDRESS
-addressRoute.get(
-  "/get-all",
-  asyncHandler(async (req, res) => {
+const getAllAddress = asyncHandler(async (req, res) => {
+  try {
     const count = await Address.countDocuments({});
     const address = await Address.find({});
     res.json({ count, address });
-  })
-);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
 
-// CHECK EXIST ADDRESS
-
-addressRoute.get(
-  "/check-address",
-  protect,
-  asyncHandler(async (req, res) => {
+const checkExistAddress = asyncHandler(async (req, res) => {
+  try {
     const addressArr = await Address.find({ user: req.user._id });
     let createAddress = {};
     if (addressArr.length > 0) {
@@ -30,14 +22,13 @@ addressRoute.get(
       createAddress = { error: "User have Address YET" };
     }
     res.status(201).json(createAddress);
-  })
-);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
 
-// CREATE ADDRESS
-addressRoute.post(
-  "/create-address",
-  protect,
-  asyncHandler(async (req, res) => {
+const createAddress = asyncHandler(async (req, res) => {
+  try {
     const { street, city, postalCode, country } = req.body;
     const addressArr = await Address.find({ user: req.user._id });
     let createAddress;
@@ -61,13 +52,13 @@ addressRoute.post(
       createAddress = await address.save();
     }
     res.status(201).json(createAddress);
-  })
-);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
 
-// GET SINGLE ADDRESS
-addressRoute.get(
-  "/:id",
-  asyncHandler(async (req, res) => {
+const getAddressById = asyncHandler(async (req, res) => {
+  try {
     const address = await Address.findById(req.params.id);
     if (address) {
       res.json(address);
@@ -75,19 +66,14 @@ addressRoute.get(
       res.status(404).json({ message: "Address not Found" });
       throw new Error("Address not Found");
     }
-  })
-);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
 
-
-// CREATE ADDRESS
-
-
-
-
-
-
-
-
-
-
-module.exports = addressRoute;
+module.exports = {
+  getAllAddress,
+  checkExistAddress,
+  createAddress,
+  getAddressById,
+};

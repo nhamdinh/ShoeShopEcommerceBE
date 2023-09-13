@@ -1,8 +1,8 @@
 const express = require("express");
 const asyncHandler = require("express-async-handler");
 
-const Cart = require("../../src/api/v1/Models/CartModel");
-const { protect } = require("../../src/api/v1/Middleware/AuthMiddleware");
+const Cart = require("./../../Models/CartModel");
+const { protect } = require("./../../Middleware/AuthMiddleware");
 
 const cartRoute = express.Router();
 

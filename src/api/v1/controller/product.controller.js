@@ -1,16 +1,10 @@
-const express = require("express");
 const asyncHandler = require("express-async-handler");
-const { protect, admin } = require("../../src/api/v1/Middleware/AuthMiddleware");
 
-const Product = require("../../src/api/v1/Models/ProductModel");
-const User = require("../../src/api/v1/Models/UserModel");
+const Product = require("../Models/ProductModel");
+const User = require("../Models/UserModel");
 
-const productRoute = express.Router();
-
-// GET ALL PRODUCT
-productRoute.get(
-  "/get-all",
-  asyncHandler(async (req, res) => {
+const getAllProduct = asyncHandler(async (req, res) => {
+  try {
     const page = Number(req.query?.page) || 1;
     const PAGE_SIZE = Number(req.query?.limit) || 6;
     const orderBy = req.query?.orderBy || "createdAt";
@@ -52,27 +46,25 @@ productRoute.get(
       totalPages: Math.ceil(count / PAGE_SIZE),
       limit: PAGE_SIZE,
     });
-  })
-);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
 
-// USER GET ALL PRODUCT WITHOUT SEARCH AND PAGINATION
-productRoute.get(
-  "/all-user",
-  asyncHandler(async (req, res) => {
+const getAllProductWithout = asyncHandler(async (req, res) => {
+  try {
     const count = await Product.countDocuments({ deletedAt: null });
     const products = await Product.find({ deletedAt: null }).sort({
       createdAt: -1,
     });
     res.json({ count, products });
-  })
-);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
 
-// ADMIN GET ALL PRODUCT WITHOUT SEARCH AND PAGINATION
-productRoute.get(
-  "/all-admin",
-  protect,
-  admin,
-  asyncHandler(async (req, res) => {
+const getAllProductAdmin = asyncHandler(async (req, res) => {
+  try {
     const page = Number(req.query?.page) || 1;
     const PAGE_SIZE = Number(req.query?.limit) || 6;
     const orderBy = req.query?.orderBy || "createdAt";
@@ -114,13 +106,13 @@ productRoute.get(
       totalPages: Math.ceil(count / PAGE_SIZE),
       limit: PAGE_SIZE,
     });
-  })
-);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
 
-// GET SINGLE PRODUCT
-productRoute.get(
-  "/:id",
-  asyncHandler(async (req, res) => {
+const getProductById = asyncHandler(async (req, res) => {
+  try {
     const product = await Product.findById(req.params.id);
     if (product) {
       res.json(product);
@@ -128,15 +120,13 @@ productRoute.get(
       res.status(404).json({ message: "Product not Found" });
       throw new Error("Product not Found");
     }
-  })
-);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
 
-// DELETE PRODUCT
-productRoute.post(
-  "/delete/:id",
-  protect,
-  admin,
-  asyncHandler(async (req, res) => {
+const deleteProductById = asyncHandler(async (req, res) => {
+  try {
     const product = await Product.findById(req.params.id);
     if (product) {
       product.deletedAt = Date.now();
@@ -146,15 +136,13 @@ productRoute.post(
       res.status(404).json({ message: "Product not Found" });
       throw new Error("Product not Found");
     }
-  })
-);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
 
-// CREATE PRODUCT
-productRoute.post(
-  "/create",
-  protect,
-  admin,
-  asyncHandler(async (req, res) => {
+const createProduct = asyncHandler(async (req, res) => {
+  try {
     const { name, price, description, image, countInStock, category } =
       req.body;
     const productExist = await Product.findOne({ name });
@@ -179,15 +167,13 @@ productRoute.post(
         throw new Error("Invalid product data");
       }
     }
-  })
-);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
 
-// UPDATE PRODUCT
-productRoute.put(
-  "/:id/update",
-  protect,
-  admin,
-  asyncHandler(async (req, res) => {
+const updateProduct = asyncHandler(async (req, res) => {
+  try {
     const { name, price, description, image, countInStock, category } =
       req.body;
     const product = await Product.findById(req.params.id);
@@ -205,14 +191,13 @@ productRoute.put(
       res.status(404).json({ message: "Product not Found" });
       throw new Error("Product not found");
     }
-  })
-);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
 
-// PRODUCT REVIEW
-productRoute.post(
-  "/:id/review",
-  protect,
-  asyncHandler(async (req, res) => {
+const createProductReview = asyncHandler(async (req, res) => {
+  try {
     const { rating, comment } = req.body;
     const product = await Product.findById(req.params.id);
 
@@ -243,34 +228,13 @@ productRoute.post(
       res.status(404).json({ message: "Product not Found" });
       throw new Error("Product not Found");
     }
-  })
-);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
 
-// // GET ALL PRODUCT REVIEW
-// productRoute.get(
-//   "/all-admin/reviews",
-//   // protect,
-//   // admin,
-//   asyncHandler(async (req, res) => {
-//     const products = await Product.find({ deletedAt: null }).sort({
-//       createdAt: -1,
-//     });
-//     let reviews = [];
-//     products?.map((product) => {
-//       product?.reviews?.map((rew) => {
-//         reviews.push(rew);
-//       });
-//     });
-//     res.json(reviews);
-//   })
-// );
-
-// UPDATE REVIEW
-productRoute.put(
-  "/:id/update-review",
-  protect,
-  admin,
-  asyncHandler(async (req, res) => {
+const updateProductReview = asyncHandler(async (req, res) => {
+  try {
     const { comment, productId } = req.body;
     const product = await Product.findById(productId);
 
@@ -289,14 +253,13 @@ productRoute.put(
       res.status(404).json({ message: "Product not Found" });
       throw new Error("Product not found");
     }
-  })
-);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
 
-// CHECK USER IS BUY PRODUCT?
-productRoute.get(
-  "/:id/user-buyer",
-  protect,
-  asyncHandler(async (req, res) => {
+const checkUserIsBuy = asyncHandler(async (req, res) => {
+  try {
     const user = await User.findById(req.user._id);
 
     if (user) {
@@ -310,7 +273,20 @@ productRoute.get(
       res.status(404).json({ message: "User not Found" });
       throw new Error("User not Found");
     }
-  })
-);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
 
-module.exports = productRoute;
+module.exports = {
+  getAllProduct,
+  getAllProductWithout,
+  getAllProductAdmin,
+  getProductById,
+  deleteProductById,
+  createProduct,
+  updateProduct,
+  createProductReview,
+  updateProductReview,
+  checkUserIsBuy,
+};
