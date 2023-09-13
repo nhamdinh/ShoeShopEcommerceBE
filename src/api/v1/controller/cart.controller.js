@@ -1,52 +1,93 @@
 const asyncHandler = require("express-async-handler");
 
-const Product = require("../Models/ProductModel");
-const User = require("../Models/UserModel");
-const Cart = require("./../../Models/CartModel");
+const Cart = require("../Models/CartModel");
 
 const getAllCart = asyncHandler(async (req, res) => {
   try {
-    const page = Number(req.query?.page) || 1;
-    const PAGE_SIZE = Number(req.query?.limit) || 6;
-    const orderBy = req.query?.orderBy || "createdAt";
-    let brand = req.query?.brand ?? "";
+    const count = await Cart.countDocuments({});
+    const carts = await Cart.find({}).sort({ createdAt: -1 });
+    res.json({ count, carts });
+  } catch (error) {
+    throw new Error(error);
+  }
+});
 
-    if (brand === "" || brand === "All") {
-      brand = {};
+const getCartById = asyncHandler(async (req, res) => {
+  try {
+    const cart = await Cart.findById(req.params.id);
+    if (cart) {
+      res.json(cart);
     } else {
-      brand = {
-        "category.brand": brand,
-      };
+      res.status(404).json({ message: "Cart not Found" });
+      throw new Error("Cart not Found");
     }
+  } catch (error) {
+    throw new Error(error);
+  }
+});
 
-    const keyword = req.query?.keyword
-      ? {
-          name: {
-            $regex: req.query?.keyword,
-            $options: "i",
-          },
+const createCart = asyncHandler(async (req, res) => {
+  try {
+    const { cartItems } = req.body;
+
+    const cartArr = await Cart.find({ user: req.user._id, deletedAt: null });
+
+    let createCart;
+    if (cartArr.length > 0) {
+      let hasItem = false;
+      cartArr[0].cartItems?.map((caDb) => {
+        if (caDb?.product === cartItems[0]?.product) {
+          caDb.qty = cartItems[0]?.qty;
+          hasItem = true;
         }
-      : {};
-    const count = await Product.countDocuments({
-      ...keyword,
-      ...brand,
-      deletedAt: null,
-    });
-    const products = await Product.find({
-      ...keyword,
-      ...brand,
-      deletedAt: null,
-    })
-      .limit(PAGE_SIZE)
-      .skip(PAGE_SIZE * (page - 1))
-      .sort({ _id: -1 });
-    res.json({
-      count,
-      products,
-      page,
-      totalPages: Math.ceil(count / PAGE_SIZE),
-      limit: PAGE_SIZE,
-    });
+      });
+      if (!hasItem)
+        cartArr[0].cartItems = [...cartItems, ...cartArr[0].cartItems];
+
+      createCart = await cartArr[0].save();
+    } else {
+      const cart = new Cart({ user: req.user._id, cartItems });
+      createCart = await cart.save();
+    }
+    res.status(201).json(createCart);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+const deleteItemFromCart = asyncHandler(async (req, res) => {
+  try {
+    const { product } = req.body;
+    const cart = await Cart.findById(req.params.id);
+    if (cart) {
+      let cartItems = cart?.cartItems;
+      let cartItems_temp = [];
+      cartItems?.map((it) => {
+        if (it?.product.toString() !== product?.toString()) {
+          cartItems_temp.push(it);
+        }
+      });
+      cart.cartItems = cartItems_temp;
+      const updateCart = await cart.save();
+
+      res.json(updateCart);
+    } else {
+      res.status(404).json({ message: "Cart not Found" });
+      throw new Error("Cart not Found");
+    }
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+const checkCart = asyncHandler(async (req, res) => {
+  try {
+    const cartArr = await Cart.find({ user: req.user._id, deletedAt: null });
+    let createCart = { cartItems: [] };
+    if (cartArr.length > 0) {
+      createCart = cartArr[0];
+    }
+    res.status(201).json(createCart);
   } catch (error) {
     throw new Error(error);
   }
@@ -54,4 +95,8 @@ const getAllCart = asyncHandler(async (req, res) => {
 
 module.exports = {
   getAllCart,
+  checkCart,
+  createCart,
+  getCartById,
+  deleteItemFromCart,
 };
