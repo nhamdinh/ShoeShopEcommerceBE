@@ -1,11 +1,11 @@
 const express = require("express");
 const asyncHandler = require("express-async-handler");
 
-const { admin, protect } = require("../../Middleware/AuthMiddleware");
+const { protect, admin } = require("./../../Middleware/AuthMiddleware");
 
-const generateToken = require("../../utils/generateToken");
-const User = require("../../Models/UserModel");
-const ChatStory = require("../../Models/ChatStoryModel");
+const generateToken = require("./../../utils/generateToken");
+const User = require("./../../Models/UserModel");
+const ChatStory = require("./../../Models/ChatStoryModel");
 
 const userRouter = express.Router();
 

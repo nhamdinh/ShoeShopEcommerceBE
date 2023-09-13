@@ -3,7 +3,6 @@ const app = require("./app");
 const server = require("./socket");
 
 const { SOCKET_PORT } = process.env || 6000;
-
 server.listen(SOCKET_PORT, () => {
   console.log(`Server socketIo run in port ${SOCKET_PORT}`);
 });

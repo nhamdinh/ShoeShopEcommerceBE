@@ -1,10 +1,11 @@
 const express = require("express");
 const asyncHandler = require("express-async-handler");
-const { protect, admin } = require("../../Middleware/AuthMiddleware");
+const { protect, admin } = require("./../../Middleware/AuthMiddleware");
 
-const Category = require("../../Models/CategoryModel");
-const Brand = require("../../Models/BrandModel");
-const { PAGE_SIZE } = require("../../common/constant");
+const Category = require("./../../Models/CategoryModel");
+const Brand = require("./../../Models/BrandModel");
+const { PAGE_SIZE } = require("./../../utils/constant");
+
 const categoryRoutes = express.Router();
 
 // GET ALL CATEGORY

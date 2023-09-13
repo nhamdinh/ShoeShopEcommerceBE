@@ -5,9 +5,9 @@ const morgan = require("morgan");
 const cors = require("cors");
 const path = require("path");
 
-const connectDatabase = require("./config/MongoDb");
-const storageUpload = require("./config/storageUpload");
-const { URL_SERVER } = require("./common/constant");
+const connectDatabase = require("./src/config/MongoDb");
+const storageUpload = require("./src/config/storageUpload");
+const { URL_SERVER } = require("./src/api/v1/utils/constant");
 
 const bodyParser = require("body-parser");
 
@@ -48,7 +48,8 @@ app.use(morgan("common"));
 app.get("/", (req, res) => {
   res.send("API is running");
 });
-app.use(require("./routes"));
+app.use(require("./src/api/v1/routes/"));
+
 app.get("/api/config/paypal", (req, res) => {
   res.send(process.env.PAYPAL_CLIENT_ID);
 });

@@ -1,8 +1,6 @@
 const express = require("express");
 const asyncHandler = require("express-async-handler");
 
-const Address = require("../../Models/Address");
-
 const nodemailer = require("nodemailer");
 
 const { check, validationResult } = require("express-validator");

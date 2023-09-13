@@ -1,12 +1,12 @@
 const express = require("express");
 const asyncHandler = require("express-async-handler");
 
-const { protect, admin } = require("../../Middleware/AuthMiddleware");
+const { protect, admin } = require("./../../Middleware/AuthMiddleware");
 
-const Order = require("../../Models/OrderModel");
-const Cart = require("../../Models/CartModel");
-const User = require("../../Models/UserModel");
-const Product = require("../../Models/ProductModel");
+const Order = require("./../../Models/OrderModel");
+const Cart = require("./../../Models/CartModel");
+const Product = require("./../../Models/ProductModel");
+const User = require("./../../Models/UserModel");
 
 const orderRouter = express.Router();
 
