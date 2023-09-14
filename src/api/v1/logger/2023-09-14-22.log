@@ -1,0 +1,557 @@
+[dinh dang] 2023-09-14T15:25:31.028Z [shop-ecommerce:] info: New client connected socket.id === 62IISLuDiatIt25DAAAB
+[dinh dang] 2023-09-14T15:25:31.057Z [shop-ecommerce:] info: New client connected socket.id === pBAfEZkbEumgXA_1AAAD
+[dinh dang] 2023-09-14T15:25:45.695Z [shop-ecommerce:] info: New client connected socket.id === TtPsMa-n6JfWKhLVAAAC
+[dinh dang] 2023-09-14T15:25:45.740Z [shop-ecommerce:] info: New client connected socket.id === SrZp3v-UyYdHHgrtAAAD
+[dinh dang] 2023-09-14T15:26:08.954Z [shop-ecommerce:] info: New client connected socket.id === _e0M2ITIdYCkIItbAAAC
+[dinh dang] 2023-09-14T15:26:08.966Z [shop-ecommerce:] info: New client connected socket.id === kgqCI5XQyCbv9NayAAAD
+[dinh dang] 2023-09-14T15:26:13.214Z [shop-ecommerce:] info: New client connected socket.id === S6Rt5uQdNje3vzWFAAAC
+[dinh dang] 2023-09-14T15:26:13.222Z [shop-ecommerce:] info: New client connected socket.id === D90GaEv5hLv1NOywAAAD
+[dinh dang] 2023-09-14T15:26:36.787Z [shop-ecommerce:] info: New client connected socket.id === 0AR7srLB3VF_IcWhAAAC
+[dinh dang] 2023-09-14T15:26:36.800Z [shop-ecommerce:] info: New client connected socket.id === CSAumE4PYCaNX82XAAAD
+[dinh dang] 2023-09-14T15:26:43.001Z [shop-ecommerce:] info: Client disconnected
+[dinh dang] 2023-09-14T15:26:47.115Z [shop-ecommerce:] info: {
+  _id: new ObjectId("64f32931063f1765ae760d3d"),
+  name: 'mao1',
+  email: 'mao@gmail.com',
+  phone: '9999999999',
+  password: '$2b$10$3FUsDEHwMUWJBF.inn0ey.AvpO4OUEVoTA0KlfhkD3QQTMQFDggEe',
+  countChat: 1,
+  isAdmin: false,
+  buyer: [
+    '64ef15aa741e64fd54371606',
+    '64ef15aa741e64fd54371609',
+    '64ff1647c3455ba0097bad1e',
+    '64ef15aa741e64fd543715e4'
+  ],
+  createdAt: 2023-09-02T12:23:13.977Z,
+  updatedAt: 2023-09-14T14:44:39.550Z,
+  __v: 3,
+  refreshToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0ZjMyOTMxMDYzZjE3NjVhZTc2MGQzZCIsImlhdCI6MTY5NDcwMjY2MiwiZXhwIjoxNjk0OTYxODYyfQ.YYzc6iTxYyJTndtWogQ6YUbUtljM6_NNSwuj0vtz_8I'
+}
+[dinh dang] 2023-09-14T15:26:47.277Z [shop-ecommerce:] info: New client connected socket.id === j9gBOBkz9sjd0rC7AAAG
+[dinh dang] 2023-09-14T15:26:47.422Z [shop-ecommerce:] info: Client disconnected
+[dinh dang] 2023-09-14T15:26:47.444Z [shop-ecommerce:] info: New client connected socket.id === -Lo3YikdI-MJ1KxUAAAI
+[dinh dang] 2023-09-14T15:26:53.322Z [shop-ecommerce:] info: Client disconnected
+[dinh dang] 2023-09-14T15:26:54.579Z [shop-ecommerce:] info: New client connected socket.id === lvpPwdQWCNxqN98gAAAL
+[dinh dang] 2023-09-14T15:26:54.826Z [shop-ecommerce:] info: Client disconnected
+[dinh dang] 2023-09-14T15:26:54.866Z [shop-ecommerce:] info: New client connected socket.id === Qd4pIjUy4dO3prCEAAAN
+[dinh dang] 2023-09-14T15:27:11.892Z [shop-ecommerce:] info: New client connected socket.id === AdcpI1eOksfMuvEUAAAC
+[dinh dang] 2023-09-14T15:27:11.906Z [shop-ecommerce:] info: New client connected socket.id === 9-DLHcSrqC_x1GHOAAAD
+[dinh dang] 2023-09-14T15:34:29.980Z [shop-ecommerce:] info: New client connected socket.id === JAazwe4Xz5fvJ2o2AAAC
+[dinh dang] 2023-09-14T15:34:29.992Z [shop-ecommerce:] info: New client connected socket.id === AwPibhznaan7PuVcAAAD
+[dinh dang] 2023-09-14T15:37:49.953Z [shop-ecommerce:] info: New client connected socket.id === mZI_0guLe_VX97iZAAAC
+[dinh dang] 2023-09-14T15:37:49.966Z [shop-ecommerce:] info: New client connected socket.id === kiRmXaAjGxZX6a0nAAAD
+[dinh dang] 2023-09-14T15:38:03.483Z [shop-ecommerce:] info: Client disconnected
+[dinh dang] 2023-09-14T15:38:07.132Z [shop-ecommerce:] info: {
+  _id: new ObjectId("64f32931063f1765ae760d3d"),
+  name: 'mao1',
+  email: 'mao@gmail.com',
+  phone: '9999999999',
+  password: '$2b$10$3FUsDEHwMUWJBF.inn0ey.AvpO4OUEVoTA0KlfhkD3QQTMQFDggEe',
+  countChat: 1,
+  isAdmin: false,
+  buyer: [
+    '64ef15aa741e64fd54371606',
+    '64ef15aa741e64fd54371609',
+    '64ff1647c3455ba0097bad1e',
+    '64ef15aa741e64fd543715e4'
+  ],
+  createdAt: 2023-09-02T12:23:13.977Z,
+  updatedAt: 2023-09-14T15:26:47.120Z,
+  __v: 3,
+  refreshToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0ZjMyOTMxMDYzZjE3NjVhZTc2MGQzZCIsImlhdCI6MTY5NDcwNTIwNywiZXhwIjoxNjk0OTY0NDA3fQ.rlBxCho6OM8Rm4s9gcwgmpFZWvfVHtaHRYFfijPilko'
+}
+[dinh dang] 2023-09-14T15:38:07.173Z [shop-ecommerce:] info: res.cookie :::::function (name, value, options) {
+  var opts = merge({}, options);
+  var secret = this.req.secret;
+  var signed = opts.signed;
+
+  if (signed && !secret) {
+    throw new Error('cookieParser("secret") required for signed cookies');
+  }
+
+  var val = typeof value === 'object'
+    ? 'j:' + JSON.stringify(value)
+    : String(value);
+
+  if (signed) {
+    val = 's:' + sign(val, secret);
+  }
+
+  if (opts.maxAge != null) {
+    var maxAge = opts.maxAge - 0
+
+    if (!isNaN(maxAge)) {
+      opts.expires = new Date(Date.now() + maxAge)
+      opts.maxAge = Math.floor(maxAge / 1000)
+    }
+  }
+
+  if (opts.path == null) {
+    opts.path = '/';
+  }
+
+  this.append('Set-Cookie', cookie.serialize(name, String(val), opts));
+
+  return this;
+}
+[dinh dang] 2023-09-14T15:38:07.304Z [shop-ecommerce:] info: New client connected socket.id === ZpTGv0_Kr7L-x2neAAAG
+[dinh dang] 2023-09-14T15:38:07.469Z [shop-ecommerce:] info: Client disconnected
+[dinh dang] 2023-09-14T15:38:07.477Z [shop-ecommerce:] info: New client connected socket.id === hTDiJ9ktokCG5LL8AAAI
+[dinh dang] 2023-09-14T15:41:58.178Z [shop-ecommerce:] info: New client connected socket.id === dTd5xmXr89PDYL5-AAAB
+[dinh dang] 2023-09-14T15:41:58.663Z [shop-ecommerce:] info: New client connected socket.id === JrzQyDp9mBUxOSUnAAAD
+[dinh dang] 2023-09-14T15:42:05.628Z [shop-ecommerce:] info: Client disconnected
+[dinh dang] 2023-09-14T15:42:10.835Z [shop-ecommerce:] info: {
+  _id: new ObjectId("64f32931063f1765ae760d3d"),
+  name: 'mao1',
+  email: 'mao@gmail.com',
+  phone: '9999999999',
+  password: '$2b$10$3FUsDEHwMUWJBF.inn0ey.AvpO4OUEVoTA0KlfhkD3QQTMQFDggEe',
+  countChat: 1,
+  isAdmin: false,
+  buyer: [
+    '64ef15aa741e64fd54371606',
+    '64ef15aa741e64fd54371609',
+    '64ff1647c3455ba0097bad1e',
+    '64ef15aa741e64fd543715e4'
+  ],
+  createdAt: 2023-09-02T12:23:13.977Z,
+  updatedAt: 2023-09-14T15:38:07.139Z,
+  __v: 3,
+  refreshToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0ZjMyOTMxMDYzZjE3NjVhZTc2MGQzZCIsImlhdCI6MTY5NDcwNTg4NywiZXhwIjoxNjk0OTY1MDg3fQ.A-zTf2QknUSxWb8GGOj_FLRNv757DNZJ_nO6ChEsBC4'
+}
+[dinh dang] 2023-09-14T15:43:10.200Z [shop-ecommerce:] info: New client connected socket.id === qfp24A46qAgezVMxAAAB
+[dinh dang] 2023-09-14T15:43:13.220Z [shop-ecommerce:] info: {
+  _id: new ObjectId("64f32931063f1765ae760d3d"),
+  name: 'mao1',
+  email: 'mao@gmail.com',
+  phone: '9999999999',
+  password: '$2b$10$3FUsDEHwMUWJBF.inn0ey.AvpO4OUEVoTA0KlfhkD3QQTMQFDggEe',
+  countChat: 1,
+  isAdmin: false,
+  buyer: [
+    '64ef15aa741e64fd54371606',
+    '64ef15aa741e64fd54371609',
+    '64ff1647c3455ba0097bad1e',
+    '64ef15aa741e64fd543715e4'
+  ],
+  createdAt: 2023-09-02T12:23:13.977Z,
+  updatedAt: 2023-09-14T15:42:10.840Z,
+  __v: 3,
+  refreshToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0ZjMyOTMxMDYzZjE3NjVhZTc2MGQzZCIsImlhdCI6MTY5NDcwNjEzMCwiZXhwIjoxNjk0OTY1MzMwfQ.Q0-DZIp9hwzLZqeLjXY2x41v-kyuM9ht7sbqMMlqbZk'
+}
+[dinh dang] 2023-09-14T15:44:09.852Z [shop-ecommerce:] info: {
+  _id: new ObjectId("64f32931063f1765ae760d3d"),
+  name: 'mao1',
+  email: 'mao@gmail.com',
+  phone: '9999999999',
+  password: '$2b$10$3FUsDEHwMUWJBF.inn0ey.AvpO4OUEVoTA0KlfhkD3QQTMQFDggEe',
+  countChat: 1,
+  isAdmin: false,
+  buyer: [
+    '64ef15aa741e64fd54371606',
+    '64ef15aa741e64fd54371609',
+    '64ff1647c3455ba0097bad1e',
+    '64ef15aa741e64fd543715e4'
+  ],
+  createdAt: 2023-09-02T12:23:13.977Z,
+  updatedAt: 2023-09-14T15:43:13.225Z,
+  __v: 3,
+  refreshToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0ZjMyOTMxMDYzZjE3NjVhZTc2MGQzZCIsImlhdCI6MTY5NDcwNjE5MywiZXhwIjoxNjk0OTY1MzkzfQ.Dt3qrk9RPBzbRzjF1354EvX2a14hUd4m-RIkLFpNWCg'
+}
+[dinh dang] 2023-09-14T15:44:53.495Z [shop-ecommerce:] info: New client connected socket.id === UOGIf34zKB3-2MK3AAAB
+[dinh dang] 2023-09-14T15:45:02.979Z [shop-ecommerce:] info: {
+  _id: new ObjectId("64f32931063f1765ae760d3d"),
+  name: 'mao1',
+  email: 'mao@gmail.com',
+  phone: '9999999999',
+  password: '$2b$10$3FUsDEHwMUWJBF.inn0ey.AvpO4OUEVoTA0KlfhkD3QQTMQFDggEe',
+  countChat: 1,
+  isAdmin: false,
+  buyer: [
+    '64ef15aa741e64fd54371606',
+    '64ef15aa741e64fd54371609',
+    '64ff1647c3455ba0097bad1e',
+    '64ef15aa741e64fd543715e4'
+  ],
+  createdAt: 2023-09-02T12:23:13.977Z,
+  updatedAt: 2023-09-14T15:44:09.854Z,
+  __v: 3,
+  refreshToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0ZjMyOTMxMDYzZjE3NjVhZTc2MGQzZCIsImlhdCI6MTY5NDcwNjI0OSwiZXhwIjoxNjk0OTY1NDQ5fQ.vTJJTB1eHewAawEDmp7L5ArhWl5y7CjZUu4kJfByIkA'
+}
+[dinh dang] 2023-09-14T15:45:03.025Z [shop-ecommerce:] info: res.cookie :::::function (name, value, options) {
+  var opts = merge({}, options);
+  var secret = this.req.secret;
+  var signed = opts.signed;
+
+  if (signed && !secret) {
+    throw new Error('cookieParser("secret") required for signed cookies');
+  }
+
+  var val = typeof value === 'object'
+    ? 'j:' + JSON.stringify(value)
+    : String(value);
+
+  if (signed) {
+    val = 's:' + sign(val, secret);
+  }
+
+  if (opts.maxAge != null) {
+    var maxAge = opts.maxAge - 0
+
+    if (!isNaN(maxAge)) {
+      opts.expires = new Date(Date.now() + maxAge)
+      opts.maxAge = Math.floor(maxAge / 1000)
+    }
+  }
+
+  if (opts.path == null) {
+    opts.path = '/';
+  }
+
+  this.append('Set-Cookie', cookie.serialize(name, String(val), opts));
+
+  return this;
+}
+[dinh dang] 2023-09-14T15:45:03.176Z [shop-ecommerce:] info: New client connected socket.id === WAfcyGxWEjP37QI3AAAE
+[dinh dang] 2023-09-14T15:45:03.318Z [shop-ecommerce:] info: Client disconnected
+[dinh dang] 2023-09-14T15:45:03.342Z [shop-ecommerce:] info: New client connected socket.id === DKCy6rKr6uBMnv6FAAAG
+[dinh dang] 2023-09-14T15:45:46.207Z [shop-ecommerce:] info: New client connected socket.id === 8rKP59paGg7JJeROAAAC
+[dinh dang] 2023-09-14T15:45:46.219Z [shop-ecommerce:] info: New client connected socket.id === efIh63rbx2MAd2RNAAAD
+[dinh dang] 2023-09-14T15:45:46.857Z [shop-ecommerce:] info: Client disconnected
+[dinh dang] 2023-09-14T15:45:50.048Z [shop-ecommerce:] info: {
+  _id: new ObjectId("64f32931063f1765ae760d3d"),
+  name: 'mao1',
+  email: 'mao@gmail.com',
+  phone: '9999999999',
+  password: '$2b$10$3FUsDEHwMUWJBF.inn0ey.AvpO4OUEVoTA0KlfhkD3QQTMQFDggEe',
+  countChat: 1,
+  isAdmin: false,
+  buyer: [
+    '64ef15aa741e64fd54371606',
+    '64ef15aa741e64fd54371609',
+    '64ff1647c3455ba0097bad1e',
+    '64ef15aa741e64fd543715e4'
+  ],
+  createdAt: 2023-09-02T12:23:13.977Z,
+  updatedAt: 2023-09-14T15:45:02.985Z,
+  __v: 3,
+  refreshToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0ZjMyOTMxMDYzZjE3NjVhZTc2MGQzZCIsImlhdCI6MTY5NDcwNjMwMiwiZXhwIjoxNjk0OTY1NTAyfQ._MKDz0MAfqNlonzCmqBiWuTCQ8Ca2vM9J0olbfUjAiQ'
+}
+[dinh dang] 2023-09-14T15:45:50.085Z [shop-ecommerce:] info: res.cookie :::::function (name, value, options) {
+  var opts = merge({}, options);
+  var secret = this.req.secret;
+  var signed = opts.signed;
+
+  if (signed && !secret) {
+    throw new Error('cookieParser("secret") required for signed cookies');
+  }
+
+  var val = typeof value === 'object'
+    ? 'j:' + JSON.stringify(value)
+    : String(value);
+
+  if (signed) {
+    val = 's:' + sign(val, secret);
+  }
+
+  if (opts.maxAge != null) {
+    var maxAge = opts.maxAge - 0
+
+    if (!isNaN(maxAge)) {
+      opts.expires = new Date(Date.now() + maxAge)
+      opts.maxAge = Math.floor(maxAge / 1000)
+    }
+  }
+
+  if (opts.path == null) {
+    opts.path = '/';
+  }
+
+  this.append('Set-Cookie', cookie.serialize(name, String(val), opts));
+
+  return this;
+}
+[dinh dang] 2023-09-14T15:45:50.200Z [shop-ecommerce:] info: New client connected socket.id === H3dk_C2CSIA44Y5sAAAH
+[dinh dang] 2023-09-14T15:46:36.225Z [shop-ecommerce:] info: New client connected socket.id === M9WWCc6ZtGKPutfDAAAC
+[dinh dang] 2023-09-14T15:46:36.244Z [shop-ecommerce:] info: New client connected socket.id === OlqLbZJkYa2euwBwAAAD
+[dinh dang] 2023-09-14T15:47:09.514Z [shop-ecommerce:] info: New client connected socket.id === TzmexwNxfq-jS_tXAAAB
+[dinh dang] 2023-09-14T15:47:09.665Z [shop-ecommerce:] info: New client connected socket.id === UoUfn88fIgdLq_ZKAAAD
+[dinh dang] 2023-09-14T15:47:12.797Z [shop-ecommerce:] info: Client disconnected
+[dinh dang] 2023-09-14T15:47:15.090Z [shop-ecommerce:] info: {
+  _id: new ObjectId("64f32931063f1765ae760d3d"),
+  name: 'mao1',
+  email: 'mao@gmail.com',
+  phone: '9999999999',
+  password: '$2b$10$3FUsDEHwMUWJBF.inn0ey.AvpO4OUEVoTA0KlfhkD3QQTMQFDggEe',
+  countChat: 1,
+  isAdmin: false,
+  buyer: [
+    '64ef15aa741e64fd54371606',
+    '64ef15aa741e64fd54371609',
+    '64ff1647c3455ba0097bad1e',
+    '64ef15aa741e64fd543715e4'
+  ],
+  createdAt: 2023-09-02T12:23:13.977Z,
+  updatedAt: 2023-09-14T15:45:50.053Z,
+  __v: 3,
+  refreshToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0ZjMyOTMxMDYzZjE3NjVhZTc2MGQzZCIsImlhdCI6MTY5NDcwNjM1MCwiZXhwIjoxNjk0OTY1NTUwfQ.IS2naf2gOXNwWrhKvQVdzt8FefdjLar9-J7Wo7sLdTI'
+}
+[dinh dang] 2023-09-14T15:47:15.133Z [shop-ecommerce:] info: res.cookie :::::function (name, value, options) {
+  var opts = merge({}, options);
+  var secret = this.req.secret;
+  var signed = opts.signed;
+
+  if (signed && !secret) {
+    throw new Error('cookieParser("secret") required for signed cookies');
+  }
+
+  var val = typeof value === 'object'
+    ? 'j:' + JSON.stringify(value)
+    : String(value);
+
+  if (signed) {
+    val = 's:' + sign(val, secret);
+  }
+
+  if (opts.maxAge != null) {
+    var maxAge = opts.maxAge - 0
+
+    if (!isNaN(maxAge)) {
+      opts.expires = new Date(Date.now() + maxAge)
+      opts.maxAge = Math.floor(maxAge / 1000)
+    }
+  }
+
+  if (opts.path == null) {
+    opts.path = '/';
+  }
+
+  this.append('Set-Cookie', cookie.serialize(name, String(val), opts));
+
+  return this;
+}
+[dinh dang] 2023-09-14T15:47:53.128Z [shop-ecommerce:] info: {
+  _id: new ObjectId("64f32931063f1765ae760d3d"),
+  name: 'mao1',
+  email: 'mao@gmail.com',
+  phone: '9999999999',
+  password: '$2b$10$3FUsDEHwMUWJBF.inn0ey.AvpO4OUEVoTA0KlfhkD3QQTMQFDggEe',
+  countChat: 1,
+  isAdmin: false,
+  buyer: [
+    '64ef15aa741e64fd54371606',
+    '64ef15aa741e64fd54371609',
+    '64ff1647c3455ba0097bad1e',
+    '64ef15aa741e64fd543715e4'
+  ],
+  createdAt: 2023-09-02T12:23:13.977Z,
+  updatedAt: 2023-09-14T15:47:15.095Z,
+  __v: 3,
+  refreshToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0ZjMyOTMxMDYzZjE3NjVhZTc2MGQzZCIsImlhdCI6MTY5NDcwNjQzNSwiZXhwIjoxNjk0OTY1NjM1fQ.CR8kCWZANagP32dIhCDxt4IDk2mtkb4Esh_9pGy-hIU'
+}
+[dinh dang] 2023-09-14T15:47:53.164Z [shop-ecommerce:] info: res.cookie :::::function (name, value, options) {
+  var opts = merge({}, options);
+  var secret = this.req.secret;
+  var signed = opts.signed;
+
+  if (signed && !secret) {
+    throw new Error('cookieParser("secret") required for signed cookies');
+  }
+
+  var val = typeof value === 'object'
+    ? 'j:' + JSON.stringify(value)
+    : String(value);
+
+  if (signed) {
+    val = 's:' + sign(val, secret);
+  }
+
+  if (opts.maxAge != null) {
+    var maxAge = opts.maxAge - 0
+
+    if (!isNaN(maxAge)) {
+      opts.expires = new Date(Date.now() + maxAge)
+      opts.maxAge = Math.floor(maxAge / 1000)
+    }
+  }
+
+  if (opts.path == null) {
+    opts.path = '/';
+  }
+
+  this.append('Set-Cookie', cookie.serialize(name, String(val), opts));
+
+  return this;
+}
+[dinh dang] 2023-09-14T15:48:25.940Z [shop-ecommerce:] info: New client connected socket.id === LdqRxFAT88ArjTvTAAAB
+[dinh dang] 2023-09-14T15:48:29.138Z [shop-ecommerce:] info: {
+  _id: new ObjectId("64f32931063f1765ae760d3d"),
+  name: 'mao1',
+  email: 'mao@gmail.com',
+  phone: '9999999999',
+  password: '$2b$10$3FUsDEHwMUWJBF.inn0ey.AvpO4OUEVoTA0KlfhkD3QQTMQFDggEe',
+  countChat: 1,
+  isAdmin: false,
+  buyer: [
+    '64ef15aa741e64fd54371606',
+    '64ef15aa741e64fd54371609',
+    '64ff1647c3455ba0097bad1e',
+    '64ef15aa741e64fd543715e4'
+  ],
+  createdAt: 2023-09-02T12:23:13.977Z,
+  updatedAt: 2023-09-14T15:47:53.131Z,
+  __v: 3,
+  refreshToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0ZjMyOTMxMDYzZjE3NjVhZTc2MGQzZCIsImlhdCI6MTY5NDcwNjQ3MywiZXhwIjoxNjk0OTY1NjczfQ.Iss3_crpsfai3hGKa5Wh5Njt43OdhmL5EyFkW240iTE'
+}
+[dinh dang] 2023-09-14T15:48:29.178Z [shop-ecommerce:] info: res.cookie :::::function (name, value, options) {
+  var opts = merge({}, options);
+  var secret = this.req.secret;
+  var signed = opts.signed;
+
+  if (signed && !secret) {
+    throw new Error('cookieParser("secret") required for signed cookies');
+  }
+
+  var val = typeof value === 'object'
+    ? 'j:' + JSON.stringify(value)
+    : String(value);
+
+  if (signed) {
+    val = 's:' + sign(val, secret);
+  }
+
+  if (opts.maxAge != null) {
+    var maxAge = opts.maxAge - 0
+
+    if (!isNaN(maxAge)) {
+      opts.expires = new Date(Date.now() + maxAge)
+      opts.maxAge = Math.floor(maxAge / 1000)
+    }
+  }
+
+  if (opts.path == null) {
+    opts.path = '/';
+  }
+
+  this.append('Set-Cookie', cookie.serialize(name, String(val), opts));
+
+  return this;
+}
+[dinh dang] 2023-09-14T15:48:29.312Z [shop-ecommerce:] info: New client connected socket.id === tV1nAIkc8crJIhfcAAAE
+[dinh dang] 2023-09-14T15:48:29.470Z [shop-ecommerce:] info: Client disconnected
+[dinh dang] 2023-09-14T15:48:29.487Z [shop-ecommerce:] info: New client connected socket.id === G2PLDIdH9dVQZOtQAAAG
+[dinh dang] 2023-09-14T15:49:46.187Z [shop-ecommerce:] info: New client connected socket.id === C42AvMgVm3y3MH9GAAAC
+[dinh dang] 2023-09-14T15:49:46.198Z [shop-ecommerce:] info: New client connected socket.id === zHvGGTQWgMmuEuL6AAAD
+[dinh dang] 2023-09-14T15:49:49.599Z [shop-ecommerce:] info: Client disconnected
+[dinh dang] 2023-09-14T15:49:50.736Z [shop-ecommerce:] info: {
+  _id: new ObjectId("64f32931063f1765ae760d3d"),
+  name: 'mao1',
+  email: 'mao@gmail.com',
+  phone: '9999999999',
+  password: '$2b$10$3FUsDEHwMUWJBF.inn0ey.AvpO4OUEVoTA0KlfhkD3QQTMQFDggEe',
+  countChat: 1,
+  isAdmin: false,
+  buyer: [
+    '64ef15aa741e64fd54371606',
+    '64ef15aa741e64fd54371609',
+    '64ff1647c3455ba0097bad1e',
+    '64ef15aa741e64fd543715e4'
+  ],
+  createdAt: 2023-09-02T12:23:13.977Z,
+  updatedAt: 2023-09-14T15:48:29.144Z,
+  __v: 3,
+  refreshToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0ZjMyOTMxMDYzZjE3NjVhZTc2MGQzZCIsImlhdCI6MTY5NDcwNjUwOSwiZXhwIjoxNjk0OTY1NzA5fQ.KiPatLscOp93M5gptbWq6FbArjOPEnyc_7Nqf0A6r8w'
+}
+[dinh dang] 2023-09-14T15:49:50.798Z [shop-ecommerce:] info: res.cookie :::::function (name, value, options) {
+  var opts = merge({}, options);
+  var secret = this.req.secret;
+  var signed = opts.signed;
+
+  if (signed && !secret) {
+    throw new Error('cookieParser("secret") required for signed cookies');
+  }
+
+  var val = typeof value === 'object'
+    ? 'j:' + JSON.stringify(value)
+    : String(value);
+
+  if (signed) {
+    val = 's:' + sign(val, secret);
+  }
+
+  if (opts.maxAge != null) {
+    var maxAge = opts.maxAge - 0
+
+    if (!isNaN(maxAge)) {
+      opts.expires = new Date(Date.now() + maxAge)
+      opts.maxAge = Math.floor(maxAge / 1000)
+    }
+  }
+
+  if (opts.path == null) {
+    opts.path = '/';
+  }
+
+  this.append('Set-Cookie', cookie.serialize(name, String(val), opts));
+
+  return this;
+}
+[dinh dang] 2023-09-14T15:49:50.950Z [shop-ecommerce:] info: New client connected socket.id === 9ik2pbjMXVFQ5UQeAAAH
+[dinh dang] 2023-09-14T15:51:11.013Z [shop-ecommerce:] info: New client connected socket.id === KKHz-F8jWXQDxuywAAAC
+[dinh dang] 2023-09-14T15:51:11.022Z [shop-ecommerce:] info: New client connected socket.id === QXIdsi_N3ZPFHTb7AAAD
+[dinh dang] 2023-09-14T15:51:12.269Z [shop-ecommerce:] info: Client disconnected
+[dinh dang] 2023-09-14T15:51:13.587Z [shop-ecommerce:] info: {
+  _id: new ObjectId("64f32931063f1765ae760d3d"),
+  name: 'mao1',
+  email: 'mao@gmail.com',
+  phone: '9999999999',
+  password: '$2b$10$3FUsDEHwMUWJBF.inn0ey.AvpO4OUEVoTA0KlfhkD3QQTMQFDggEe',
+  countChat: 1,
+  isAdmin: false,
+  buyer: [
+    '64ef15aa741e64fd54371606',
+    '64ef15aa741e64fd54371609',
+    '64ff1647c3455ba0097bad1e',
+    '64ef15aa741e64fd543715e4'
+  ],
+  createdAt: 2023-09-02T12:23:13.977Z,
+  updatedAt: 2023-09-14T15:49:50.742Z,
+  __v: 3,
+  refreshToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0ZjMyOTMxMDYzZjE3NjVhZTc2MGQzZCIsImlhdCI6MTY5NDcwNjU5MCwiZXhwIjoxNjk0OTY1NzkwfQ.jgRVJ-wImLDODRwM4N6-cbcqBpC6KELfv8jTAUwwDhw'
+}
+[dinh dang] 2023-09-14T15:51:13.632Z [shop-ecommerce:] info: res.cookie :::::function (name, value, options) {
+  var opts = merge({}, options);
+  var secret = this.req.secret;
+  var signed = opts.signed;
+
+  if (signed && !secret) {
+    throw new Error('cookieParser("secret") required for signed cookies');
+  }
+
+  var val = typeof value === 'object'
+    ? 'j:' + JSON.stringify(value)
+    : String(value);
+
+  if (signed) {
+    val = 's:' + sign(val, secret);
+  }
+
+  if (opts.maxAge != null) {
+    var maxAge = opts.maxAge - 0
+
+    if (!isNaN(maxAge)) {
+      opts.expires = new Date(Date.now() + maxAge)
+      opts.maxAge = Math.floor(maxAge / 1000)
+    }
+  }
+
+  if (opts.path == null) {
+    opts.path = '/';
+  }
+
+  this.append('Set-Cookie', cookie.serialize(name, String(val), opts));
+
+  return this;
+}
+[dinh dang] 2023-09-14T15:51:52.191Z [shop-ecommerce:] info: New client connected socket.id === 2EkgEW6dVYBX-_aXAAAB

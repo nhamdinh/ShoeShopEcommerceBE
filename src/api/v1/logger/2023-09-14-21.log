@@ -1,0 +1,307 @@
+[dinh dang] 2023-09-14T14:23:06.469Z [shop-ecommerce:] info: New client connected socket.id === 5uulBLd8BEVlhFu4AAAC
+[dinh dang] 2023-09-14T14:23:06.480Z [shop-ecommerce:] info: New client connected socket.id === UQ2zM1PEcmWC9yq9AAAD
+[dinh dang] 2023-09-14T14:23:29.185Z [shop-ecommerce:] info: New client connected socket.id === Muk4wFNeoBtjGbW2AAAC
+[dinh dang] 2023-09-14T14:23:29.194Z [shop-ecommerce:] info: New client connected socket.id === IuQOiMNqTxWcSobQAAAD
+[dinh dang] 2023-09-14T14:23:42.977Z [shop-ecommerce:] info: New client connected socket.id === ZOdPfgyEpqQQZ7y9AAAC
+[dinh dang] 2023-09-14T14:23:42.987Z [shop-ecommerce:] info: New client connected socket.id === ckDUxxBkDs7_aGe9AAAD
+[dinh dang] 2023-09-14T14:26:25.446Z [shop-ecommerce:] info: New client connected socket.id === SNIqdZkwBAps4iZJAAAB
+[dinh dang] 2023-09-14T14:26:25.671Z [shop-ecommerce:] info: New client connected socket.id === 3K4Z8593ShYBTbhpAAAD
+[dinh dang] 2023-09-14T14:26:32.690Z [shop-ecommerce:] info: New client connected socket.id === 33y4MBV1X9_CRCUiAAAC
+[dinh dang] 2023-09-14T14:26:32.697Z [shop-ecommerce:] info: New client connected socket.id === JOjaeMxBJeJA0LdfAAAD
+[dinh dang] 2023-09-14T14:27:12.447Z [shop-ecommerce:] info: New client connected socket.id === TqJspNohBhLMsjrVAAAB
+[dinh dang] 2023-09-14T14:27:12.665Z [shop-ecommerce:] info: New client connected socket.id === _ugYbQstYH2v9FMOAAAD
+[dinh dang] 2023-09-14T14:28:05.211Z [shop-ecommerce:] info: New client connected socket.id === VSBf_hyudROYtTkWAAAC
+[dinh dang] 2023-09-14T14:28:05.224Z [shop-ecommerce:] info: New client connected socket.id === ivtGihTkrdp0VKtjAAAD
+[dinh dang] 2023-09-14T14:28:15.942Z [shop-ecommerce:] info: New client connected socket.id === RKvpOrgHA4CDx4qoAAAC
+[dinh dang] 2023-09-14T14:28:15.952Z [shop-ecommerce:] info: New client connected socket.id === 9iBCmE58g_G5P0JtAAAD
+[dinh dang] 2023-09-14T14:28:18.672Z [shop-ecommerce:] info: Client disconnected
+[dinh dang] 2023-09-14T14:28:20.208Z [shop-ecommerce:] info: New client connected socket.id === O2TvnuUDUan-OsKKAAAG
+[dinh dang] 2023-09-14T14:28:41.774Z [shop-ecommerce:] info: Client disconnected
+[dinh dang] 2023-09-14T14:28:50.338Z [shop-ecommerce:] info: {
+  _id: new ObjectId("64f32931063f1765ae760d3d"),
+  name: 'mao',
+  email: 'mao@gmail.com',
+  phone: '9999999999',
+  password: '$2b$10$3FUsDEHwMUWJBF.inn0ey.AvpO4OUEVoTA0KlfhkD3QQTMQFDggEe',
+  countChat: 1,
+  isAdmin: false,
+  buyer: [
+    '64ef15aa741e64fd54371606',
+    '64ef15aa741e64fd54371609',
+    '64ff1647c3455ba0097bad1e',
+    '64ef15aa741e64fd543715e4'
+  ],
+  createdAt: 2023-09-02T12:23:13.977Z,
+  updatedAt: 2023-09-14T03:31:23.998Z,
+  __v: 3
+}
+[dinh dang] 2023-09-14T14:28:50.343Z [shop-ecommerce:] info: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0ZjMyOTMxMDYzZjE3NjVhZTc2MGQzZCIsImlhdCI6MTY5NDcwMTczMCwiZXhwIjoxNjk0OTYwOTMwfQ.NgrvyRrPgChKLeL2cI4oupPNA2N71dDaBsbcC9i1tHs
+[dinh dang] 2023-09-14T14:28:50.473Z [shop-ecommerce:] info: New client connected socket.id === LuQx4gIdl09pluEXAAAJ
+[dinh dang] 2023-09-14T14:28:50.613Z [shop-ecommerce:] info: Client disconnected
+[dinh dang] 2023-09-14T14:28:50.620Z [shop-ecommerce:] info: New client connected socket.id === jdwboDE6svVDdCR_AAAL
+[dinh dang] 2023-09-14T14:29:16.012Z [shop-ecommerce:] info: New client connected socket.id === JpP6ptdK2-ODTL1cAAAC
+[dinh dang] 2023-09-14T14:29:16.022Z [shop-ecommerce:] info: New client connected socket.id === lLBE_tPMBMYVa8tWAAAD
+[dinh dang] 2023-09-14T14:29:22.396Z [shop-ecommerce:] info: Client disconnected
+[dinh dang] 2023-09-14T14:29:25.166Z [shop-ecommerce:] info: {
+  _id: new ObjectId("64f32931063f1765ae760d3d"),
+  name: 'mao',
+  email: 'mao@gmail.com',
+  phone: '9999999999',
+  password: '$2b$10$3FUsDEHwMUWJBF.inn0ey.AvpO4OUEVoTA0KlfhkD3QQTMQFDggEe',
+  countChat: 1,
+  isAdmin: false,
+  buyer: [
+    '64ef15aa741e64fd54371606',
+    '64ef15aa741e64fd54371609',
+    '64ff1647c3455ba0097bad1e',
+    '64ef15aa741e64fd543715e4'
+  ],
+  createdAt: 2023-09-02T12:23:13.977Z,
+  updatedAt: 2023-09-14T03:31:23.998Z,
+  __v: 3
+}
+[dinh dang] 2023-09-14T14:29:25.170Z [shop-ecommerce:] info: refreshToken ::::: 
+[dinh dang] 2023-09-14T14:29:25.302Z [shop-ecommerce:] info: New client connected socket.id === R_k6Kds7XQO7JNayAAAG
+[dinh dang] 2023-09-14T14:29:25.446Z [shop-ecommerce:] info: Client disconnected
+[dinh dang] 2023-09-14T14:29:25.456Z [shop-ecommerce:] info: New client connected socket.id === cfwK2-VIIDSMWi2EAAAI
+[dinh dang] 2023-09-14T14:29:55.323Z [shop-ecommerce:] info: New client connected socket.id === QCaW1rBEphXiDNk2AAAB
+[dinh dang] 2023-09-14T14:29:55.688Z [shop-ecommerce:] info: New client connected socket.id === 6jjn5xUN1MpDm_qfAAAD
+[dinh dang] 2023-09-14T14:30:06.629Z [shop-ecommerce:] info: Client disconnected
+[dinh dang] 2023-09-14T14:30:09.347Z [shop-ecommerce:] info: {
+  _id: new ObjectId("64f32931063f1765ae760d3d"),
+  name: 'mao',
+  email: 'mao@gmail.com',
+  phone: '9999999999',
+  password: '$2b$10$3FUsDEHwMUWJBF.inn0ey.AvpO4OUEVoTA0KlfhkD3QQTMQFDggEe',
+  countChat: 1,
+  isAdmin: false,
+  buyer: [
+    '64ef15aa741e64fd54371606',
+    '64ef15aa741e64fd54371609',
+    '64ff1647c3455ba0097bad1e',
+    '64ef15aa741e64fd543715e4'
+  ],
+  createdAt: 2023-09-02T12:23:13.977Z,
+  updatedAt: 2023-09-14T03:31:23.998Z,
+  __v: 3
+}
+[dinh dang] 2023-09-14T14:30:09.351Z [shop-ecommerce:] info: refreshToken ::::: 
+[dinh dang] 2023-09-14T14:30:09.492Z [shop-ecommerce:] info: New client connected socket.id === kUfZT31ZEzfqXiPyAAAG
+[dinh dang] 2023-09-14T14:30:09.619Z [shop-ecommerce:] info: Client disconnected
+[dinh dang] 2023-09-14T14:30:09.674Z [shop-ecommerce:] info: New client connected socket.id === QiBaxyTmXuB73I_tAAAI
+[dinh dang] 2023-09-14T14:30:29.995Z [shop-ecommerce:] info: New client connected socket.id === ASFjuQO5A1yZcs8rAAAC
+[dinh dang] 2023-09-14T14:30:30.008Z [shop-ecommerce:] info: New client connected socket.id === 3NmBFLw7HbF77Xe-AAAD
+[dinh dang] 2023-09-14T14:30:34.159Z [shop-ecommerce:] info: Client disconnected
+[dinh dang] 2023-09-14T14:30:36.942Z [shop-ecommerce:] info: {
+  _id: new ObjectId("64f32931063f1765ae760d3d"),
+  name: 'mao',
+  email: 'mao@gmail.com',
+  phone: '9999999999',
+  password: '$2b$10$3FUsDEHwMUWJBF.inn0ey.AvpO4OUEVoTA0KlfhkD3QQTMQFDggEe',
+  countChat: 1,
+  isAdmin: false,
+  buyer: [
+    '64ef15aa741e64fd54371606',
+    '64ef15aa741e64fd54371609',
+    '64ff1647c3455ba0097bad1e',
+    '64ef15aa741e64fd543715e4'
+  ],
+  createdAt: 2023-09-02T12:23:13.977Z,
+  updatedAt: 2023-09-14T03:31:23.998Z,
+  __v: 3
+}
+[dinh dang] 2023-09-14T14:30:36.947Z [shop-ecommerce:] info: refreshToken === 
+[dinh dang] 2023-09-14T14:30:37.088Z [shop-ecommerce:] info: New client connected socket.id === _Z5uaQ49fMHuZVA4AAAG
+[dinh dang] 2023-09-14T14:30:37.254Z [shop-ecommerce:] info: Client disconnected
+[dinh dang] 2023-09-14T14:30:37.275Z [shop-ecommerce:] info: New client connected socket.id === NWkJeYRpT9vNQ4cSAAAI
+[dinh dang] 2023-09-14T14:31:23.181Z [shop-ecommerce:] info: New client connected socket.id === fUEwBibhpLHsM4PFAAAC
+[dinh dang] 2023-09-14T14:31:23.215Z [shop-ecommerce:] info: New client connected socket.id === mjAUTxkXh4Ik9s-lAAAD
+[dinh dang] 2023-09-14T14:31:28.436Z [shop-ecommerce:] info: Client disconnected
+[dinh dang] 2023-09-14T14:31:32.275Z [shop-ecommerce:] info: {
+  _id: new ObjectId("64f32931063f1765ae760d3d"),
+  name: 'mao',
+  email: 'mao@gmail.com',
+  phone: '9999999999',
+  password: '$2b$10$3FUsDEHwMUWJBF.inn0ey.AvpO4OUEVoTA0KlfhkD3QQTMQFDggEe',
+  countChat: 1,
+  isAdmin: false,
+  buyer: [
+    '64ef15aa741e64fd54371606',
+    '64ef15aa741e64fd54371609',
+    '64ff1647c3455ba0097bad1e',
+    '64ef15aa741e64fd543715e4'
+  ],
+  createdAt: 2023-09-02T12:23:13.977Z,
+  updatedAt: 2023-09-14T03:31:23.998Z,
+  __v: 3
+}
+[dinh dang] 2023-09-14T14:31:32.279Z [shop-ecommerce:] info: refreshToken === eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0ZjMyOTMxMDYzZjE3NjVhZTc2MGQzZCIsImlhdCI6MTY5NDcwMTg5MiwiZXhwIjoxNjk0OTYxMDkyfQ.P4PWz0SEdCAKvWLoxHy1xGV1gmyYA_sYJ18VcPyjnMg
+[dinh dang] 2023-09-14T14:31:32.413Z [shop-ecommerce:] info: New client connected socket.id === yoQbDuQ6_9nsI-GsAAAG
+[dinh dang] 2023-09-14T14:31:32.607Z [shop-ecommerce:] info: Client disconnected
+[dinh dang] 2023-09-14T14:31:32.657Z [shop-ecommerce:] info: New client connected socket.id === LG_vJHCOlNw2Nf5AAAAI
+[dinh dang] 2023-09-14T14:32:49.302Z [shop-ecommerce:] info: New client connected socket.id === wlMa7_FGOK5EeARFAAAC
+[dinh dang] 2023-09-14T14:32:49.316Z [shop-ecommerce:] info: New client connected socket.id === RwVaHyi0GGldDLOqAAAD
+[dinh dang] 2023-09-14T14:32:55.546Z [shop-ecommerce:] info: Client disconnected
+[dinh dang] 2023-09-14T14:32:59.123Z [shop-ecommerce:] info: {
+  _id: new ObjectId("64f32931063f1765ae760d3d"),
+  name: 'mao',
+  email: 'mao@gmail.com',
+  phone: '9999999999',
+  password: '$2b$10$3FUsDEHwMUWJBF.inn0ey.AvpO4OUEVoTA0KlfhkD3QQTMQFDggEe',
+  countChat: 1,
+  isAdmin: false,
+  buyer: [
+    '64ef15aa741e64fd54371606',
+    '64ef15aa741e64fd54371609',
+    '64ff1647c3455ba0097bad1e',
+    '64ef15aa741e64fd543715e4'
+  ],
+  createdAt: 2023-09-02T12:23:13.977Z,
+  updatedAt: 2023-09-14T03:31:23.998Z,
+  __v: 3
+}
+[dinh dang] 2023-09-14T14:32:59.172Z [shop-ecommerce:] info: updateuser ::: {
+  _id: new ObjectId("64f32931063f1765ae760d3d"),
+  name: 'mao',
+  email: 'mao@gmail.com',
+  phone: '9999999999',
+  password: '$2b$10$3FUsDEHwMUWJBF.inn0ey.AvpO4OUEVoTA0KlfhkD3QQTMQFDggEe',
+  countChat: 1,
+  isAdmin: false,
+  buyer: [
+    '64ef15aa741e64fd54371606',
+    '64ef15aa741e64fd54371609',
+    '64ff1647c3455ba0097bad1e',
+    '64ef15aa741e64fd543715e4'
+  ],
+  createdAt: 2023-09-02T12:23:13.977Z,
+  updatedAt: 2023-09-14T03:31:23.998Z,
+  __v: 3
+}
+[dinh dang] 2023-09-14T14:32:59.173Z [shop-ecommerce:] info: refreshToken === eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0ZjMyOTMxMDYzZjE3NjVhZTc2MGQzZCIsImlhdCI6MTY5NDcwMTk3OSwiZXhwIjoxNjk0OTYxMTc5fQ.42W11C0ztcJRqxW6ll4lpO8DbwkXyRr0-_1DXP7euHA
+[dinh dang] 2023-09-14T14:32:59.316Z [shop-ecommerce:] info: New client connected socket.id === CCLRKSndw0qvyXSkAAAG
+[dinh dang] 2023-09-14T14:32:59.461Z [shop-ecommerce:] info: Client disconnected
+[dinh dang] 2023-09-14T14:32:59.481Z [shop-ecommerce:] info: New client connected socket.id === mUr-P-uq6ho1ReUoAAAI
+[dinh dang] 2023-09-14T14:35:07.802Z [shop-ecommerce:] info: Client disconnected
+[dinh dang] 2023-09-14T14:35:09.500Z [shop-ecommerce:] info: New client connected socket.id === a_rzeP35k-Z02kD7AAAL
+[dinh dang] 2023-09-14T14:36:09.520Z [shop-ecommerce:] info: New client connected socket.id === nxIZr_ihbBXsmOdaAAAC
+[dinh dang] 2023-09-14T14:36:09.527Z [shop-ecommerce:] info: New client connected socket.id === labiMAiKOrGf_JN6AAAD
+[dinh dang] 2023-09-14T14:36:18.728Z [shop-ecommerce:] info: Client disconnected
+[dinh dang] 2023-09-14T14:36:23.840Z [shop-ecommerce:] info: {
+  _id: new ObjectId("64f32931063f1765ae760d3d"),
+  name: 'mao',
+  email: 'mao@gmail.com',
+  phone: '9999999999',
+  password: '$2b$10$3FUsDEHwMUWJBF.inn0ey.AvpO4OUEVoTA0KlfhkD3QQTMQFDggEe',
+  countChat: 1,
+  isAdmin: false,
+  buyer: [
+    '64ef15aa741e64fd54371606',
+    '64ef15aa741e64fd54371609',
+    '64ff1647c3455ba0097bad1e',
+    '64ef15aa741e64fd543715e4'
+  ],
+  createdAt: 2023-09-02T12:23:13.977Z,
+  updatedAt: 2023-09-14T14:32:59.132Z,
+  __v: 3,
+  refreshToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0ZjMyOTMxMDYzZjE3NjVhZTc2MGQzZCIsImlhdCI6MTY5NDcwMTk3OSwiZXhwIjoxNjk0OTYxMTc5fQ.42W11C0ztcJRqxW6ll4lpO8DbwkXyRr0-_1DXP7euHA'
+}
+[dinh dang] 2023-09-14T14:36:23.883Z [shop-ecommerce:] info: updateuser ::: function (name, value, options) {
+  var opts = merge({}, options);
+  var secret = this.req.secret;
+  var signed = opts.signed;
+
+  if (signed && !secret) {
+    throw new Error('cookieParser("secret") required for signed cookies');
+  }
+
+  var val = typeof value === 'object'
+    ? 'j:' + JSON.stringify(value)
+    : String(value);
+
+  if (signed) {
+    val = 's:' + sign(val, secret);
+  }
+
+  if (opts.maxAge != null) {
+    var maxAge = opts.maxAge - 0
+
+    if (!isNaN(maxAge)) {
+      opts.expires = new Date(Date.now() + maxAge)
+      opts.maxAge = Math.floor(maxAge / 1000)
+    }
+  }
+
+  if (opts.path == null) {
+    opts.path = '/';
+  }
+
+  this.append('Set-Cookie', cookie.serialize(name, String(val), opts));
+
+  return this;
+}
+[dinh dang] 2023-09-14T14:36:24.010Z [shop-ecommerce:] info: New client connected socket.id === 1_nU0ZKYEihgbUBZAAAG
+[dinh dang] 2023-09-14T14:36:24.157Z [shop-ecommerce:] info: Client disconnected
+[dinh dang] 2023-09-14T14:36:24.166Z [shop-ecommerce:] info: New client connected socket.id === 5ElRlTMSXqqdclgXAAAI
+[dinh dang] 2023-09-14T14:37:46.699Z [shop-ecommerce:] info: New client connected socket.id === yMEY2s32EY9wPdvaAAAC
+[dinh dang] 2023-09-14T14:37:46.714Z [shop-ecommerce:] info: New client connected socket.id === Kacb4bw7ipibTCA5AAAD
+[dinh dang] 2023-09-14T14:37:50.774Z [shop-ecommerce:] info: Client disconnected
+[dinh dang] 2023-09-14T14:37:54.585Z [shop-ecommerce:] info: {
+  _id: new ObjectId("64f32931063f1765ae760d3d"),
+  name: 'mao',
+  email: 'mao@gmail.com',
+  phone: '9999999999',
+  password: '$2b$10$3FUsDEHwMUWJBF.inn0ey.AvpO4OUEVoTA0KlfhkD3QQTMQFDggEe',
+  countChat: 1,
+  isAdmin: false,
+  buyer: [
+    '64ef15aa741e64fd54371606',
+    '64ef15aa741e64fd54371609',
+    '64ff1647c3455ba0097bad1e',
+    '64ef15aa741e64fd543715e4'
+  ],
+  createdAt: 2023-09-02T12:23:13.977Z,
+  updatedAt: 2023-09-14T14:36:23.845Z,
+  __v: 3,
+  refreshToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0ZjMyOTMxMDYzZjE3NjVhZTc2MGQzZCIsImlhdCI6MTY5NDcwMjE4MywiZXhwIjoxNjk0OTYxMzgzfQ.4xAF9VMSTg3xskew43IFQWPQZHDqJGIEBiIvXO5zoQE'
+}
+[dinh dang] 2023-09-14T14:37:54.765Z [shop-ecommerce:] info: New client connected socket.id === k9ZC-Cb-tG1OMIzmAAAG
+[dinh dang] 2023-09-14T14:37:54.938Z [shop-ecommerce:] info: Client disconnected
+[dinh dang] 2023-09-14T14:37:54.957Z [shop-ecommerce:] info: New client connected socket.id === 0AUkpg7M9fjR_dDMAAAI
+[dinh dang] 2023-09-14T14:39:42.874Z [shop-ecommerce:] info: New client connected socket.id === FPuT4CXwk4Ng1xODAAAC
+[dinh dang] 2023-09-14T14:39:42.888Z [shop-ecommerce:] info: New client connected socket.id === lwq_c_TsBNp0k_20AAAD
+[dinh dang] 2023-09-14T14:42:51.018Z [shop-ecommerce:] info: New client connected socket.id === RIVXUq4o2Adwe4iFAAAC
+[dinh dang] 2023-09-14T14:42:51.032Z [shop-ecommerce:] info: New client connected socket.id === TpLvArTXHcGjhlOPAAAD
+[dinh dang] 2023-09-14T14:44:05.532Z [shop-ecommerce:] info: New client connected socket.id === 9TBf2suwg4koC_45AAAC
+[dinh dang] 2023-09-14T14:44:05.540Z [shop-ecommerce:] info: New client connected socket.id === 2lgjN6luwTmv924IAAAD
+[dinh dang] 2023-09-14T14:44:09.492Z [shop-ecommerce:] info: New client connected socket.id === ov9T6BAYAM3cIbvbAAAC
+[dinh dang] 2023-09-14T14:44:09.506Z [shop-ecommerce:] info: New client connected socket.id === y3KIgrk6YVatMwjBAAAD
+[dinh dang] 2023-09-14T14:44:15.743Z [shop-ecommerce:] info: Client disconnected
+[dinh dang] 2023-09-14T14:44:22.410Z [shop-ecommerce:] info: {
+  _id: new ObjectId("64f32931063f1765ae760d3d"),
+  name: 'mao',
+  email: 'mao@gmail.com',
+  phone: '9999999999',
+  password: '$2b$10$3FUsDEHwMUWJBF.inn0ey.AvpO4OUEVoTA0KlfhkD3QQTMQFDggEe',
+  countChat: 1,
+  isAdmin: false,
+  buyer: [
+    '64ef15aa741e64fd54371606',
+    '64ef15aa741e64fd54371609',
+    '64ff1647c3455ba0097bad1e',
+    '64ef15aa741e64fd543715e4'
+  ],
+  createdAt: 2023-09-02T12:23:13.977Z,
+  updatedAt: 2023-09-14T14:37:54.591Z,
+  __v: 3,
+  refreshToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0ZjMyOTMxMDYzZjE3NjVhZTc2MGQzZCIsImlhdCI6MTY5NDcwMjI3NCwiZXhwIjoxNjk0OTYxNDc0fQ.U7_s6_KLCWPIKAzH08mUaWUaUr10vijxruZ0I09Uccw'
+}
+[dinh dang] 2023-09-14T14:44:22.618Z [shop-ecommerce:] info: New client connected socket.id === x6LqgQiIS4tvWvLXAAAG
+[dinh dang] 2023-09-14T14:44:23.050Z [shop-ecommerce:] info: Client disconnected
+[dinh dang] 2023-09-14T14:44:23.070Z [shop-ecommerce:] info: New client connected socket.id === 5VuabwUnRXHy1_j2AAAI
+[dinh dang] 2023-09-14T14:44:40.138Z [shop-ecommerce:] info: Client disconnected
+[dinh dang] 2023-09-14T14:44:40.150Z [shop-ecommerce:] info: New client connected socket.id === e5vDSlDGT1WsKKDPAAAK
+[dinh dang] 2023-09-14T14:44:43.377Z [shop-ecommerce:] info: Client disconnected
+[dinh dang] 2023-09-14T14:44:45.406Z [shop-ecommerce:] info: New client connected socket.id === v3mEkCQGNjWHYj30AAAN
+[dinh dang] 2023-09-14T14:44:46.172Z [shop-ecommerce:] info: Client disconnected
+[dinh dang] 2023-09-14T14:44:46.188Z [shop-ecommerce:] info: New client connected socket.id === LPZkNE7R550oLOMgAAAP
