@@ -18,7 +18,7 @@ const getCartById = asyncHandler(async (req, res) => {
     if (cart) {
       res.json(cart);
     } else {
-      res.status(404).json({ message: "Cart not Found" });
+      res.status(200).json({ message: "Cart not Found" });
       throw new Error("Cart not Found");
     }
   } catch (error) {
@@ -72,7 +72,7 @@ const deleteItemFromCart = asyncHandler(async (req, res) => {
 
       res.json(updateCart);
     } else {
-      res.status(404).json({ message: "Cart not Found" });
+      res.status(200).json({ message: "Cart not Found" });
       throw new Error("Cart not Found");
     }
   } catch (error) {

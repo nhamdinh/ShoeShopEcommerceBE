@@ -111,14 +111,16 @@ const getAllProductAdmin = asyncHandler(async (req, res) => {
   }
 });
 
-const getProductById = asyncHandler(async (req, res) => {
+const getProductById = asyncHandler(async (req, res, next) => {
   try {
     const product = await Product.findById(req.params.id);
     if (product) {
       res.json(product);
     } else {
-      res.status(404).json({ message: "Product not Found" });
-      throw new Error("Product not Found");
+      const error = new Error(`Product not Found : ${req.originalUrl}`);
+      res.status(200);
+      next(error);
+      // throw new Error("Product not Found");
     }
   } catch (error) {
     throw new Error(error);
@@ -133,7 +135,7 @@ const deleteProductById = asyncHandler(async (req, res) => {
       await product.save();
       res.json({ message: "Product deleted" });
     } else {
-      res.status(404).json({ message: "Product not Found" });
+      res.status(200).json({ message: "Product not Found" });
       throw new Error("Product not Found");
     }
   } catch (error) {
@@ -188,7 +190,7 @@ const updateProduct = asyncHandler(async (req, res) => {
       const updatedProduct = await product.save();
       res.json(updatedProduct);
     } else {
-      res.status(404).json({ message: "Product not Found" });
+      res.status(200).json({ message: "Product not Found" });
       throw new Error("Product not found");
     }
   } catch (error) {
@@ -225,7 +227,7 @@ const createProductReview = asyncHandler(async (req, res) => {
       await product.save();
       res.status(201).json({ message: "Reviewed Added" });
     } else {
-      res.status(404).json({ message: "Product not Found" });
+      res.status(200).json({ message: "Product not Found" });
       throw new Error("Product not Found");
     }
   } catch (error) {
@@ -250,7 +252,7 @@ const updateProductReview = asyncHandler(async (req, res) => {
       const updatedProduct = await product.save();
       res.json(updatedProduct);
     } else {
-      res.status(404).json({ message: "Product not Found" });
+      res.status(200).json({ message: "Product not Found" });
       throw new Error("Product not found");
     }
   } catch (error) {
@@ -270,7 +272,7 @@ const checkUserIsBuy = asyncHandler(async (req, res) => {
       });
       res.status(201).json({ hasBuyer });
     } else {
-      res.status(404).json({ message: "User not Found" });
+      res.status(200).json({ message: "User not Found" });
       throw new Error("User not Found");
     }
   } catch (error) {

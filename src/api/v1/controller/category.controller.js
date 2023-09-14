@@ -46,7 +46,7 @@ const deleteCategoryById = asyncHandler(async (req, res) => {
       await category.save();
       res.json({ message: "Category deleted" });
     } else {
-      res.status(404).json({ message: "Category not Found" });
+      res.status(200).json({ message: "Category not Found" });
       throw new Error("Category not Found");
     }
   } catch (error) {
@@ -113,7 +113,7 @@ const deleteBrandById = asyncHandler(async (req, res) => {
       await brands.save();
       res.json({ message: "Brand deleted" });
     } else {
-      res.status(404).json({ message: "Brand not Found" });
+      res.status(200).json({ message: "Brand not Found" });
       throw new Error("Brand not Found");
     }
   } catch (error) {
