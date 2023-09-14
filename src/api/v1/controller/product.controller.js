@@ -2,6 +2,7 @@ const asyncHandler = require("express-async-handler");
 
 const Product = require("../Models/ProductModel");
 const User = require("../Models/UserModel");
+const logger = require("../log");
 
 const getAllProduct = asyncHandler(async (req, res) => {
   try {
@@ -114,6 +115,8 @@ const getAllProductAdmin = asyncHandler(async (req, res) => {
 const getProductById = asyncHandler(async (req, res, next) => {
   try {
     const product = await Product.findById(req.params.id);
+    logger.info("product.id === " + product?._id);
+
     if (product) {
       res.json(product);
     } else {

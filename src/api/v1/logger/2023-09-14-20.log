@@ -1,0 +1,29 @@
+[dinh dang] 2023-09-14T13:22:00.672Z [shop-ecommerce:] info: New client connected socket.id === gyrKWWxh_YhTQbZxAAAB
+[dinh dang] 2023-09-14T13:22:00.691Z [shop-ecommerce:] info: New client connected socket.id === Os8_oz5M0T5qiU0HAAAD
+[dinh dang] 2023-09-14T13:22:09.471Z [shop-ecommerce:] info: product.id === {
+  category: { name: 'Tablet', brand: 'ACER' },
+  _id: new ObjectId("64ef15aa741e64fd54371609"),
+  name: 'Laptop Cambodia pictured Herbert Dawson ',
+  image: 'https://images.unsplash.com/photo-1612425626229-632fab8bfc02?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1758&q=80',
+  description: 'list garden west beat operation anyway dog trip for bad wave against tube local fire swim board typical frame scientific sheet raise face lead cry South Sudan',
+  rating: 1,
+  numReviews: 1,
+  price: 244,
+  countInStock: 38,
+  stock: 96,
+  deletedAt: null,
+  reviews: [
+    {
+      name: 'mao',
+      rating: 1,
+      comment: 'chan lem\nzzz',
+      user: new ObjectId("64f32931063f1765ae760d3d"),
+      _id: new ObjectId("64f74f028ebd9a47dc812a0f"),
+      createdAt: 2023-09-05T15:53:38.819Z,
+      updatedAt: 2023-09-05T15:54:08.603Z
+    }
+  ],
+  __v: 1,
+  createdAt: 2023-08-30T10:10:50.912Z,
+  updatedAt: 2023-09-05T15:54:08.603Z
+}

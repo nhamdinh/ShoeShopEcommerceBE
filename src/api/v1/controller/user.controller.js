@@ -4,6 +4,7 @@ const { validationResult } = require("express-validator");
 
 const User = require("../Models/UserModel");
 const ChatStory = require("../Models/ChatStoryModel");
+const logger = require("../log");
 
 const getAllUser = asyncHandler(async (req, res) => {
   try {
@@ -61,6 +62,8 @@ const login = asyncHandler(async (req, res) => {
     const user = await User.findOne({ email });
 
     if (user && (await user.matchPassword(password))) {
+      logger.info(user);
+
       res.json({
         _id: user._id,
         name: user.name,

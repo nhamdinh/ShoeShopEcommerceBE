@@ -1,7 +1,9 @@
 const http = require("http");
 const app = require("./app");
+
 const ChatStory = require("./src/api/v1/Models/ChatStoryModel");
 const User = require("./src/api/v1/Models/UserModel");
+const logger = require("./src/api/v1/log");
 
 const server = http.createServer(app);
 const socketIo = require("socket.io")(server, {
@@ -11,8 +13,7 @@ const socketIo = require("socket.io")(server, {
 });
 
 socketIo.on("connection", (socket) => {
-  console.log("New client connected socket.id === " + socket.id);
-
+  logger.info("New client connected socket.id === " + socket.id);
   socket.emit("serverSetSocketId", socket.id);
 
   socket.on("clientSendData", function (data) {
@@ -54,7 +55,7 @@ socketIo.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    console.log("Client disconnected");
+    logger.info("Client disconnected");
   });
 });
 
