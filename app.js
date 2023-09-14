@@ -4,12 +4,16 @@ const helmet = require("helmet");
 const morgan = require("morgan");
 const cors = require("cors");
 const path = require("path");
+const {
+  notFound,
+  errorHandler,
+} = require("./src/api/v1/Middleware/errorHandler");
 
 const connectDatabase = require("./src/config/MongoDb");
-const storageUpload = require("./src/config/storageUpload");
-const { URL_SERVER } = require("./src/api/v1/utils/constant");
+const { storageUpload } = require("./src/config/storageUpload");
 
 const bodyParser = require("body-parser");
+const { uploadPhoto } = require("./src/api/v1/Middleware/uploadImage");
 
 connectDatabase();
 
@@ -53,23 +57,9 @@ app.use(require("./src/api/v1/routes/"));
 app.get("/api/config/paypal", (req, res) => {
   res.send(process.env.PAYPAL_CLIENT_ID);
 });
-app.post("/api/upload", storageUpload.single("file"), (req, res) => {
-  let folder = req?.query?.folder;
-  let url = "";
-  try {
-    if (folder === "products") {
-      url = URL_SERVER + "products-img/" + req?.file?.filename;
-    } else if (folder === "categorys") {
-      url = URL_SERVER + "categorys-img/" + req?.file?.filename;
-    } else {
-      url = URL_SERVER + "commons/" + req?.file?.filename;
-    }
-    return res.status(200).json({ url });
-  } catch (error) {
-    console.error(error);
-  }
-});
-
+app.post("/api/upload", storageUpload.single("file"), uploadPhoto);
+app.use(notFound);
+app.use(errorHandler);
 /* API */
 
 module.exports = app;
