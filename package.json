@@ -14,6 +14,7 @@
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.2",
     "concurrently": "^7.0.0",
+    "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "dotenv": "^16.0.2",
     "ejs": "^3.1.9",
@@ -29,6 +30,8 @@
     "nodemon": "^2.0.20",
     "path": "^0.12.7",
     "sharp": "^0.32.5",
-    "socket.io": "^4.5.3"
+    "socket.io": "^4.5.3",
+    "winston": "^3.10.0",
+    "winston-daily-rotate-file": "^4.7.1"
   }
 }

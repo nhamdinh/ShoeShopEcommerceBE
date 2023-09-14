@@ -1,9 +1,12 @@
 const asyncHandler = require("express-async-handler");
-const generateToken = require("./../utils/generateToken");
+const generateToken = require("../utils/generateToken");
+const generateRefreshToken = require("../utils/generateRefreshToken");
+
 const { validationResult } = require("express-validator");
 
 const User = require("../Models/UserModel");
 const ChatStory = require("../Models/ChatStoryModel");
+const logger = require("../log");
 
 const getAllUser = asyncHandler(async (req, res) => {
   try {
@@ -61,18 +64,39 @@ const login = asyncHandler(async (req, res) => {
     const user = await User.findOne({ email });
 
     if (user && (await user.matchPassword(password))) {
+      logger.info(user);
+      const refreshToken = await generateRefreshToken(user?._id);
+      await User.findByIdAndUpdate(user._id, {
+        refreshToken: refreshToken,
+      });
+
+      // res.cookie("cookie1", "This is my first cookie", {
+      //   signed: true,
+      //   maxAge: 1000 * 60 * 60 * 24 * 7,
+      //   httpOnly: true,
+      // });
+
+      // res.cookie("message", "This is a cookie.").send();
+      // res.cookie("refreshToken", refreshToken, {
+      //   httpOnly: true,
+      //   maxAge: 72 * 60 * 60 * 1000,
+      //   signed: true,
+      // });
+      logger.info("res.cookie :::::" + res.cookie);
+
       res.json({
         _id: user._id,
         name: user.name,
         email: user.email,
         phone: user.phone,
         isAdmin: user.isAdmin,
+        refreshToken: refreshToken,
         token: generateToken(user._id),
         createdAt: user.createdAt,
       });
     } else {
-      res.status(401).json({ message: "Invalid Email or Password" });
-      throw new Error("Invalid Email or Password");
+      res.status(401).json({ message: "Wrong Email or Password" });
+      throw new Error("Wrong Email or Password");
     }
   } catch (error) {
     throw new Error(error);
@@ -94,6 +118,7 @@ const register = asyncHandler(async (req, res) => {
       res.status(400).json({ message: "User already exists" });
       throw new Error("User already exists");
     }
+    const refreshToken = await generateRefreshToken(user?._id);
 
     const user = await User.create({
       name,
@@ -101,6 +126,7 @@ const register = asyncHandler(async (req, res) => {
       phone,
       password,
       isAdmin,
+      refreshToken,
     });
 
     if (user) {
@@ -110,6 +136,7 @@ const register = asyncHandler(async (req, res) => {
         email: user.email,
         phone: user.phone,
         isAdmin: user.isAdmin,
+        refreshToken: refreshToken,
         token: generateToken(user._id),
       });
     } else {
@@ -166,7 +193,7 @@ const updateProfile = asyncHandler(async (req, res) => {
         phone: updatedUser.phone,
         isAdmin: updatedUser.isAdmin,
         createdAt: updatedUser.createdAt,
-        token: generateToken(updatedUser._id),
+        // token: generateToken(updatedUser._id),
       });
     } else {
       res.status(200).json({ message: "User not Found" });

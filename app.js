@@ -18,6 +18,9 @@ const { uploadPhoto } = require("./src/api/v1/Middleware/uploadImage");
 connectDatabase();
 
 const app = express();
+const cookieParser = require("cookie-parser");
+app.use(cookieParser("random secret string"));
+
 app.use(
   cors({
     origin: "*",
@@ -49,6 +52,7 @@ app.use(morgan("common"));
 /* middleware */
 
 /* API */
+
 app.get("/", (req, res) => {
   res.send("API is running");
 });
