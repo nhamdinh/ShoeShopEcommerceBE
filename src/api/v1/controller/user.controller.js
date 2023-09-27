@@ -7,6 +7,7 @@ const { validationResult } = require("express-validator");
 const User = require("../Models/UserModel");
 const ChatStory = require("../Models/ChatStoryModel");
 const logger = require("../log");
+const { COOKIE_REFRESH_TOKEN } = require("../utils/constant");
 
 const getAllUser = asyncHandler(async (req, res) => {
   try {
@@ -70,21 +71,23 @@ const login = asyncHandler(async (req, res) => {
         refreshToken: refreshToken,
       });
 
-      // res.cookie("cookie1", "This is my first cookie", {
-      //   signed: true,
-      //   maxAge: 1000 * 60 * 60 * 24 * 7,
-      //   httpOnly: true,
-      // });
-
-      // res.cookie("message", "This is a cookie.").send();
-      // res.cookie("refreshToken", refreshToken, {
+      // res.cookie(COOKIE_REFRESH_TOKEN, refreshToken, {
       //   httpOnly: true,
       //   maxAge: 72 * 60 * 60 * 1000,
       //   signed: true,
       // });
-      logger.info("res.cookie :::::" + res.cookie);
+      // res.cookie(COOKIE_REFRESH_TOKEN,`encrypted cookie string Value`);
 
-      res.json({
+      // res.cookie('cookieName', 'cookieValue') // options is optional
+      // res.send('')
+
+      logger.info("refreshToken ::: " + refreshToken);
+
+      // res
+      //   .cookie("access_token", "token")
+      //   .json({ message: "Logged in successfully 😊 👌" });
+
+      return res.cookie("access_token1", "token1111").json({
         _id: user._id,
         name: user.name,
         email: user.email,
@@ -98,6 +101,66 @@ const login = asyncHandler(async (req, res) => {
       res.status(401).json({ message: "Wrong Email or Password" });
       throw new Error("Wrong Email or Password");
     }
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+function parseCookies(request) {
+  const list = {};
+  const cookieHeader = request.headers?.cookie;
+  if (!cookieHeader) return list;
+
+  cookieHeader.split(`;`).forEach(function (cookie) {
+    let [name, ...rest] = cookie.split(`=`);
+    name = name?.trim();
+    if (!name) return;
+    const value = rest.join(`=`).trim();
+    if (!value) return;
+    list[name] = decodeURIComponent(value);
+  });
+
+  return list;
+}
+const logout = asyncHandler(async (req, res) => {
+  try {
+    // const cookie = req.headers?.cookie;
+    // const cookie = req.cookies[COOKIE_REFRESH_TOKEN];
+    const cookies = parseCookies(req);
+    logger.info(cookies);
+
+    const list = {};
+    // const cookieHeader = req.headers?.cookie;
+    const cookieHeader = req.signedCookies;
+
+    if (!cookieHeader) throw new Error("No Refresh Token in Cookies");
+
+    cookieHeader.split(`;`).forEach(function (cookie) {
+      let [name, ...rest] = cookie.split(`=`);
+      name = name?.trim();
+      if (!name) return;
+      const value = rest.join(`=`).trim();
+      if (!value) return;
+      list[name] = decodeURIComponent(value);
+    });
+    // logger.info("cookie ::: " + list[COOKIE_REFRESH_TOKEN]);
+
+    const refreshToken = list?.refreshToken;
+    const user = await User.findOne({ refreshToken });
+    if (!user) {
+      res.clearCookie(COOKIE_REFRESH_TOKEN, {
+        httpOnly: true,
+        secure: true,
+      });
+      res.status(200); // forbidden
+    }
+    await User.findOneAndUpdate(refreshToken, {
+      refreshToken: "",
+    });
+    res.clearCookie(COOKIE_REFRESH_TOKEN, {
+      httpOnly: true,
+      secure: true,
+    });
+    res.status(200); // forbidden
   } catch (error) {
     throw new Error(error);
   }
@@ -261,6 +324,7 @@ module.exports = {
   getAllUser,
   getAllUserByAdmin,
   login,
+  logout,
   register,
   getProfile,
   updateProfile,

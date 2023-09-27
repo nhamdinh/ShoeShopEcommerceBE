@@ -13,14 +13,15 @@ let transport = new winston.transports.DailyRotateFile({
   // level: "info",
 });
 
-const customFormat = winston.format.printf((info) => {
-  return `[dinh dang] ${info.timestamp} [${info.label}] ${info.level}: ${info.message}`;
+const customFormat = winston.format.prettyPrint((info) => {
+  return `[FM] ${info.timestamp} [${info.label}] ${info.level}: ${info.message}`;
 });
 const logger = winston.createLogger({
   format: winston.format.combine(
     winston.format.label({ label: "shop-ecommerce:" }),
     winston.format.timestamp(),
-    customFormat
+    customFormat,
+    // winston.format.prettyPrint()
   ),
   transports: [
     new winston.transports.Console(),
