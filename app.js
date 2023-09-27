@@ -11,15 +11,16 @@ const {
 
 const connectDatabase = require("./src/config/MongoDb");
 const { storageUpload } = require("./src/config/storageUpload");
+const { uploadPhoto } = require("./src/api/v1/Middleware/uploadImage");
 
 const bodyParser = require("body-parser");
-const { uploadPhoto } = require("./src/api/v1/Middleware/uploadImage");
 
 connectDatabase();
 
 const app = express();
 const cookieParser = require("cookie-parser");
-app.use(cookieParser("random secret string"));
+// app.use(cookieParser("randomsecretstring"));
+app.use(cookieParser());
 
 app.use(
   cors({
@@ -31,6 +32,16 @@ app.use(
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.set("view engine", require("ejs"));
+
+app.get("/cookie", (req, res) => {
+  // res.cookie("name", "express").send("cookie set"); //Sets name = express
+  res
+    .cookie("access_token", "token", {
+      httpOnly: true,
+    })
+    .status(200)
+    .json({ message: "Logged in successfully 😊 👌" });
+});
 
 app.use(
   "/commons",

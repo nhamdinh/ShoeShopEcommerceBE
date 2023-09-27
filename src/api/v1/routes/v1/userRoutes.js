@@ -6,6 +6,7 @@ const {
   getAllUser,
   getAllUserByAdmin,
   login,
+  logout,
   register,
   getProfile,
   updateProfile,
@@ -19,6 +20,9 @@ const userRouter = express.Router();
 
 // LOGIN
 userRouter.post("/login", validate.validateLogin(), login);
+
+// LOGOUT
+userRouter.post("/logout", logout);
 
 // REGISTER
 userRouter.post("/register", validate.validateRegisterUser(), register);
