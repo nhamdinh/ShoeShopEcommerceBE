@@ -1,0 +1,19 @@
+{
+    "editor.fontSize": 21,
+    "editor.fontFamily": "Consolas, 'Courier New', monospace",
+    "editor.formatOnType": false,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "workbench.editor.enablePreview": false,
+    "liveServer.settings.port": 5504,
+    "window.zoomLevel": -2,
+    "liveSassCompile.settings.formats": [
+        {
+            "format": "expanded",
+            "extensionName": ".css",
+            "savePath": "./css"
+        }
+    ],
+    "[javascript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    }
+}
