@@ -20,7 +20,8 @@ const logger = winston.createLogger({
   format: winston.format.combine(
     winston.format.label({ label: "shop-ecommerce:" }),
     winston.format.timestamp(),
-    customFormat
+    customFormat,
+    // winston.format.prettyPrint()
   ),
   transports: [
     new winston.transports.Console(),
