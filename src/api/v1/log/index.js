@@ -14,7 +14,7 @@ let transport = new winston.transports.DailyRotateFile({
 });
 
 const customFormat = winston.format.printf((info) => {
-  return `[dinh dang] ${info.timestamp} [${info.label}] ${info.level}: ${info.message}`;
+  return `[format] ${info.timestamp} [${info.label}] ${info.level}: ${info.message}`;
 });
 const logger = winston.createLogger({
   format: winston.format.combine(
