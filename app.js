@@ -2,6 +2,8 @@ const express = require("express");
 const http = require("http");
 const helmet = require("helmet");
 const morgan = require("morgan");
+const compression = require("compression");
+
 const cors = require("cors");
 const path = require("path");
 const {
@@ -57,15 +59,23 @@ app.use(
 ); // server images
 
 /* middleware */
+app.use(helmet()); //bao ve thong tin may chu
+app.use(morgan("dev")); //log
+app.use(compression()); // tiet kiem bang thong 100 lan
+
 app.use(express.json());
-app.use(helmet());
-app.use(morgan("common"));
+
+// app.use(morgan("combined"));
 /* middleware */
 
 /* API */
 
-app.get("/", (req, res) => {
-  res.send("API is running");
+app.get("/", (req, res, next) => {
+  const strCompression = "hello world";
+  res.status(200).json({
+    mess: `API is running`,
+    metadata: strCompression.repeat(99999),
+  });
 });
 app.use(require("./src/api/v1/routes/"));
 
