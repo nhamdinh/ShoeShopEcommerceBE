@@ -57,7 +57,7 @@ const deleteCategoryById = asyncHandler(async (req, res) => {
 const createCategory = asyncHandler(async (req, res) => {
   try {
     const { category } = req.body;
-    const categoryExist = await Category.findOne({ category });
+    const categoryExist = await Category.findOne({ category }).lean();
     if (categoryExist) {
       res.status(400).json({ message: "Category name already exist" });
 
@@ -124,7 +124,7 @@ const deleteBrandById = asyncHandler(async (req, res) => {
 const createBrand = asyncHandler(async (req, res) => {
   try {
     const { brand, image } = req.body;
-    const brandExist = await Brand.findOne({ brand });
+    const brandExist = await Brand.findOne({ brand }).lean();
     if (brandExist) {
       res.status(400).json({ message: "Brand name already exist" });
 

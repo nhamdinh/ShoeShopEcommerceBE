@@ -17,9 +17,7 @@ const { storageUpload } = require("./src/config/storageUpload");
 const { uploadPhoto } = require("./src/api/v1/Middleware/uploadImage");
 const { checkOverload } = require("./src/api/v1/helpers/checkConnect");
 require("./src/config/MongoDb");
-checkOverload();
-
-const bodyParser = require("body-parser");
+// checkOverload();
 
 const app = express();
 
@@ -34,8 +32,6 @@ app.use(
     credentials: true,
   })
 );
-
-app.use(bodyParser.urlencoded({ extended: true }));
 
 app.set("view engine", require("ejs"));
 
@@ -58,19 +54,24 @@ app.use(morgan("dev")); //log
 app.use(compression()); // tiet kiem bang thong 100 lan, van chuyen du lieu
 
 app.use(express.json());
+app.use(
+  express.urlencoded({
+    extended: true,
+  })
+);
 
 // app.use(morgan("combined"));
 /* middleware */
 
 /* API */
 
-// app.get("/", (req, res, next) => {
-//   const strCompression = "hello world";
-//   res.status(200).json({
-//     mess: `API is running`,
-//     metadata: strCompression.repeat(10000),
-//   });
-// });
+app.get("/", (req, res, next) => {
+  const strCompression = "hello world";
+  res.status(200).json({
+    mess: `API is running`,
+    metadata: strCompression.repeat(10000),
+  });
+});
 app.use(require("./src/api/v1/routes/"));
 
 app.get("/api/config/paypal", (req, res) => {
