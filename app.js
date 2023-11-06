@@ -13,13 +13,13 @@ const {
 } = require("./src/api/v1/Middleware/errorHandler");
 const asyncHandler = require("express-async-handler");
 
-const connectDatabase = require("./src/config/MongoDb");
 const { storageUpload } = require("./src/config/storageUpload");
 const { uploadPhoto } = require("./src/api/v1/Middleware/uploadImage");
+const { checkOverload } = require("./src/api/v1/helpers/checkConnect");
+require("./src/config/MongoDb");
+checkOverload();
 
 const bodyParser = require("body-parser");
-
-connectDatabase();
 
 const app = express();
 
@@ -55,7 +55,7 @@ app.use(
 /* middleware */
 app.use(helmet()); //bao ve thong tin may chu
 app.use(morgan("dev")); //log
-app.use(compression()); // tiet kiem bang thong 100 lan
+app.use(compression()); // tiet kiem bang thong 100 lan, van chuyen du lieu
 
 app.use(express.json());
 
@@ -64,13 +64,13 @@ app.use(express.json());
 
 /* API */
 
-app.get("/", (req, res, next) => {
-  const strCompression = "hello world";
-  res.status(200).json({
-    mess: `API is running`,
-    metadata: strCompression.repeat(99999),
-  });
-});
+// app.get("/", (req, res, next) => {
+//   const strCompression = "hello world";
+//   res.status(200).json({
+//     mess: `API is running`,
+//     metadata: strCompression.repeat(10000),
+//   });
+// });
 app.use(require("./src/api/v1/routes/"));
 
 app.get("/api/config/paypal", (req, res) => {
