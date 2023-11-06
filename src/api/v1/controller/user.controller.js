@@ -1,3 +1,4 @@
+"use strict";
 const asyncHandler = require("express-async-handler");
 const generateToken = require("../utils/generateToken");
 const generateRefreshToken = require("../utils/generateRefreshToken");
