@@ -58,7 +58,7 @@ const getAllProductWithout = asyncHandler(async (req, res) => {
     const products = await Product.find({ deletedAt: null }).sort({
       createdAt: -1,
     });
-    res.json({ count, products });
+    res.json({ code: "success", count, products });
   } catch (error) {
     throw new Error(error);
   }
@@ -150,7 +150,7 @@ const createProduct = asyncHandler(async (req, res) => {
   try {
     const { name, price, description, image, countInStock, category } =
       req.body;
-    const productExist = await Product.findOne({ name });
+    const productExist = await Product.findOne({ name }).lean();
     if (productExist) {
       res.status(400).json({ message: "Product name already exist" });
       throw new Error("Product name already exist");

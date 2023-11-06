@@ -1,6 +1,9 @@
+"use strict";
+
 const asyncHandler = require("express-async-handler");
 const generateToken = require("../utils/generateToken");
 const generateRefreshToken = require("../utils/generateRefreshToken");
+const crypto = require("node:crypto");
 
 const { validationResult } = require("express-validator");
 
@@ -8,6 +11,9 @@ const User = require("../Models/UserModel");
 const ChatStory = require("../Models/ChatStoryModel");
 const logger = require("../log");
 const { COOKIE_REFRESH_TOKEN } = require("../utils/constant");
+const KeyTokenServices = require("../services/KeyTokenServices");
+const { createToken } = require("../utils/authUtils");
+const { getInfoData } = require("../utils/getInfo");
 
 const getAllUser = asyncHandler(async (req, res) => {
   try {
@@ -62,7 +68,7 @@ const login = asyncHandler(async (req, res) => {
     }
 
     const { email, password } = req.body;
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).lean();
 
     if (user && (await user.matchPassword(password))) {
       logger.info(user);
@@ -175,32 +181,65 @@ const register = asyncHandler(async (req, res) => {
     }
 
     const { name, email, password, phone, isAdmin } = req.body;
-    const userExists = await User.findOne({ email });
-
+    const userExists = await User.findOne({ email }).lean(); //giam size OBJECT, tra ve 1 obj js original, neu k trar ve nhieu thong tin hon
+    // console.log('userExists ::: ',userExists)
     if (userExists) {
-      res.status(400).json({ message: "User already exists" });
+      res.status(400).json({ code: "fail", message: "User already exists" });
       throw new Error("User already exists");
     }
-    const refreshToken = await generateRefreshToken(user?._id);
 
-    const user = await User.create({
+    const newUser = await User.create({
       name,
       email,
       phone,
       password,
       isAdmin,
-      refreshToken,
     });
 
-    if (user) {
+    if (newUser) {
+      /* create public key; private key; createKeyToken */
+      const { publicKey, privateKey } = crypto.generateKeyPairSync("rsa", {
+        modulusLength: 4096,
+        publicKeyEncoding: {
+          type: "pkcs1",
+          format: "pem",
+        },
+        privateKeyEncoding: {
+          type: "pkcs1",
+          format: "pem",
+        },
+      });
+
+      const publicKeyString = await KeyTokenServices.createKeyToken({
+        userId: newUser._id,
+        publicKey,
+        privateKey,
+      });
+
+      if (!publicKeyString) {
+        res.status(400).json({ code: "fail", message: "publicKey Error" });
+      }
+      // console.log(" newUser._id .toString()::::::", newUser._id.toString());
+      const { token, refreshToken } = await createToken(
+        {
+          userId: newUser._id,
+          email,
+        },
+        publicKeyString,
+        privateKey
+      );
+      /* create public key; private key; createKeyToken */
+
+      // const refreshToken = await generateRefreshToken(newUser?._id);
+      // const token = await generateToken(newUser?._id);
+
       res.status(201).json({
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
-        isAdmin: user.isAdmin,
-        refreshToken: refreshToken,
-        token: generateToken(user._id),
+        ...getInfoData({
+          object: newUser,
+          fields: ["_id", "name", "email"],
+        }),
+        refreshToken,
+        token,
       });
     } else {
       res.status(400).json({ message: "Invalid User Data" });

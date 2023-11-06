@@ -1,6 +1,13 @@
 const express = require("express");
 const routes = express.Router();
 
+// routes.use("/", (req, res, next) => {
+//   const strCompression = "hello world";
+//   res.status(200).json({
+//     mess: `API is running`,
+//     metadata: strCompression.repeat(10000),
+//   });
+// });
 routes.use("/api/import", require("./v1/dataImportRoute"));
 
 routes.use("/api/products", require("./v1/productRoutes"));

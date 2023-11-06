@@ -11,3 +11,9 @@ const { PORT } = process.env || 5000;
 app.listen(PORT, () => {
   console.log(`server run in port ${PORT}`);
 });
+
+process.on("SIGINT", () => {
+  server.close(() => {
+    console.log(`Server shutdown`);
+  });
+});
