@@ -1,21 +1,27 @@
-const mongoose = require("mongoose");
+const { Schema, model } = require("mongoose"); // Erase if already required
 const bcrypt = require("bcrypt");
+const DOCUMENT_NAME = "User";
+const COLLECTION_NAME = "Users";
 
-const userSchema = mongoose.Schema(
+const userSchema = Schema(
   {
     name: {
       type: String,
       required: true,
+      trim: true,
+      maxLength: 150,
     },
     email: {
       type: String,
       required: true,
       unique: true,
+      trim: true,
     },
     phone: {
       type: String,
       required: true,
       unique: false,
+      trim: true,
     },
     password: {
       type: String,
@@ -39,19 +45,33 @@ const userSchema = mongoose.Schema(
     refreshToken: {
       type: String,
     },
+    status: {
+      type: String,
+      enum: ["active", "inactive"],
+      default: "active",
+    },
+    verify: {
+      type: Boolean,
+      default: true,
+    },
+    roles: {
+      type: Array,
+      default: [],
+    },
     // passwordChangedAt: Date,
     // passwordResetToken: String,
     // passwordResetExpires: Date,
   },
   {
+    collection: COLLECTION_NAME,
     timestamps: true,
   }
 );
 
-// Login
-userSchema.methods.matchPassword = async function (enterPassword) {
-  return await bcrypt.compare(enterPassword, this.password);
-};
+// // Login
+// userSchema.methods.matchPassword = async function (enterPassword) {
+//   return await bcrypt.compare(enterPassword, this.password);
+// };
 
 // Register
 userSchema.pre("save", async function (next) {
@@ -62,6 +82,4 @@ userSchema.pre("save", async function (next) {
   this.password = await bcrypt.hash(this.password, salt);
 });
 
-const User = mongoose.model("User", userSchema);
-
-module.exports = User;
+module.exports = model(DOCUMENT_NAME, userSchema);

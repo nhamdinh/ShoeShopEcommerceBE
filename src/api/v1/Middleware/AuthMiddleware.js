@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const asyncHandler = require("express-async-handler");
 const User = require("../Models/UserModel");
+const { ForbiddenRequestError } = require("../core/errorResponse");
 
 module.exports = {
   admin: (req, res, next) => {
@@ -9,8 +10,7 @@ module.exports = {
     if (req.user && req.user.isAdmin) {
       next();
     } else {
-      res.status(401).json({ message: "Not authorized as an Admin" });
-      throw new Error("Not authorized as an Admin");
+      throw new ForbiddenRequestError("Not authorized as an Admin", 401);
     }
   },
 
@@ -24,19 +24,17 @@ module.exports = {
     ) {
       try {
         token = req.headers.authorization.split(" ")[1];
-
+        if (!token) {
+          throw new ForbiddenRequestError("Not authorized, no token", 401);
+        }
+        
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         req.user = await User.findById(decoded.id).select("-password");
         next();
       } catch (error) {
         console.error(error);
-        res.status(401).json({ message: "Not authorized, token failed" });
-        throw new Error("Not authorized, token failed");
+        throw new ForbiddenRequestError("Not authorized, token failed", 401);
       }
-    }
-    if (!token) {
-      res.status(401).json({ message: "Not authorized, no token" });
-      throw new Error("Not authorized, no token");
     }
   }),
 };

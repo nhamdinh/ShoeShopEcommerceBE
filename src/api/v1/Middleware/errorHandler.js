@@ -2,16 +2,17 @@
 
 const notFound = (req, res, next) => {
   const error = new Error(`API Not Found : ${req.originalUrl}`);
-  res.status(404);
+  error.status = 404;
   next(error);
 };
 
 // Error Handler
-const errorHandler = (err, req, res, next) => {
-  const statuscode = res.statusCode === 200 ? 500 : res.statusCode;
-  res.status(statuscode).json({
-    status: "fail",
-    message: err?.message,
+const errorHandler = (error, req, res, next) => {
+  const statusCode = error.status ?? 500;
+  res.status(statusCode).json({
+    status: "error",
+    code: statusCode,
+    message: error?.message ?? "Internal Server Error",
     // stack: err?.stack,
   });
 };

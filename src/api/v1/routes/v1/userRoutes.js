@@ -1,49 +1,58 @@
 const express = require("express");
+const asyncHandler = require("express-async-handler");
 
 const { protect, admin } = require("./../../Middleware/AuthMiddleware");
 
-const {
-  getAllUser,
-  getAllUserByAdmin,
-  login,
-  logout,
-  register,
-  getProfile,
-  updateProfile,
-  getAllChats,
-  getStory,
-  clearCountChat,
-} = require("../../controller/user.controller");
+// const {
+//   getAllUser,
+//   getAllUserByAdmin,
+//   login,
+//   logout,
+//   getProfile,
+//   updateProfile,
+//   getAllChats,
+//   getStory,
+//   clearCountChat,
+// } = require("../../controller/user.controller");
 const { validate } = require("../../validations");
+const userController = require("../../controller/user.controller");
 
 const userRouter = express.Router();
 
 // LOGIN
-userRouter.post("/login", validate.validateLogin(), login);
+userRouter.post(
+  "/login",
+  validate.validateLogin(),
+  asyncHandler(userController.login)
+);
 
-// LOGOUT
-userRouter.post("/logout", logout);
+// // LOGOUT
+// userRouter.post("/logout", logout);
 
 // REGISTER
-userRouter.post("/register", validate.validateRegisterUser(), register);
+userRouter.post(
+  "/register",
+  validate.validateRegisterUser(),
+  asyncHandler(userController.register)
+);
 
 // PROFILE
-userRouter.get("/profile", protect, getProfile);
+userRouter.get("/profile", protect, asyncHandler(userController.getProfile));
 
-// UPDATE PROFILE
-userRouter.put("/update-profile", protect, updateProfile);
+// // UPDATE PROFILE
+// userRouter.put("/update-profile", protect, updateProfile);
 
-// ADMIN GET ALL USER
-userRouter.get("/all-admin", protect, admin, getAllUserByAdmin);
+// // ADMIN GET ALL USER
+// userRouter.get("/all-admin", protect, admin, getAllUserByAdmin);
 
-// GET ALL USER
-userRouter.get("/get-all", getAllUser);
-/* =======================  CHAT STORIES ======================= */
-// GET ALL CHAT STORIES
-userRouter.get("/get-all-chats", getAllChats);
+// // GET ALL USER
+// userRouter.get("/get-all", getAllUser);
+// /* =======================  CHAT STORIES ======================= */
+// // GET ALL CHAT STORIES
+// userRouter.get("/get-all-chats", getAllChats);
 
-userRouter.get("/get-story", protect, getStory);
+// userRouter.get("/get-story", protect, getStory);
 
-userRouter.put("/clear-count-chat", protect, admin, clearCountChat);
+// userRouter.put("/clear-count-chat", protect, admin, clearCountChat);
 
 module.exports = userRouter;

@@ -148,10 +148,10 @@ app.get(
 //     cookiedomainrewrite: "localhost",
 //   })
 // );
-
+/* API */
+/* errorHandler */
 app.use(notFound);
 app.use(errorHandler);
-
-/* API */
+/* errorHandler */
 
 module.exports = app;
