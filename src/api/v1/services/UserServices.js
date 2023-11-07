@@ -1,6 +1,7 @@
 "use strict";
 const { validationResult } = require("express-validator");
 const crypto = require("node:crypto");
+const bcrypt = require("bcrypt");
 
 const { ForbiddenRequestError } = require("../core/errorResponse");
 const User = require("../Models/UserModel");
@@ -27,40 +28,41 @@ class UserServices {
       throw new ForbiddenRequestError("Wrong Email or Password");
     }
 
-    if (await user.matchPassword(password)) {
-      logger.info(`user ::: ${user}`);
-      const refreshToken = await generateRefreshToken(user?._id);
-      await User.findByIdAndUpdate(user._id, {
-        refreshToken: refreshToken,
-      });
-
-      // res.cookie(COOKIE_REFRESH_TOKEN, refreshToken, {
-      //   httpOnly: true,
-      //   maxAge: 72 * 60 * 60 * 1000,
-      //   signed: true,
-      // });
-      // res.cookie(COOKIE_REFRESH_TOKEN,`encrypted cookie string Value`);
-
-      // res.cookie('cookieName', 'cookieValue') // options is optional
-      // res.send('')
-
-      logger.info("refreshToken ::: " + refreshToken);
-
-      // res
-      //   .cookie("access_token", "token")
-      //   .json({ message: "Logged in successfully 😊 👌" });
-
-      return {
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
-        isAdmin: user.isAdmin,
-        refreshToken: refreshToken,
-        token: generateToken(user._id),
-        createdAt: user.createdAt,
-      };
+    const match = await bcrypt.compare(password, user.password);
+    if (!match) {
+      throw new ForbiddenRequestError("Wrong Email or Password");
     }
+    console.log(`user ::: ${user}`);
+
+    const refreshToken = await generateRefreshToken(user?._id);
+    await User.findByIdAndUpdate(user._id, {
+      refreshToken: refreshToken,
+    });
+
+    // res.cookie(COOKIE_REFRESH_TOKEN, refreshToken, {
+    //   httpOnly: true,
+    //   maxAge: 72 * 60 * 60 * 1000,
+    //   signed: true,
+    // });
+    // res.cookie(COOKIE_REFRESH_TOKEN,`encrypted cookie string Value`);
+
+    // res.cookie('cookieName', 'cookieValue') // options is optional
+    // res.send('')
+
+    logger.info("refreshToken ::: " + refreshToken);
+
+    // res
+    //   .cookie("access_token", "token")
+    //   .json({ message: "Logged in successfully 😊 👌" });
+
+    return {
+      ...getInfoData({
+        object: user,
+        fields: ["_id", "name", "email", "phone", "isAdmin", "createdAt"],
+      }),
+      refreshToken: refreshToken,
+      token: await generateToken(user._id),
+    };
   };
   // function parseCookies(request) {
   //   const list = {};
@@ -90,12 +92,10 @@ class UserServices {
       throw new ForbiddenRequestError("User not Found");
     }
     return {
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      phone: user.phone,
-      isAdmin: user.isAdmin,
-      createdAt: user.createdAt,
+      ...getInfoData({
+        object: user,
+        fields: ["_id", "name", "email", "phone", "isAdmin", "createdAt"],
+      }),
       admins,
     };
   };
