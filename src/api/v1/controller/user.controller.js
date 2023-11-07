@@ -14,6 +14,7 @@ const { COOKIE_REFRESH_TOKEN } = require("../utils/constant");
 const KeyTokenServices = require("../services/KeyTokenServices");
 const { createToken } = require("../utils/authUtils");
 const { getInfoData } = require("../utils/getInfo");
+const { ForbiddenRequestError } = require("../core/errorResponse");
 
 const getAllUser = asyncHandler(async (req, res) => {
   try {
@@ -173,80 +174,72 @@ const logout = asyncHandler(async (req, res) => {
 });
 
 const register = asyncHandler(async (req, res) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      res.status(422).json(errors.array());
-      return;
-    }
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    res.status(422).json(errors.array());
+    return;
+  }
+  const { name, email, password, phone, isAdmin } = req.body;
+  const userExists = await User.findOne({ email }).lean(); //giam size OBJECT, tra ve 1 obj js original, neu k trar ve nhieu thong tin hon
+  if (userExists) {
+    throw new ForbiddenRequestError("User already exists");
+  }
 
-    const { name, email, password, phone, isAdmin } = req.body;
-    const userExists = await User.findOne({ email }).lean(); //giam size OBJECT, tra ve 1 obj js original, neu k trar ve nhieu thong tin hon
-    // console.log('userExists ::: ',userExists)
-    if (userExists) {
-      res.status(400).json({ code: "fail", message: "User already exists" });
-      throw new Error("User already exists");
-    }
+  const newUser = await User.create({
+    name,
+    email,
+    phone,
+    password,
+    isAdmin,
+  });
 
-    const newUser = await User.create({
-      name,
-      email,
-      phone,
-      password,
-      isAdmin,
+  if (newUser) {
+    /* create public key; private key; createKeyToken */
+    const { publicKey, privateKey } = crypto.generateKeyPairSync("rsa", {
+      modulusLength: 4096,
+      publicKeyEncoding: {
+        type: "pkcs1",
+        format: "pem",
+      },
+      privateKeyEncoding: {
+        type: "pkcs1",
+        format: "pem",
+      },
     });
 
-    if (newUser) {
-      /* create public key; private key; createKeyToken */
-      const { publicKey, privateKey } = crypto.generateKeyPairSync("rsa", {
-        modulusLength: 4096,
-        publicKeyEncoding: {
-          type: "pkcs1",
-          format: "pem",
-        },
-        privateKeyEncoding: {
-          type: "pkcs1",
-          format: "pem",
-        },
-      });
+    const publicKeyString = await KeyTokenServices.createKeyToken({
+      userId: newUser._id,
+      publicKey,
+      privateKey,
+    });
 
-      const publicKeyString = await KeyTokenServices.createKeyToken({
-        userId: newUser._id,
-        publicKey,
-        privateKey,
-      });
-
-      if (!publicKeyString) {
-        res.status(400).json({ code: "fail", message: "publicKey Error" });
-      }
-      // console.log(" newUser._id .toString()::::::", newUser._id.toString());
-      const { token, refreshToken } = await createToken(
-        {
-          userId: newUser._id,
-          email,
-        },
-        publicKeyString,
-        privateKey
-      );
-      /* create public key; private key; createKeyToken */
-
-      // const refreshToken = await generateRefreshToken(newUser?._id);
-      // const token = await generateToken(newUser?._id);
-
-      res.status(201).json({
-        ...getInfoData({
-          object: newUser,
-          fields: ["_id", "name", "email"],
-        }),
-        refreshToken,
-        token,
-      });
-    } else {
-      res.status(400).json({ message: "Invalid User Data" });
-      throw new Error("Invalid User Data");
+    if (!publicKeyString) {
+      throw new ForbiddenRequestError("publicKey Error");
     }
-  } catch (error) {
-    throw new Error(error);
+    // console.log(" newUser._id .toString()::::::", newUser._id.toString());
+    const { token, refreshToken } = await createToken(
+      {
+        userId: newUser._id,
+        email,
+      },
+      publicKeyString,
+      privateKey
+    );
+    /* create public key; private key; createKeyToken */
+
+    // const refreshToken = await generateRefreshToken(newUser?._id);
+    // const token = await generateToken(newUser?._id);
+
+    res.status(201).json({
+      ...getInfoData({
+        object: newUser,
+        fields: ["_id", "name", "email"],
+      }),
+      refreshToken,
+      token,
+    });
+  } else {
+    throw new ForbiddenRequestError("Invalid User Data");
   }
 });
 
