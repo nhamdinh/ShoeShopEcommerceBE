@@ -4,13 +4,19 @@ const crypto = require("node:crypto");
 const bcrypt = require("bcrypt");
 
 const { ForbiddenRequestError } = require("../core/errorResponse");
-const User = require("../Models/UserModel");
 const KeyTokenServices = require("./KeyTokenServices");
 const { getInfoData } = require("../utils/getInfo");
 const { createToken } = require("../utils/authUtils");
 const logger = require("../log");
 const generateRefreshToken = require("../utils/generateRefreshToken");
 const generateToken = require("../utils/generateToken");
+const {
+  findUserByEmail,
+  findByIdAndUpdateToken,
+  findUserById,
+  findAllAdminUsers,
+  createUser,
+} = require("../repositories/user.repo");
 
 class UserServices {
   static login = async (req) => {
@@ -23,7 +29,9 @@ class UserServices {
     }
 
     const { email, password } = req.body;
-    const user = await User.findOne({ email });
+    const user = await findUserByEmail({ email });
+    console.log(`user ::: ${user}`);
+
     if (!user) {
       throw new ForbiddenRequestError("Wrong Email or Password");
     }
@@ -32,13 +40,13 @@ class UserServices {
     if (!match) {
       throw new ForbiddenRequestError("Wrong Email or Password");
     }
-    console.log(`user ::: ${user}`);
 
     const refreshToken = await generateRefreshToken(user?._id);
-    await User.findByIdAndUpdate(user._id, {
-      refreshToken: refreshToken,
-    });
 
+    const userUpdate = await findByIdAndUpdateToken(user._id, refreshToken);
+    if (!userUpdate) {
+      throw new ForbiddenRequestError("Wrong userUpdate");
+    }
     // res.cookie(COOKIE_REFRESH_TOKEN, refreshToken, {
     //   httpOnly: true,
     //   maxAge: 72 * 60 * 60 * 1000,
@@ -82,15 +90,12 @@ class UserServices {
   // }
 
   static getProfile = async (req) => {
-    const user = await User.findById(req.user._id);
-
-    const admins = await User.find({ isAdmin: true })
-      .select("email")
-      .select("phone");
-    // logger.info(`admins ::: ${admins}`);
+    const user = await findUserById(req.user._id);
     if (!user) {
       throw new ForbiddenRequestError("User not Found");
     }
+    const admins = await findAllAdminUsers();
+    // logger.info(`admins ::: ${admins}`);
     return {
       ...getInfoData({
         object: user,
@@ -110,12 +115,12 @@ class UserServices {
       );
     }
     const { name, email, password, phone, isAdmin } = req.body;
-    const userExists = await User.findOne({ email }).lean(); //giam size OBJECT, tra ve 1 obj js original, neu k trar ve nhieu thong tin hon
+    const userExists = await findUserByEmail({ email }); //giam size OBJECT, tra ve 1 obj js original, neu k trar ve nhieu thong tin hon
     if (userExists) {
       throw new ForbiddenRequestError("User already exists");
     }
 
-    const newUser = await User.create({
+    const newUser = await createUser({
       name,
       email,
       phone,
