@@ -27,9 +27,10 @@ const clothingSchema = new Schema(
     brand: { type: String, require: true },
     size: String,
     material: String,
+    product_shop: { type: Schema.Types.ObjectId, ref: "User" },
   },
   {
-    collection: "clothes",
+    collection: "clothings",
     timestamps: true,
   }
 );
@@ -39,9 +40,10 @@ const electronicsSchema = new Schema(
     brand: { type: String, require: true },
     size: String,
     material: String,
+    product_shop: { type: Schema.Types.ObjectId, ref: "User" },
   },
   {
-    collection: "clothes",
+    collection: "electronics",
     timestamps: true,
   }
 );
