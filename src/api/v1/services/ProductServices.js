@@ -4,22 +4,21 @@ const ProductModel = require("../Models/ProductModel");
 const { ForbiddenRequestError } = require("../core/errorResponse");
 
 class ProductFactory {
-  static createProduct = async (req) => {
-    const user = await findUserById(req.user._id);
-    if (!user) {
-      throw new ForbiddenRequestError("User not Found");
-    }
-    const admins = await findAllAdminUsers();
-    // logger.info(`admins ::: ${admins}`);
-    return {
-      ...getInfoData({
-        object: user,
-        fields: ["_id", "name", "email", "phone", "isAdmin", "createdAt"],
-      }),
-      admins,
-    };
+  static productRegistry = {};
+
+  static registryProductType(type, classRef) {
+    ProductFactory.productRegistry[type] = classRef;
+  }
+
+  static createProduct = async (type, payload) => {
+    const productClass = ProductFactory.productRegistry[type];
+    if (!productClass)
+      throw new ForbiddenRequestError(`Invalid Product type ::: ${type}`);
+
+    return new productClass(payload).createProduct();
   };
 }
+
 class Product {
   constructor({
     product_name,
@@ -41,19 +40,20 @@ class Product {
     this.product_attributes = product_attributes;
   }
 
-  async createProduct() {
-    return await ProductModel.product.create(this);
+  async createProduct(product_id) {
+    return await ProductModel.product.create({ ...this, _id: product_id });
   }
 }
 
 class Clothing extends Product {
   async createProduct() {
-    const newClothing = await ProductModel.clothing.create(
-      this.product_attributes
-    );
+    const newClothing = await ProductModel.clothing.create({
+      ...this.product_attributes,
+      product_shop: this.product_shop,
+    });
     if (!newClothing) throw new ForbiddenRequestError("Wrong create clothing");
 
-    const newProduct = await super.createProduct();
+    const newProduct = await super.createProduct(newClothing._id);
     if (!newProduct)
       throw new ForbiddenRequestError("Wrong create new Product");
     return newProduct;
@@ -61,17 +61,21 @@ class Clothing extends Product {
 }
 class Electronic extends Product {
   async createProduct() {
-    const newElectronic = await ProductModel.electronic.create(
-      this.product_attributes
-    );
+    const newElectronic = await ProductModel.electronic.create({
+      ...this.product_attributes,
+      product_shop: this.product_shop,
+    });
+    console.log(`newElectronic ::: ${newElectronic}`);
     if (!newElectronic)
       throw new ForbiddenRequestError("Wrong create electronic");
 
-    const newProduct = await super.createProduct();
+    const newProduct = await super.createProduct(newElectronic._id);
     if (!newProduct)
       throw new ForbiddenRequestError("Wrong create new Product");
     return newProduct;
   }
 }
-
+// register product type
+ProductFactory.registryProductType("Clothing", Clothing);
+ProductFactory.registryProductType("Electronic", Electronic);
 module.exports = ProductFactory;
