@@ -5,7 +5,7 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "workbench.editor.enablePreview": false,
     "liveServer.settings.port": 5504,
-    "window.zoomLevel": -1,
+    "window.zoomLevel": -2,
     "liveSassCompile.settings.formats": [
         {
             "format": "expanded",
