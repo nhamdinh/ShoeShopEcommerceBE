@@ -1,9 +1,12 @@
 "use strict";
-
 const { ForbiddenRequestError } = require("../core/errorResponse");
 const {
   createProductRepo,
   createProductTypeRepo,
+  publishedProductByShopRepo,
+  findAllProductsByShopRepo,
+  draftProductByShopRepo,
+  searchProductsRepo,
 } = require("../repositories/product.repo");
 const { PRODUCT_TYPES } = require("../utils/constant");
 
@@ -19,6 +22,32 @@ class ProductFactory {
       throw new ForbiddenRequestError(`Invalid Product type ::: ${type}`);
 
     return new productClass(payload).createProduct();
+  };
+
+  static findAllDaftByShop = async ({ product_shop, limit = 50, skip = 0 }) => {
+    const query = { product_shop, isDraft: true };
+    return await findAllProductsByShopRepo({ query, limit, skip });
+  };
+
+  static findAllPublishedByShop = async ({
+    product_shop,
+    limit = 50,
+    skip = 0,
+  }) => {
+    const query = { product_shop, isPublished: true };
+    return await findAllProductsByShopRepo({ query, limit, skip });
+  };
+
+  static publishedProductByShop = async ({ product_shop, product_id }) => {
+    return await publishedProductByShopRepo({ product_shop, product_id });
+  };
+
+  static draftProductByShop = async ({ product_shop, product_id }) => {
+    return await draftProductByShopRepo({ product_shop, product_id });
+  };
+
+  static searchProducts = async ({ keySearch }) => {
+    return await searchProductsRepo({ keySearch });
   };
 }
 

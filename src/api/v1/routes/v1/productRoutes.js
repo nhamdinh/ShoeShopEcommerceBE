@@ -25,6 +25,41 @@ productRoute.post(
   asyncHandler(productController.createProduct)
 );
 
+// PUBLISHED PRODUCT
+productRoute.put(
+  "/published/:id",
+  protect,
+  asyncHandler(productController.publishedProductByShop)
+);
+
+// DRAFT PRODUCT
+productRoute.put(
+  "/draft/:id",
+  protect,
+  asyncHandler(productController.draftProductByShop)
+);
+
+// GET DRAFT PRODUCT
+productRoute.get(
+  "/draft/all",
+  protect,
+  asyncHandler(productController.findAllDaftByShop)
+);
+
+// GET PUBLISHED PRODUCT
+productRoute.get(
+  "/published/all",
+  protect,
+  asyncHandler(productController.findAllPublishedByShop)
+);
+
+// GET SEARCH PRODUCTS
+productRoute.get(
+  "/search/:keySearch",
+  protect,
+  asyncHandler(productController.searchProducts)
+);
+
 // // GET ALL PRODUCT
 // productRoute.get("/get-all", getAllProduct);
 
