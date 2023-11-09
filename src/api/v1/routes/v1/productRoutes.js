@@ -17,12 +17,65 @@ const productController = require("../../controller/product.controller");
 // } = require("../../controller/product.controller");
 
 const productRoute = express.Router();
-
+/**
+ * PUT 201 tao thanh cong
+ * PATCH chinh sua nhung gi can chinh
+ *
+ *  */
 // CREATE PRODUCT
 productRoute.post(
   "/create",
   protect,
   asyncHandler(productController.createProduct)
+);
+
+// PUBLISHED PRODUCT
+productRoute.put(
+  "/published/:id",
+  protect,
+  asyncHandler(productController.publishedProductByShop)
+);
+
+// DRAFT PRODUCT
+productRoute.put(
+  "/draft/:id",
+  protect,
+  asyncHandler(productController.draftProductByShop)
+);
+
+// GET DRAFT PRODUCT
+productRoute.get(
+  "/draft/all",
+  protect,
+  asyncHandler(productController.findAllDaftByShop)
+);
+
+// GET PUBLISHED PRODUCT
+productRoute.get(
+  "/published/all",
+  protect,
+  asyncHandler(productController.findAllPublishedByShop)
+);
+
+// GET SEARCH PRODUCTS
+productRoute.get(
+  "/search/:keySearch",
+  protect,
+  asyncHandler(productController.searchProducts)
+);
+
+// GET ALL PRODUCTS
+productRoute.get(
+  "/all",
+  protect,
+  asyncHandler(productController.findAllProducts)
+);
+
+// GET PRODUCT BY ID
+productRoute.get(
+  "/detail/:product_id",
+  protect,
+  asyncHandler(productController.findProductById)
 );
 
 // // GET ALL PRODUCT

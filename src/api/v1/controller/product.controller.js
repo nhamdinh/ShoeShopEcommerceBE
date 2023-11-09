@@ -1,10 +1,11 @@
 const asyncHandler = require("express-async-handler");
+const util = require("util");
 
 const Product = require("../Models/ProductModel");
 const User = require("../Models/UserModel");
 const logger = require("../log");
 const ProductServices = require("../services/ProductServices");
-const { CREATED } = require("../core/successResponse");
+const { CREATED, OK } = require("../core/successResponse");
 
 // const getAllProduct = asyncHandler(async (req, res) => {
 //   try {
@@ -305,6 +306,85 @@ class ProductController {
       metadata: await ProductServices.createProduct(req.body?.product_type, {
         ...req.body,
         product_shop: req.user._id,
+      }),
+    }).send(res);
+  };
+
+  findAllDaftByShop = async (req, res, next) => {
+    new OK({
+      message: "findAllDaftByShop OK",
+      metadata: await ProductServices.findAllDaftByShop({
+        product_shop: req.user._id,
+      }),
+    }).send(res);
+  };
+
+  findAllPublishedByShop = async (req, res, next) => {
+    new OK({
+      message: "findAllPublishedByShop OK",
+      metadata: await ProductServices.findAllPublishedByShop({
+        product_shop: req.user._id,
+      }),
+    }).send(res);
+  };
+
+  publishedProductByShop = async (req, res, next) => {
+    new OK({
+      message: "publishedProductByShop OK",
+      metadata: await ProductServices.publishedProductByShop({
+        product_shop: req.user._id,
+        product_id: req.params.id,
+      }),
+    }).send(res);
+  };
+
+  draftProductByShop = async (req, res, next) => {
+    new OK({
+      message: "draftProductByShop OK",
+      metadata: await ProductServices.draftProductByShop({
+        product_shop: req.user._id,
+        product_id: req.params.id,
+      }),
+    }).send(res);
+  };
+
+  searchProducts = async (req, res, next) => {
+    new OK({
+      message: "searchProducts OK",
+      metadata: await ProductServices.searchProducts({
+        keySearch: req.params.keySearch,
+      }),
+    }).send(res);
+  };
+
+  findAllProducts = async (req, res, next) => {
+    logger.info(
+      `req.query ::: ${util.inspect(req.query, {
+        showHidden: false,
+        depth: null,
+        colors: false,
+      })}`
+    );
+
+    new OK({
+      message: "findAllProducts OK",
+      metadata: await ProductServices.findAllProducts(req.query),
+    }).send(res);
+  };
+
+  findProductById = async (req, res, next) => {
+    logger.info(
+      `req.params ::: ${util.inspect(req.params, {
+        showHidden: false,
+        depth: null,
+        colors: false,
+      })}`
+    );
+
+    new OK({
+      message: "findProductById OK",
+      metadata: await ProductServices.findProductById({
+        product_id: req.params.product_id,
       }),
     }).send(res);
   };
