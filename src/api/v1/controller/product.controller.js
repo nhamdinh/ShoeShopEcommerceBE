@@ -1,4 +1,5 @@
 const asyncHandler = require("express-async-handler");
+const util = require("util");
 
 const Product = require("../Models/ProductModel");
 const User = require("../Models/UserModel");
@@ -352,6 +353,38 @@ class ProductController {
       message: "searchProducts OK",
       metadata: await ProductServices.searchProducts({
         keySearch: req.params.keySearch,
+      }),
+    }).send(res);
+  };
+
+  findAllProducts = async (req, res, next) => {
+    logger.info(
+      `req.query ::: ${util.inspect(req.query, {
+        showHidden: false,
+        depth: null,
+        colors: false,
+      })}`
+    );
+
+    new OK({
+      message: "findAllProducts OK",
+      metadata: await ProductServices.findAllProducts(req.query),
+    }).send(res);
+  };
+
+  findProductById = async (req, res, next) => {
+    logger.info(
+      `req.params ::: ${util.inspect(req.params, {
+        showHidden: false,
+        depth: null,
+        colors: false,
+      })}`
+    );
+
+    new OK({
+      message: "findProductById OK",
+      metadata: await ProductServices.findProductById({
+        product_id: req.params.product_id,
       }),
     }).send(res);
   };

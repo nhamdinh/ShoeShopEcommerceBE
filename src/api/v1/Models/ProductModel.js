@@ -33,8 +33,8 @@ const productSchema = new Schema(
       type: Array,
       default: [],
     },
-    isDraft: { type: Boolean, default: true, index: true, select: true },
-    isPublished: { type: Boolean, default: false, index: true, select: true }, //cho phep select
+    isDraft: { type: Boolean, default: true, index: true },
+    isPublished: { type: Boolean, default: false, index: true }, //, select: T/F: always selected/not
   },
   {
     collection: COLLECTION_NAME,

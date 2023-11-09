@@ -7,6 +7,8 @@ const {
   findAllProductsByShopRepo,
   draftProductByShopRepo,
   searchProductsRepo,
+  findAllProductsRepo,
+  findProductByIdRepo,
 } = require("../repositories/product.repo");
 const { PRODUCT_TYPES } = require("../utils/constant");
 
@@ -48,6 +50,32 @@ class ProductFactory {
 
   static searchProducts = async ({ keySearch }) => {
     return await searchProductsRepo({ keySearch });
+  };
+
+  static findAllProducts = async ({
+    limit = 50,
+    sort = "ctime",
+    page = 1,
+    filter = { isPublished: true },
+    select = ["product_name", "product_price", "product_thumb"],
+  }) => {
+    return await findAllProductsRepo({
+      limit,
+      sort,
+      page,
+      filter,
+      select,
+    });
+  };
+
+  static findProductById = async ({
+    product_id,
+    unSelect = ["__v", "product_attributes"],
+  }) => {
+    return await findProductByIdRepo({
+      product_id,
+      unSelect,
+    });
   };
 }
 
