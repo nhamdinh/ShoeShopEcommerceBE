@@ -2,7 +2,7 @@
 
 const UserModel = require("../Models/UserModel");
 
-const findUserByEmail = async ({
+const findUserByEmailRepo = async ({
   email,
   select = {
     // name: 1,
@@ -16,13 +16,13 @@ const findUserByEmail = async ({
   return await UserModel.findOne({ email }).select(select).exec();
 };
 
-const findByIdAndUpdateToken = async (id, refreshToken) => {
+const findByIdAndUpdateTokenRepo = async (id, refreshToken) => {
   return await UserModel.findByIdAndUpdate(id, {
     refreshToken: refreshToken,
   }).exec();
 };
 
-const findUserById = async (id) => {
+const findUserByIdRepo = async (id) => {
   return await UserModel.findById(id).lean().exec();
   /* 
   lean(): giam size OBJECT, 
@@ -31,18 +31,18 @@ const findUserById = async (id) => {
   exec(): async await trong db
   */
 };
-const findAllAdminUsers = async (select = { email: 1, phone: 2 }) => {
+const findAllAdminUsersRepo = async (select = { email: 1, phone: 2 }) => {
   return await UserModel.find({ isAdmin: true }).select(select).lean().exec();
 };
 
-const createUser = async (user) => {
+const createUserRepo = async (user) => {
   return await UserModel.create({ ...user });
 };
 
 module.exports = {
-  findUserByEmail,
-  findByIdAndUpdateToken,
-  findUserById,
-  findAllAdminUsers,
-  createUser,
+  findUserByEmailRepo,
+  findByIdAndUpdateTokenRepo,
+  findUserByIdRepo,
+  findAllAdminUsersRepo,
+  createUserRepo,
 };

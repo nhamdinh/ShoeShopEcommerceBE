@@ -1,4 +1,5 @@
 const { Schema, model } = require("mongoose"); // Erase if already required
+const { PRODUCT_TYPES } = require("../utils/constant");
 const DOCUMENT_NAME = "Product";
 const COLLECTION_NAME = "Products";
 
@@ -12,7 +13,7 @@ const productSchema = new Schema(
     product_type: {
       type: String,
       required: true,
-      enum: ["Electronic", "Clothing", "Furniture"],
+      enum: [...PRODUCT_TYPES],
     },
     product_shop: { type: Schema.Types.ObjectId, ref: "User" },
     product_attributes: { type: Schema.Types.Mixed, required: true },
@@ -22,36 +23,41 @@ const productSchema = new Schema(
     timestamps: true,
   }
 );
-const clothingSchema = new Schema(
-  {
-    brand: { type: String, require: true },
-    size: String,
-    material: String,
-    product_shop: { type: Schema.Types.ObjectId, ref: "User" },
-  },
-  {
-    collection: "clothings",
-    timestamps: true,
-  }
-);
 
-const electronicsSchema = new Schema(
-  {
-    brand: { type: String, require: true },
-    size: String,
-    material: String,
-    product_shop: { type: Schema.Types.ObjectId, ref: "User" },
-  },
-  {
-    collection: "electronics",
-    timestamps: true,
-  }
-);
+class ProductModelFactory {
+  static productTypeStrategy = {
+    // clothing: model("clothing", clothingSchema),
+    // electronic: model("electronic", electronicSchema),
+  };
+  static registryProductTypeSchema = (type, Schema) => {
+    ProductModelFactory.productTypeStrategy[type] = Schema;
+  };
+}
+
+PRODUCT_TYPES.map(async (type) => {
+  await ProductModelFactory.registryProductTypeSchema(
+    type,
+    model(
+      type,
+      new Schema(
+        {
+          brand: { type: String, require: true },
+          size: String,
+          material: String,
+          product_shop: { type: Schema.Types.ObjectId, ref: "User" },
+        },
+        {
+          collection: type + "s",
+          timestamps: true,
+        }
+      )
+    )
+  );
+});
 
 module.exports = {
+  ...ProductModelFactory.productTypeStrategy,
   product: model(DOCUMENT_NAME, productSchema),
-  clothing: model("clothing", clothingSchema),
-  electronic: model("electronic", electronicsSchema),
 };
 
 // const mongoose = require("mongoose");

@@ -1,17 +1,20 @@
 "use strict";
 
-const ProductModel = require("../Models/ProductModel");
 const { ForbiddenRequestError } = require("../core/errorResponse");
+const {
+  createProductRepo,
+  createProductTypeRepo,
+} = require("../repositories/product.repo");
+const { PRODUCT_TYPES } = require("../utils/constant");
 
 class ProductFactory {
-  static productRegistry = {};
-
+  static productTypeStrategy = {};
   static registryProductType(type, classRef) {
-    ProductFactory.productRegistry[type] = classRef;
+    ProductFactory.productTypeStrategy[type] = classRef;
   }
 
   static createProduct = async (type, payload) => {
-    const productClass = ProductFactory.productRegistry[type];
+    const productClass = ProductFactory.productTypeStrategy[type];
     if (!productClass)
       throw new ForbiddenRequestError(`Invalid Product type ::: ${type}`);
 
@@ -41,41 +44,38 @@ class Product {
   }
 
   async createProduct(product_id) {
-    return await ProductModel.product.create({ ...this, _id: product_id });
+    return await createProductRepo({ ...this, _id: product_id });
   }
 }
 
-class Clothing extends Product {
-  async createProduct() {
-    const newClothing = await ProductModel.clothing.create({
-      ...this.product_attributes,
-      product_shop: this.product_shop,
-    });
-    if (!newClothing) throw new ForbiddenRequestError("Wrong create clothing");
+const classRefStrategy = (type) => {
+  return class ClassRef extends Product {
+    async createProduct() {
+      const newProductType = await createProductTypeRepo(type, {
+        ...this.product_attributes,
+        product_shop: this.product_shop,
+      });
+      // const newProductType = await ProductModel[type].create({
+      //   ...this.product_attributes,
+      //   product_shop: this.product_shop,
+      // });
+      // console.log(`newProductType ::: ${newProductType}`);
+      if (!newProductType)
+        throw new ForbiddenRequestError(`Wrong create new Product ${type}`);
 
-    const newProduct = await super.createProduct(newClothing._id);
-    if (!newProduct)
-      throw new ForbiddenRequestError("Wrong create new Product");
-    return newProduct;
-  }
-}
-class Electronic extends Product {
-  async createProduct() {
-    const newElectronic = await ProductModel.electronic.create({
-      ...this.product_attributes,
-      product_shop: this.product_shop,
-    });
-    console.log(`newElectronic ::: ${newElectronic}`);
-    if (!newElectronic)
-      throw new ForbiddenRequestError("Wrong create electronic");
+      const newProduct = await super.createProduct(newProductType._id);
+      if (!newProduct)
+        throw new ForbiddenRequestError("Wrong create new Product");
+      return newProduct;
+    }
+  };
+};
 
-    const newProduct = await super.createProduct(newElectronic._id);
-    if (!newProduct)
-      throw new ForbiddenRequestError("Wrong create new Product");
-    return newProduct;
-  }
-}
 // register product type
-ProductFactory.registryProductType("Clothing", Clothing);
-ProductFactory.registryProductType("Electronic", Electronic);
+PRODUCT_TYPES.map((type) => {
+  ProductFactory.registryProductType(type, classRefStrategy(type));
+});
+
+// console.log(ProductFactory.productTypeStrategy);
+
 module.exports = ProductFactory;

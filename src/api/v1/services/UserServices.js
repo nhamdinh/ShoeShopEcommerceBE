@@ -11,11 +11,11 @@ const logger = require("../log");
 const generateRefreshToken = require("../utils/generateRefreshToken");
 const generateToken = require("../utils/generateToken");
 const {
-  findUserByEmail,
-  findByIdAndUpdateToken,
-  findUserById,
-  findAllAdminUsers,
-  createUser,
+  findUserByEmailRepo,
+  findByIdAndUpdateTokenRepo,
+  findUserByIdRepo,
+  findAllAdminUsersRepo,
+  createUserRepo,
 } = require("../repositories/user.repo");
 
 class UserServices {
@@ -29,7 +29,7 @@ class UserServices {
     }
 
     const { email, password } = req.body;
-    const user = await findUserByEmail({ email });
+    const user = await findUserByEmailRepo({ email });
     console.log(`user ::: ${user}`);
 
     if (!user) {
@@ -43,7 +43,7 @@ class UserServices {
 
     const refreshToken = await generateRefreshToken(user?._id);
 
-    const userUpdate = await findByIdAndUpdateToken(user._id, refreshToken);
+    const userUpdate = await findByIdAndUpdateTokenRepo(user._id, refreshToken);
     if (!userUpdate) {
       throw new ForbiddenRequestError("Wrong userUpdate");
     }
@@ -90,11 +90,11 @@ class UserServices {
   // }
 
   static getProfile = async (req) => {
-    const user = await findUserById(req.user._id);
+    const user = await findUserByIdRepo(req.user._id);
     if (!user) {
       throw new ForbiddenRequestError("User not Found");
     }
-    const admins = await findAllAdminUsers();
+    const admins = await findAllAdminUsersRepo();
     // logger.info(`admins ::: ${admins}`);
     return {
       ...getInfoData({
@@ -115,12 +115,12 @@ class UserServices {
       );
     }
     const { name, email, password, phone, isAdmin } = req.body;
-    const userExists = await findUserByEmail({ email }); //giam size OBJECT, tra ve 1 obj js original, neu k trar ve nhieu thong tin hon
+    const userExists = await findUserByEmailRepo({ email }); //giam size OBJECT, tra ve 1 obj js original, neu k trar ve nhieu thong tin hon
     if (userExists) {
       throw new ForbiddenRequestError("User already exists");
     }
 
-    const newUser = await createUser({
+    const newUser = await createUserRepo({
       name,
       email,
       phone,
