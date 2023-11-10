@@ -105,7 +105,7 @@ const findAllProductsRepo = async ({ limit, sort, page, filter, select }) => {
   return products;
 };
 
-const findProductByIdRepo = async ({ product_id, unSelect }) => {
+const findProductByIdRepo = async ({ product_id, unSelect = [] }) => {
   return await ProductModel.product
     .findById(product_id)
     .select(getUnSelectData(unSelect))
@@ -116,7 +116,6 @@ const updateProductByIdRepo = async (
   model,
   { product_id, bodyUpdate, isNew = true }
 ) => {
-
   // logger.info(
   //   `bodyUpdate Repo ::: ${util.inspect(bodyUpdate, {
   //     showHidden: false,

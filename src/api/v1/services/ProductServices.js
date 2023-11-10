@@ -1,5 +1,6 @@
 "use strict";
 const util = require("util");
+const logger = require("../log");
 
 const { ForbiddenRequestError } = require("../core/errorResponse");
 const {
@@ -14,11 +15,12 @@ const {
   updateProductByIdRepo,
 } = require("../repositories/product.repo");
 const { PRODUCT_MODEL } = require("../utils/constant");
-const logger = require("../log");
 const {
   removeNullObject,
   updateNestedObjectParser,
+  convertToObjectId,
 } = require("../utils/getInfo");
+const InventoryServices = require("./InventoryServices");
 
 class ProductFactory {
   static productModelStrategy = {
@@ -64,10 +66,15 @@ class ProductFactory {
     product_id,
     unSelect = ["__v", "product_slug"],
   }) => {
-    return await findProductByIdRepo({
-      product_id,
+    const foundProduct = await findProductByIdRepo({
+      product_id: (product_id),
       unSelect,
     });
+
+    if (!foundProduct) {
+      return null;
+    }
+    return foundProduct;
   };
 
   static findAllDaftByShop = async ({ product_shop, limit = 50, skip = 0 }) => {
@@ -101,7 +108,7 @@ class ProductFactory {
     sort = "ctime",
     page = 1,
     filter = { isPublished: true },
-    select = ["product_name", "product_price", "product_thumb"],
+    select = ["product_name", "product_price", "product_thumb","isDraft","isPublished"],
   }) => {
     return await findAllProductsRepo({
       limit,
@@ -163,16 +170,36 @@ const classRefStrategy = (model) => {
       const newProduct = await super.createProduct(newProductType._id);
       if (!newProduct)
         throw new ForbiddenRequestError("Wrong create new Product");
+      await InventoryServices.createInventory({
+        inven_productId: newProduct._id,
+        inven_shopId: this.product_shop,
+        inven_stock: this.product_quantity,
+        inven_location: "unknown",
+      });
+
       return newProduct;
     }
 
     async updateProductById(product_id) {
       const objectParams = removeNullObject(this);
 
+      const foundProduct = await findProductByIdRepo({
+        product_id,
+      });
+
+      const isOwner =
+        foundProduct.product_shop.toString() ===
+        objectParams.product_shop.toString();
+
+      if (!isOwner) {
+        throw new ForbiddenRequestError("You are not Owner", 401);
+      }
       if (objectParams.product_attributes) {
         await updateProductByIdRepo(model, {
           product_id,
-          bodyUpdate: updateNestedObjectParser(removeNullObject(objectParams.product_attributes)),
+          bodyUpdate: updateNestedObjectParser(
+            removeNullObject(objectParams.product_attributes)
+          ),
         });
       }
 

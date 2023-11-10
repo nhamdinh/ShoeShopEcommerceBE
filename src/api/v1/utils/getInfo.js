@@ -2,6 +2,9 @@
 const util = require("util");
 const _ = require("lodash");
 const logger = require("../log");
+const { Types } = require("mongoose"); // Erase if already required
+
+const convertToObjectId = (id) => Types.ObjectId(id);
 
 const getInfoData = ({ object = {}, fields = [] }) => {
   return _.pick(object, fields);
@@ -60,4 +63,5 @@ module.exports = {
   getUnSelectData,
   removeNullObject,
   updateNestedObjectParser,
+  convertToObjectId,
 };
