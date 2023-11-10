@@ -1,5 +1,7 @@
 "use strict";
+const util = require("util");
 const _ = require("lodash");
+const logger = require("../log");
 
 const getInfoData = ({ object = {}, fields = [] }) => {
   return _.pick(object, fields);
@@ -14,4 +16,48 @@ const getUnSelectData = (select = []) => {
   return Object.fromEntries(select.map((el) => [el, 0]));
 };
 
-module.exports = { getInfoData, getSelectData, getUnSelectData };
+const removeNullObject = (obj) => {
+  Object.keys(obj).forEach((key) => {
+    if (obj[key] === null || obj[key] === undefined) {
+      delete obj[key];
+    }
+  });
+
+  return obj;
+};
+/**
+ * const a ={
+ *           b:{
+ *            c:1,
+ *            d:2
+ *           }
+ *          }
+ * ==>
+ * const a ={
+ *           b.c: 1
+ *           b.d: 2,
+ *          }
+ *
+ **/
+const updateNestedObjectParser = (obj) => {
+  const final = {};
+  Object.keys(obj).forEach((key) => {
+    if (typeof obj[key] === "object" && !Array.isArray(obj[key])) {
+      const response = updateNestedObjectParser(obj[key]);
+      Object.keys(obj[key]).forEach((aa) => {
+        final[`${key}.${aa}`] = response[aa];
+      });
+    } else {
+      final[key] = obj[key];
+    }
+  });
+  return final;
+};
+
+module.exports = {
+  getInfoData,
+  getSelectData,
+  getUnSelectData,
+  removeNullObject,
+  updateNestedObjectParser,
+};

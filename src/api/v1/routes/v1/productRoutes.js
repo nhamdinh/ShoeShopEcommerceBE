@@ -77,6 +77,12 @@ productRoute.get(
   protect,
   asyncHandler(productController.findProductById)
 );
+// UPDATE PRODUCT BY ID
+productRoute.patch(
+  "/update/:product_id",
+  protect,
+  asyncHandler(productController.updateProductById)
+);
 
 // // GET ALL PRODUCT
 // productRoute.get("/get-all", getAllProduct);
