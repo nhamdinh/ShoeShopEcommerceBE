@@ -11,8 +11,8 @@ const createProductRepo = async (product) => {
   return await ProductModel.product.create({ ...product });
 };
 
-const createProductTypeRepo = async (type, product) => {
-  return await ProductModel[type].create({ ...product });
+const createProductModelRepo = async (model, product) => {
+  return await ProductModel[model].create({ ...product });
 };
 
 const findAllProductsByShopRepo = async ({ query, limit, skip }) => {
@@ -83,13 +83,13 @@ const searchProductsRepo = async ({ keySearch }) => {
 };
 
 const findAllProductsRepo = async ({ limit, sort, page, filter, select }) => {
-  logger.info(
-    `getSelectData(select) ::: ${util.inspect(getSelectData(select), {
-      showHidden: false,
-      depth: null,
-      colors: false,
-    })}`
-  );
+  // logger.info(
+  //   `getSelectData(select) ::: ${util.inspect(getSelectData(select), {
+  //     showHidden: false,
+  //     depth: null,
+  //     colors: false,
+  //   })}`
+  // );
 
   const skip = (page - 1) * limit;
   const sortBy = sort === "ctime" ? { _id: -1 } : { _id: 1 };
@@ -105,15 +105,31 @@ const findAllProductsRepo = async ({ limit, sort, page, filter, select }) => {
   return products;
 };
 
-const findProductByIdRepo = async ({ product_id, unSelect }) => {
+const findProductByIdRepo = async ({ product_id, unSelect = [] }) => {
   return await ProductModel.product
     .findById(product_id)
     .select(getUnSelectData(unSelect))
     .lean();
 };
 
+const updateProductByIdRepo = async (
+  model,
+  { product_id, bodyUpdate, isNew = true }
+) => {
+  // logger.info(
+  //   `bodyUpdate Repo ::: ${util.inspect(bodyUpdate, {
+  //     showHidden: false,
+  //     depth: null,
+  //     colors: false,
+  //   })}`
+  // );
+  return await ProductModel[model].findByIdAndUpdate(product_id, bodyUpdate, {
+    new: isNew,
+  });
+};
+
 module.exports = {
-  createProductTypeRepo,
+  createProductModelRepo,
   createProductRepo,
   findProductByIdRepo,
   publishedProductByShopRepo,
@@ -121,4 +137,5 @@ module.exports = {
   findAllProductsByShopRepo,
   searchProductsRepo,
   findAllProductsRepo,
+  updateProductByIdRepo,
 };

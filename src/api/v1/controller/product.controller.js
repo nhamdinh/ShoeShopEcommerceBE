@@ -300,6 +300,20 @@ const { CREATED, OK } = require("../core/successResponse");
 // };
 
 class ProductController {
+  updateProductById = async (req, res, next) => {
+    new OK({
+      message: "updateProductById OK",
+      metadata: await ProductServices.updateProductById(
+        req.body?.product_type,
+        req.params.product_id,
+        {
+          ...req.body,
+          product_shop: req.user._id,
+        }
+      ),
+    }).send(res);
+  };
+
   createProduct = async (req, res, next) => {
     new CREATED({
       message: "createProduct CREATED",
@@ -373,13 +387,13 @@ class ProductController {
   };
 
   findProductById = async (req, res, next) => {
-    logger.info(
-      `req.params ::: ${util.inspect(req.params, {
-        showHidden: false,
-        depth: null,
-        colors: false,
-      })}`
-    );
+    // logger.info(
+    //   `req.params ::: ${util.inspect(req.params, {
+    //     showHidden: false,
+    //     depth: null,
+    //     colors: false,
+    //   })}`
+    // );
 
     new OK({
       message: "findProductById OK",
