@@ -1,7 +1,7 @@
 const { Schema, model } = require("mongoose"); // Erase if already required
 const slugify = require("slugify");
 
-const { PRODUCT_TYPES } = require("../utils/constant");
+const { PRODUCT_MODEL } = require("../utils/constant");
 const DOCUMENT_NAME = "Product";
 const COLLECTION_NAME = "Products";
 
@@ -16,7 +16,7 @@ const productSchema = new Schema(
     product_type: {
       type: String,
       required: true,
-      enum: [...PRODUCT_TYPES],
+      enum: [...PRODUCT_MODEL],
     },
     product_shop: { type: Schema.Types.ObjectId, ref: "User" },
     product_attributes: { type: Schema.Types.Mixed, required: true },
@@ -54,16 +54,16 @@ productSchema.pre("save", async function (next) {
   next();
 });
 class ProductModelFactory {
-  static productTypeStrategy = {
+  static productModelStrategy = {
     // clothing: model("clothing", clothingSchema),
     // electronic: model("electronic", electronicSchema),
   };
-  static registryProductTypeSchema = (type, Schema) => {
-    ProductModelFactory.productTypeStrategy[type] = Schema;
+  static registryProductTypeSchema = (model, Schema) => {
+    ProductModelFactory.productModelStrategy[model] = Schema;
   };
 }
 
-PRODUCT_TYPES.map(async (type) => {
+PRODUCT_MODEL.map(async (type) => {
   await ProductModelFactory.registryProductTypeSchema(
     type,
     model(
@@ -85,7 +85,7 @@ PRODUCT_TYPES.map(async (type) => {
 });
 
 module.exports = {
-  ...ProductModelFactory.productTypeStrategy,
+  ...ProductModelFactory.productModelStrategy,
   product: model(DOCUMENT_NAME, productSchema),
 };
 
