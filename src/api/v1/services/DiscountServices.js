@@ -7,6 +7,7 @@ const {
   createDiscountRepo,
   findOneDiscountRepo,
   getAllDiscountsByShopRepo,
+  deleteDiscountByShopRepo,
 } = require("../repositories/discount.repo");
 const { convertToObjectId, removeNullObject } = require("../utils/getInfo");
 const { findAllProductsRepo } = require("../repositories/product.repo");
@@ -27,16 +28,16 @@ class DiscountServices {
 
   static getAllProductsByDiscount = async ({
     discount_code,
-    discount_shopId,
+    discount_shopId = convertToObjectId(discount_shopId),
   }) => {
     const foundDiscount = await findOneDiscountRepo({
       discount_code: discount_code,
-      discount_shopId: convertToObjectId(discount_shopId),
+      discount_shopId: discount_shopId,
       discount_isActive: true,
     });
 
     if (!foundDiscount || !foundDiscount.discount_isActive)
-      throw new ForbiddenRequestError(`Discount is not exist`);
+      throw new ForbiddenRequestError(`Discount is not exist`, 404);
 
     const { discount_applyTo, discount_productIds } = foundDiscount;
     let products = [];
@@ -44,7 +45,7 @@ class DiscountServices {
     if (discount_applyTo === "all") {
       products = await findAllProductsRepo({
         filter: {
-          product_shop: convertToObjectId(discount_shopId),
+          product_shop: discount_shopId,
           isPublished: true,
         },
         limit: 50,
@@ -58,14 +59,6 @@ class DiscountServices {
           "isPublished",
         ],
       });
-
-      logger.info(
-        `products ::: ${util.inspect(products, {
-          showHidden: false,
-          depth: null,
-          colors: false,
-        })}`
-      );
     }
 
     if (discount_applyTo === "products_special") {
@@ -73,6 +66,7 @@ class DiscountServices {
         filter: {
           _id: { $in: discount_productIds },
           isPublished: true,
+          product_shop: discount_shopId,
         },
         limit: 50,
         sort: "ctime",
@@ -112,7 +106,7 @@ class DiscountServices {
       unSelect,
     });
     if (!foundDiscounts)
-      throw new ForbiddenRequestError(`No have Discounts code`);
+      throw new ForbiddenRequestError(`Discount is not exist`, 404);
 
     return foundDiscounts;
   };
@@ -129,7 +123,7 @@ class DiscountServices {
       discount_isActive: true,
     });
     if (!foundDiscount)
-      throw new ForbiddenRequestError(`Discount is not exist`);
+      throw new ForbiddenRequestError(`Discount is not exist`, 404);
     const {
       discount_isActive,
       discount_quantity,
@@ -145,7 +139,8 @@ class DiscountServices {
     if (
       !discount_isActive ||
       discount_quantity === 0 ||
-      new Date() > new Date(discount_end)
+      new Date() > new Date(discount_end) ||
+      new Date() < new Date(discount_start)
     )
       throw new ForbiddenRequestError(`Discount is out`);
 
@@ -154,7 +149,8 @@ class DiscountServices {
       orderTotalAmount = products_order.reduce((acc, product) => {
         return acc + +product.price * +product.quantity;
       }, 0);
-      if (orderTotalAmount < discount_order_minValue)
+
+      if (+orderTotalAmount < discount_order_minValue)
         throw new ForbiddenRequestError(
           `orderTotalAmount require minimum is ${discount_order_minValue}`
         );
@@ -170,14 +166,15 @@ class DiscountServices {
       const discountAmount =
         discount_type === "fixed_amount"
           ? discount_value
-          : ((orderTotalAmount * discount_value) / 100).toFixed(0);
+          : ((+orderTotalAmount * discount_value) / 100).toFixed(0);
 
       return {
         orderTotalAmount,
-        discountAmount,
+        discountAmount: +discountAmount,
         orderTotalAmountPay: orderTotalAmount - discountAmount,
       };
     }
+    return { orderTotalAmount };
   };
 
   static deleteDiscountByShop = async ({ codeId, discount_shopId }) => {
@@ -238,15 +235,10 @@ class Discount {
   async createDiscount() {
     const objectParams = removeNullObject(this);
 
-    // logger.info(
-    //   `objectParams ::: ${util.inspect(objectParams, {
-    //     showHidden: false,
-    //     depth: null,
-    //     colors: false,
-    //   })}`
-    // );
-
-    if (new Date() > new Date(objectParams.discount_end))
+    if (
+      // new Date() > new Date(objectParams.discount_start) ||
+      new Date() > new Date(objectParams.discount_end)
+    )
       throw new ForbiddenRequestError(`Discount code has expired`);
 
     if (

@@ -30,4 +30,11 @@ DiscountRouter.post(
   asyncHandler(discountController.getAllProductsByDiscount)
 );
 
+// GET-DISCOUNT-AMOUNT
+DiscountRouter.post(
+  "/get-discount-amount",
+  protect,
+  asyncHandler(discountController.getDiscountsAmount)
+);
+
 module.exports = DiscountRouter;

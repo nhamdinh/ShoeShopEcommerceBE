@@ -8,6 +8,7 @@ const crypto = require("node:crypto");
 const { validationResult } = require("express-validator");
 
 const ChatStory = require("../Models/ChatStoryModel");
+const util = require("util");
 const logger = require("../log");
 const { COOKIE_REFRESH_TOKEN } = require("../utils/constant");
 const KeyTokenServices = require("../services/KeyTokenServices");
@@ -44,18 +45,24 @@ class DiscountController {
     }).send(res);
   };
 
-  // getProfile = async (req, res) => {
-  //   new OK({
-  //     message: "getProfile OK",
-  //     metadata: await UserServices.getProfile(req),
-  //   }).send(res);
-  // };
-  // login = async (req, res) => {
-  //   new OK({
-  //     message: "login OK",
-  //     metadata: await UserServices.login(req),
-  //   }).send(res);
-  // };
+  getDiscountsAmount = async (req, res, next) => {
+    // logger.info(
+    //   `req.body ::: ${util.inspect(req.body, {
+    //     showHidden: false,
+    //     depth: null,
+    //     colors: false,
+    //   })}`
+    // );
+    new OK({
+      message: "getDiscountsAmount OK",
+      metadata: await DiscountServices.getDiscountsAmount({
+        discount_used_userId: req.user._id,
+        discount_code: req.body.discount_code,
+        discount_shopId: req.body.discount_shopId,
+        products_order: req.body.products_order,
+      }),
+    }).send(res);
+  };
 }
 
 module.exports = new DiscountController();

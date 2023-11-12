@@ -1,28 +1,38 @@
 const express = require("express");
+const asyncHandler = require("express-async-handler");
+
 const { protect } = require("./../../Middleware/AuthMiddleware");
-const {
-  getAllCart,
-  checkCart,
-  createCart,
-  getCartById,
-  deleteItemFromCart,
-} = require("../../controller/cart.controller");
+const cartController = require("../../controller/cart.controller");
+// const {
+//   getAllCart,
+//   checkCart,
+//   createCart,
+//   getCartById,
+//   deleteItemFromCart,
+// } = require("../../controller/cart.controller");
 
-const cartRoute = express.Router();
+const cartRouter = express.Router();
 
-// GET ALL CART
-cartRoute.get("/get-all", getAllCart);
+// ADD-TO-CART
+cartRouter.post(
+  "/add-to-cart",
+  protect,
+  asyncHandler(cartController.addProductToCart)
+);
 
-// CHECK EXIST CART
-cartRoute.get("/check-cart", protect, checkCart);
+// // GET ALL CART
+// cartRoute.get("/get-all", getAllCart);
 
-// CREATE CART
-cartRoute.post("/create-cart", protect, createCart);
+// // CHECK EXIST CART
+// cartRoute.get("/check-cart", protect, checkCart);
 
-// GET SINGLE CART
-cartRoute.get("/:id", getCartById);
+// // CREATE CART
+// cartRoute.post("/create-cart", protect, createCart);
 
-// REMOVE ITEM FROM CART
-cartRoute.put("/:id/remove", protect, deleteItemFromCart);
+// // GET SINGLE CART
+// cartRoute.get("/:id", getCartById);
 
-module.exports = cartRoute;
+// // REMOVE ITEM FROM CART
+// cartRoute.put("/:id/remove", protect, deleteItemFromCart);
+
+module.exports = cartRouter;
