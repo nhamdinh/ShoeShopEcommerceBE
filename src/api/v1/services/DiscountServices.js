@@ -2,12 +2,13 @@
 const util = require("util");
 const logger = require("../log");
 
-const {} = require("../core/errorResponse");
+const { ForbiddenRequestError } = require("../core/errorResponse");
 const {
   createDiscountRepo,
   findOneDiscountRepo,
+  getAllDiscountsByShopRepo,
 } = require("../repositories/discount.repo");
-const { convertToObjectId } = require("../utils/getInfo");
+const { convertToObjectId, removeNullObject } = require("../utils/getInfo");
 const { findAllProductsRepo } = require("../repositories/product.repo");
 
 /**
@@ -20,8 +21,184 @@ const { findAllProductsRepo } = require("../repositories/product.repo");
  **/
 
 class DiscountServices {
+  static createDiscount = async (payload) => {
+    return new Discount(payload).createDiscount();
+  };
+
+  static getAllProductsByDiscount = async ({
+    discount_code,
+    discount_shopId,
+  }) => {
+    const foundDiscount = await findOneDiscountRepo({
+      discount_code: discount_code,
+      discount_shopId: convertToObjectId(discount_shopId),
+      discount_isActive: true,
+    });
+
+    if (!foundDiscount || !foundDiscount.discount_isActive)
+      throw new ForbiddenRequestError(`Discount is not exist`);
+
+    const { discount_applyTo, discount_productIds } = foundDiscount;
+    let products = [];
+
+    if (discount_applyTo === "all") {
+      products = await findAllProductsRepo({
+        filter: {
+          product_shop: convertToObjectId(discount_shopId),
+          isPublished: true,
+        },
+        limit: 50,
+        sort: "ctime",
+        page: 1,
+        select: [
+          "product_shop",
+          "product_name",
+          "product_price",
+          "product_thumb",
+          "isPublished",
+        ],
+      });
+
+      logger.info(
+        `products ::: ${util.inspect(products, {
+          showHidden: false,
+          depth: null,
+          colors: false,
+        })}`
+      );
+    }
+
+    if (discount_applyTo === "products_special") {
+      products = await findAllProductsRepo({
+        filter: {
+          _id: { $in: discount_productIds },
+          isPublished: true,
+        },
+        limit: 50,
+        sort: "ctime",
+        page: 1,
+        select: [
+          "product_shop",
+          "product_name",
+          "product_price",
+          "product_thumb",
+          "isDraft",
+          "isPublished",
+        ],
+      });
+    }
+    return products;
+  };
+
+  static getAllDiscountsByShop = async ({
+    limit = 50,
+    sort = "ctime",
+    page = 1,
+    discount_shopId = convertToObjectId(discount_shopId),
+    filter = {
+      discount_isActive: true,
+    },
+
+    unSelect = ["__v"],
+  }) => {
+    const foundDiscounts = await getAllDiscountsByShopRepo({
+      limit: +limit,
+      page: +page,
+      sort,
+      filter: {
+        ...filter,
+        discount_shopId,
+      },
+      unSelect,
+    });
+    if (!foundDiscounts)
+      throw new ForbiddenRequestError(`No have Discounts code`);
+
+    return foundDiscounts;
+  };
+
+  static getDiscountsAmount = async ({
+    discount_code,
+    discount_shopId,
+    discount_used_userId,
+    products_order,
+  }) => {
+    const foundDiscount = await findOneDiscountRepo({
+      discount_code: discount_code,
+      discount_shopId: convertToObjectId(discount_shopId),
+      discount_isActive: true,
+    });
+    if (!foundDiscount)
+      throw new ForbiddenRequestError(`Discount is not exist`);
+    const {
+      discount_isActive,
+      discount_quantity,
+      discount_start,
+      discount_end,
+      discount_order_minValue,
+      discount_useMax_user,
+      discount_used_users,
+      discount_type,
+      discount_value,
+    } = foundDiscount;
+
+    if (
+      !discount_isActive ||
+      discount_quantity === 0 ||
+      new Date() > new Date(discount_end)
+    )
+      throw new ForbiddenRequestError(`Discount is out`);
+
+    let orderTotalAmount = 0;
+    if (discount_order_minValue > 0) {
+      orderTotalAmount = products_order.reduce((acc, product) => {
+        return acc + +product.price * +product.quantity;
+      }, 0);
+      if (orderTotalAmount < discount_order_minValue)
+        throw new ForbiddenRequestError(
+          `orderTotalAmount require minimum is ${discount_order_minValue}`
+        );
+
+      /* check */
+      if (discount_useMax_user > 0) {
+        const userUsed = discount_used_users.find(
+          (user) => user._id === discount_used_userId
+        );
+        if (userUsed) throw new ForbiddenRequestError(`Your turn is over`);
+      }
+
+      const discountAmount =
+        discount_type === "fixed_amount"
+          ? discount_value
+          : ((orderTotalAmount * discount_value) / 100).toFixed(0);
+
+      return {
+        orderTotalAmount,
+        discountAmount,
+        orderTotalAmountPay: orderTotalAmount - discountAmount,
+      };
+    }
+  };
+
+  static deleteDiscountByShop = async ({ codeId, discount_shopId }) => {
+    const deleted = await deleteDiscountByShopRepo({
+      codeId: convertToObjectId(codeId),
+      discount_shopId: convertToObjectId(discount_shopId),
+    });
+    return deleted;
+  };
+
+  static cancelDiscountBy = async () => {
+    // const deleted = await deleteDiscountByShopRepo({
+    //   codeId: convertToObjectId(codeId),
+    //   discount_shopId: convertToObjectId(discount_shopId),
+    // });
+    return null;
+  };
+}
+
+class Discount {
   constructor({
-    discount_name,
     discount_description,
     discount_type,
     discount_value,
@@ -35,10 +212,10 @@ class DiscountServices {
     discount_order_minValue,
     discount_shopId,
     discount_isActive,
+    discount_isDelete,
     discount_applyTo,
     discount_productIds,
   }) {
-    this.discount_name = discount_name;
     this.discount_description = discount_description;
     this.discount_type = discount_type;
     this.discount_value = discount_value;
@@ -52,82 +229,43 @@ class DiscountServices {
     this.discount_order_minValue = discount_order_minValue;
     this.discount_shopId = convertToObjectId(discount_shopId);
     this.discount_isActive = discount_isActive;
+    this.discount_isDelete = discount_isDelete;
     this.discount_applyTo = discount_applyTo;
     this.discount_productIds =
       this.discount_applyTo === "all" ? [] : discount_productIds;
   }
 
-  static createDiscount = async () => {
-    if (
-      new Date() < new Date(this.discount_start) ||
-      new Date() > new Date(this.discount_end)
-    )
+  async createDiscount() {
+    const objectParams = removeNullObject(this);
+
+    // logger.info(
+    //   `objectParams ::: ${util.inspect(objectParams, {
+    //     showHidden: false,
+    //     depth: null,
+    //     colors: false,
+    //   })}`
+    // );
+
+    if (new Date() > new Date(objectParams.discount_end))
       throw new ForbiddenRequestError(`Discount code has expired`);
 
-    if (new Date(this.discount_end) <= new Date(this.discount_start))
+    if (
+      new Date(objectParams.discount_end) <=
+      new Date(objectParams.discount_start)
+    )
       throw new ForbiddenRequestError(`Start date must be before End date`);
 
     const foundDiscount = await findOneDiscountRepo({
-      discount_code: this.discount_code,
-      discount_shopId: this.discount_shopId,
+      discount_code: objectParams.discount_code,
+      discount_shopId: objectParams.discount_shopId,
+      discount_isActive: true,
     });
 
     if (foundDiscount && foundDiscount.discount_isActive)
       throw new ForbiddenRequestError(`Discount is exist`);
 
-    return await createDiscountRepo(this);
-  };
-
-  static getAllProductsByDiscount = async () => {
-    const foundDiscount = await findOneDiscountRepo({
-      discount_code: this.discount_code,
-      discount_shopId: this.discount_shopId,
-    });
-
-    if (!foundDiscount || !foundDiscount.discount_isActive)
-      throw new ForbiddenRequestError(`Discount is not exist`);
-
-    const { discount_applyTo, discount_productIds } = foundDiscount;
-    let products = [];
-
-    if (discount_applyTo === "all") {
-      products = await findAllProductsRepo({
-        filter: {
-          product_shop: this.discount_shopId,
-          isPublished: true,
-        },
-        limit: 50,
-        sort: "ctime",
-        page: 1,
-        select: [
-          "product_name",
-          "product_price",
-          "product_thumb",
-          "isPublished",
-        ],
-      });
-    }
-
-    if (discount_applyTo === "products_special") {
-      products = await findAllProductsRepo({
-        filter: {
-          _id: { $in: discount_productIds },
-          isPublished: true,
-        },
-        limit: 50,
-        sort: "ctime",
-        page: 1,
-        select: [
-          "product_name",
-          "product_price",
-          "product_thumb",
-          "isDraft",
-          "isPublished",
-        ],
-      });
-    }
-    return products;
-  };
+    return await createDiscountRepo(objectParams);
+  }
 }
 
 module.exports = DiscountServices;

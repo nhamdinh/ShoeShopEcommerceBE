@@ -6,7 +6,7 @@ const COLLECTION_NAME = "Discounts";
 // Declare the Schema of the Mongo model
 const discountSchema = new Schema(
   {
-    discount_name: { type: String, required: true },
+    discount_code: { type: String, required: true },
     discount_description: { type: String, required: true },
     discount_type: {
       type: String,
@@ -16,7 +16,6 @@ const discountSchema = new Schema(
     },
     discount_value: { type: Number, required: true },
 
-    discount_code: { type: String, required: true },
     discount_start: { type: Date, required: true },
     discount_end: { type: Date, required: true },
     discount_quantity: { type: Number, required: true },
@@ -30,6 +29,7 @@ const discountSchema = new Schema(
       ref: "User",
     },
     discount_isActive: { type: Boolean, default: true },
+    discount_isDelete: { type: Boolean, default: false },
     discount_applyTo: {
       type: String,
       require: true,

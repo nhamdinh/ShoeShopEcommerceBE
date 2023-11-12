@@ -109,6 +109,7 @@ class ProductFactory {
     filter = { isPublished: true },
     select = [
       "product_name",
+      "product_shop",
       "product_price",
       "product_thumb",
       "isDraft",
