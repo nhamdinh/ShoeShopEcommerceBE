@@ -18,7 +18,6 @@ const { PRODUCT_MODEL } = require("../utils/constant");
 const {
   removeNullObject,
   updateNestedObjectParser,
-  convertToObjectId,
 } = require("../utils/getInfo");
 const InventoryServices = require("./InventoryServices");
 
@@ -67,7 +66,7 @@ class ProductFactory {
     unSelect = ["__v", "product_slug"],
   }) => {
     const foundProduct = await findProductByIdRepo({
-      product_id: (product_id),
+      product_id: product_id,
       unSelect,
     });
 
@@ -108,7 +107,14 @@ class ProductFactory {
     sort = "ctime",
     page = 1,
     filter = { isPublished: true },
-    select = ["product_name", "product_price", "product_thumb","isDraft","isPublished"],
+    select = [
+      "product_name",
+      "product_shop",
+      "product_price",
+      "product_thumb",
+      "isDraft",
+      "isPublished",
+    ],
   }) => {
     return await findAllProductsRepo({
       limit,
@@ -187,13 +193,24 @@ const classRefStrategy = (model) => {
         product_id,
       });
 
+      if (!foundProduct) {
+        throw new ForbiddenRequestError("Product not found", 404);
+      }
+
       const isOwner =
         foundProduct.product_shop.toString() ===
         objectParams.product_shop.toString();
-
       if (!isOwner) {
         throw new ForbiddenRequestError("You are not Owner", 401);
       }
+
+      const isModel =
+        foundProduct.product_type.toString() ===
+        objectParams.product_type.toString();
+      if (!isModel) {
+        throw new ForbiddenRequestError("Wrong product model");
+      }
+
       if (objectParams.product_attributes) {
         await updateProductByIdRepo(model, {
           product_id,
