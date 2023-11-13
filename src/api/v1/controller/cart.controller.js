@@ -9,7 +9,7 @@ class CartController {
     new OK({
       message: "addProductToCart OK",
       metadata: await CartServices.addProductToCart({
-        cart_products: [],
+        product: req.body.product,
         cart_userId: req.user._id,
       }),
     }).send(res);
