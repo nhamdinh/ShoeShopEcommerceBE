@@ -20,8 +20,18 @@ cartRouter.post(
   asyncHandler(cartController.addProductToCart)
 );
 
-// // GET ALL CART
-// cartRoute.get("/get-all", getAllCart);
+// GET CURRENT CART
+cartRouter.get(
+  "/get-current-cart",
+  protect,
+  asyncHandler(cartController.getCurrentCart)
+);
+
+// GET ALL CART
+cartRouter.get("/get-all", asyncHandler(cartController.getAllCart));
+
+// GET ALL CART
+cartRouter.patch("/delete", protect, asyncHandler(cartController.deleteCart));
 
 // // CHECK EXIST CART
 // cartRoute.get("/check-cart", protect, checkCart);

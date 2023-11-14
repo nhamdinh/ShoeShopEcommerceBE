@@ -14,19 +14,35 @@ class CartController {
       }),
     }).send(res);
   };
+
+  getCurrentCart = async (req, res, next) => {
+    new OK({
+      message: "getCurrentCart OK",
+      metadata: await CartServices.getCurrentCart({
+        cart_userId: req.user._id,
+      }),
+    }).send(res);
+  };
+
+  getAllCart = async (req, res, next) => {
+    new OK({
+      message: "getAllCart OK",
+      metadata: await CartServices.getAllCart(),
+    }).send(res);
+  };
+
+  deleteCart = async (req, res, next) => {
+    new OK({
+      message: "deleteCart OK",
+      metadata: await CartServices.deleteCart({
+        cart_id: req.body.cart_id,
+        cart_userId: req.user._id,
+      }),
+    }).send(res);
+  };
 }
 
 module.exports = new CartController();
-
-// const getAllCart = asyncHandler(async (req, res) => {
-//   try {
-//     const count = await Cart.countDocuments({});
-//     const carts = await Cart.find({}).sort({ createdAt: -1 });
-//     res.json({ count, carts });
-//   } catch (error) {
-//     throw new Error(error);
-//   }
-// });
 
 // const getCartById = asyncHandler(async (req, res) => {
 //   try {
