@@ -88,13 +88,13 @@ const searchProductsRepo = async ({ keySearch }) => {
 };
 
 const findAllProductsRepo = async ({ limit, sort, page, filter, select }) => {
-  logger.info(
-    `filter(select) ::: ${util.inspect(filter, {
-      showHidden: false,
-      depth: null,
-      colors: false,
-    })}`
-  );
+  // logger.info(
+  //   `filter(select) ::: ${util.inspect(filter, {
+  //     showHidden: false,
+  //     depth: null,
+  //     colors: false,
+  //   })}`
+  // );
 
   const skip = (page - 1) * limit;
   const sortBy = sort === "ctime" ? { _id: -1 } : { _id: 1 };
@@ -118,6 +118,16 @@ const findProductByIdRepo = async ({ product_id, unSelect = [] }) => {
     .findById(product_id)
     .select(getUnSelectData(unSelect))
     .lean();
+};
+
+const findProductById1Repo = async ({ product_id }) => {
+  return await ProductModel.product
+    .findById(product_id)
+    .lean();
+};
+
+const findOneProductRepo = async ({ filter }) => {
+  return await ProductModel.product.findOne(filter).lean();
 };
 
 const updateProductByIdRepo = async (
@@ -146,4 +156,6 @@ module.exports = {
   searchProductsRepo,
   findAllProductsRepo,
   updateProductByIdRepo,
+  findOneProductRepo,
+  findProductById1Repo
 };
