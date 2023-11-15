@@ -4,7 +4,11 @@ const util = require("util");
 const { Types } = require("mongoose"); // Erase if already required
 
 const ProductModel = require("../Models/ProductModel");
-const { getSelectData, getUnSelectData } = require("../utils/getInfo");
+const {
+  getSelectData,
+  getUnSelectData,
+  convertToObjectId,
+} = require("../utils/getInfo");
 const logger = require("../log");
 
 const createProductRepo = async (product) => {
@@ -121,9 +125,7 @@ const findProductByIdRepo = async ({ product_id, unSelect = [] }) => {
 };
 
 const findProductById1Repo = async ({ product_id }) => {
-  return await ProductModel.product
-    .findById(product_id)
-    .lean();
+  return await ProductModel.product.findById(product_id).lean();
 };
 
 const findOneProductRepo = async ({ filter }) => {
@@ -146,6 +148,24 @@ const updateProductByIdRepo = async (
   });
 };
 
+const checkProductsRepo = async (products) => {
+  return await Promise.all(
+    products.map(async (product) => {
+      const foundProduct = await ProductModel.product.findById(
+        convertToObjectId(product?.productId)
+      );
+
+      if (foundProduct) {
+        return {
+          price: foundProduct?.product_price,
+          productId: product?.productId,
+          quantity: product?.quantity,
+        };
+      }
+    })
+  );
+};
+
 module.exports = {
   createProductModelRepo,
   createProductRepo,
@@ -157,5 +177,6 @@ module.exports = {
   findAllProductsRepo,
   updateProductByIdRepo,
   findOneProductRepo,
-  findProductById1Repo
+  findProductById1Repo,
+  checkProductsRepo,
 };

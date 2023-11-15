@@ -22,7 +22,10 @@ class DiscountController {
   createDiscount = async (req, res, next) => {
     new CREATED({
       message: "createDiscount CREATED",
-      metadata: await DiscountServices.createDiscount(req.body),
+      metadata: await DiscountServices.createDiscount({
+        ...req.body,
+        discount_shopId: req.user._id,
+      }),
     }).send(res);
   };
 
