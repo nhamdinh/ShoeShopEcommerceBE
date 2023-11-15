@@ -117,21 +117,6 @@ class DiscountServices {
     discount_used_userId,
     products_order,
   }) => {
-    logger.info(
-      `xxx ::: ${util.inspect(
-        {
-          discount_code: discount_code,
-          discount_shopId: convertToObjectId(discount_shopId),
-          discount_isActive: true,
-        },
-        {
-          showHidden: false,
-          depth: null,
-          colors: false,
-        }
-      )}`
-    );
-
     const foundDiscount = await findOneDiscountRepo({
       discount_code: discount_code,
       discount_shopId: convertToObjectId(discount_shopId),

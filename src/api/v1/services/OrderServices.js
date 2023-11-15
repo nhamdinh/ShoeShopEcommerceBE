@@ -79,7 +79,7 @@ class OrderServices {
       checkCart.totalAmount += checkProductsPrice;
 
       if (shopDiscount.length > 0) {
-        const xxx = await getDiscountsAmount({
+        const {orderTotalAmount,discountAmount} = await getDiscountsAmount({
           discount_code: shopDiscount[0].discount_code,
           discount_shopId: shopId,
           discount_used_userId: convertToObjectId(userId),
@@ -87,7 +87,14 @@ class OrderServices {
         });
 
         logger.info(
-          `xxx ${i}::: ${util.inspect(xxx, {
+          `orderTotalAmount ${i}::: ${util.inspect(orderTotalAmount, {
+            showHidden: false,
+            depth: null,
+            colors: false,
+          })}`
+        );
+        logger.info(
+          `discountAmount ${i}::: ${util.inspect(discountAmount, {
             showHidden: false,
             depth: null,
             colors: false,
