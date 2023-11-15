@@ -16,6 +16,10 @@ const cartSchema = new Schema(
       type: Array,
       default: [],
     },
+    cart_products_deleted: {
+      type: Array,
+      default: [],
+    },
     cart_userId: {
       type: Schema.Types.ObjectId,
       required: true,

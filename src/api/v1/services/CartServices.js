@@ -77,7 +77,7 @@ class CartServices {
       cart_userId,
     });
     /* add new item */
-    if (cartCurrent.cart_products.length === 0) {
+    if (cartCurrent.cart_products.length === 0 && quantity > 0) {
       cartCurrent.cart_products = [
         {
           product_id,
@@ -93,7 +93,7 @@ class CartServices {
       (product) => product.product_id === product_id
     );
     /* add new item */
-    if (productArr.length === 0) {
+    if (productArr.length === 0 && quantity > 0) {
       cartCurrent.cart_products = [
         ...cartCurrent.cart_products,
         {
@@ -108,11 +108,22 @@ class CartServices {
 
     /* update quantity item */
     if (quantity === 0) {
-      //delete
-      const productArrDeleted = cartCurrent.cart_products.filter(
+      //delete ; tracking
+
+      const productDeletedArr = cartCurrent.cart_products_deleted.filter(
+        (productId) => productId === product_id
+      );
+      if (productDeletedArr.length === 0) {
+        cartCurrent.cart_products_deleted = [
+          ...cartCurrent.cart_products_deleted,
+          product_id,
+        ];
+      }
+
+      const updateProductArr = cartCurrent.cart_products.filter(
         (product) => product.product_id !== product_id
       );
-      cartCurrent.cart_products = productArrDeleted;
+      cartCurrent.cart_products = updateProductArr;
       return await cartCurrent.save();
     }
 
@@ -161,19 +172,25 @@ class CartServices {
     cart_userId = convertToObjectId(cart_userId),
     cart_id = convertToObjectId(cart_id),
   }) => {
-    const foundCart = await findOneRepo({
+    const foundCarts = await findCartsRepo({
       filter: {
-        _id: cart_id,
-        cart_userId,
+        _id: convertToObjectId(cart_id),
+        cart_userId: convertToObjectId(cart_userId),
         cart_state: "active",
       },
     });
-    if (!foundCart) {
+    if (foundCarts.length === 0) {
       throw new ForbiddenRequestError("Cart not found", 404);
     }
-
+    const foundCart = foundCarts[0];
     foundCart.cart_state = "failed";
-
+    // logger.info(
+    //   `foundCart ::: ${util.inspect(foundCart, {
+    //     showHidden: false,
+    //     depth: null,
+    //     colors: false,
+    //   })}`
+    // );
     const { modifiedCount } = await foundCart.update(foundCart);
 
     return modifiedCount;

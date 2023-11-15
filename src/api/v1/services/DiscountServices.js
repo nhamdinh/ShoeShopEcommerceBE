@@ -117,6 +117,21 @@ class DiscountServices {
     discount_used_userId,
     products_order,
   }) => {
+    logger.info(
+      `xxx ::: ${util.inspect(
+        {
+          discount_code: discount_code,
+          discount_shopId: convertToObjectId(discount_shopId),
+          discount_isActive: true,
+        },
+        {
+          showHidden: false,
+          depth: null,
+          colors: false,
+        }
+      )}`
+    );
+
     const foundDiscount = await findOneDiscountRepo({
       discount_code: discount_code,
       discount_shopId: convertToObjectId(discount_shopId),
@@ -234,7 +249,13 @@ class Discount {
 
   async createDiscount() {
     const objectParams = removeNullObject(this);
-
+    // logger.info(
+    //   `objectParams ::: ${util.inspect(objectParams, {
+    //     showHidden: false,
+    //     depth: null,
+    //     colors: false,
+    //   })}`
+    // );
     if (
       // new Date() > new Date(objectParams.discount_start) ||
       new Date() > new Date(objectParams.discount_end)
@@ -252,7 +273,7 @@ class Discount {
       discount_shopId: objectParams.discount_shopId,
       discount_isActive: true,
     });
-
+    /* check product belong shop??? */
     if (foundDiscount && foundDiscount.discount_isActive)
       throw new ForbiddenRequestError(`Discount is exist`);
 

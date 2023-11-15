@@ -1,3 +1,6 @@
+"use strict";
+const util = require("util");
+const logger = require("../log");
 const jwt = require("jsonwebtoken");
 const asyncHandler = require("express-async-handler");
 const User = require("../Models/UserModel");
@@ -30,6 +33,13 @@ module.exports = {
         
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         req.user = await User.findById(decoded.id).select("-password");
+        // logger.info(
+        //   `req.user::: ${util.inspect(req.user, {
+        //     showHidden: false,
+        //     depth: null,
+        //     colors: false,
+        //   })}`
+        // );
         next();
       } catch (error) {
         console.error(error);

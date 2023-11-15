@@ -1,38 +1,57 @@
+"use strict";
 const express = require("express");
+const asyncHandler = require("express-async-handler");
 
 const { protect, admin } = require("./../../Middleware/AuthMiddleware");
+const orderController = require("../../controller/order.controller");
+const orderRoute = express.Router();
 
-const {
-  getAllOrderByAdmin,
-  getAllOrder,
-  getAllOrderByUser,
-  getOrderById,
-  createOrder,
-  orderIsPaid,
-  orderIsDelivered,
-} = require("../../controller/order.controller");
+// // GET ALL INVENTORY
+// orderRoute.get("/all", asyncHandler(inventoryController.getAllInventories));
 
-const orderRouter = express.Router();
+// GET ALL INVENTORY
+orderRoute.post(
+  "/checkout",
+  protect,
+  asyncHandler(orderController.checkoutReviewCart)
+);
+module.exports = orderRoute;
 
-// GET ALL ORDERS
-orderRouter.get("/get-all", getAllOrder);
+// const express = require("express");
 
-// ADMIN GET ALL ORDERS
-orderRouter.get("/all-admin", protect, admin, getAllOrderByAdmin);
+// const { protect, admin } = require("./../../Middleware/AuthMiddleware");
 
-// GET ALL ORDERS BY USER
-orderRouter.get("/all", protect, getAllOrderByUser);
+// const {
+//   getAllOrderByAdmin,
+//   getAllOrder,
+//   getAllOrderByUser,
+//   getOrderById,
+//   createOrder,
+//   orderIsPaid,
+//   orderIsDelivered,
+// } = require("../../controller/order.controller");
 
-// CREATE ORDER
-orderRouter.post("/create-order", protect, createOrder);
+// const orderRouter = express.Router();
 
-// GET ORDER BY ID
-orderRouter.get("/detail/:id", protect, getOrderById);
+// // GET ALL ORDERS
+// orderRouter.get("/get-all", getAllOrder);
 
-// ORDER IS PAID
-orderRouter.put("/:id/pay", protect, orderIsPaid);
+// // ADMIN GET ALL ORDERS
+// orderRouter.get("/all-admin", protect, admin, getAllOrderByAdmin);
 
-// ORDER IS DELIVERED
-orderRouter.put("/:id/delivered", protect, admin, orderIsDelivered);
+// // GET ALL ORDERS BY USER
+// orderRouter.get("/all", protect, getAllOrderByUser);
 
-module.exports = orderRouter;
+// // CREATE ORDER
+// orderRouter.post("/create-order", protect, createOrder);
+
+// // GET ORDER BY ID
+// orderRouter.get("/detail/:id", protect, getOrderById);
+
+// // ORDER IS PAID
+// orderRouter.put("/:id/pay", protect, orderIsPaid);
+
+// // ORDER IS DELIVERED
+// orderRouter.put("/:id/delivered", protect, admin, orderIsDelivered);
+
+// module.exports = orderRouter;

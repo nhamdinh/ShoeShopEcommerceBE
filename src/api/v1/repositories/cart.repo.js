@@ -13,8 +13,6 @@ const findOneRepo = async ({ filter }) => {
 };
 
 const findCartsRepo = async ({ filter }) => {
-
-
   return await CartModel.find(filter);
 };
 
@@ -31,8 +29,8 @@ const getAllCartRepo = async ({ filter }) => {
     createdAt: -1,
   });
   return {
-    carts,
     totalCount: carts?.length ?? 0,
+    carts,
   };
 };
 module.exports = {
