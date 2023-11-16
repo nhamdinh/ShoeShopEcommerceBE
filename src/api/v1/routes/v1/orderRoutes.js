@@ -9,11 +9,18 @@ const orderRoute = express.Router();
 // // GET ALL INVENTORY
 // orderRoute.get("/all", asyncHandler(inventoryController.getAllInventories));
 
-// GET ALL INVENTORY
+// CHECKOUT-CART
 orderRoute.post(
-  "/checkout",
+  "/checkout-cart",
   protect,
   asyncHandler(orderController.checkoutReviewCart)
+);
+
+// CHECKOUT-ORDER
+orderRoute.post(
+  "/checkout-order",
+  protect,
+  asyncHandler(orderController.checkoutOrder)
 );
 module.exports = orderRoute;
 
