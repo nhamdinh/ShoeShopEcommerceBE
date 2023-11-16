@@ -162,11 +162,27 @@ class DiscountServices {
         );
         if (userUsed) throw new ForbiddenRequestError(`Your turn is over`);
       }
-
+      /* => tinh lai discount cho tung mon */
       const discountAmount =
         discount_type === "fixed_amount"
           ? discount_value
           : ((+orderTotalAmount * discount_value) / 100).toFixed(0);
+
+
+          // logger.info(
+          //   `orderTotalAmount ::: ${util.inspect(orderTotalAmount, {
+          //     showHidden: false,
+          //     depth: null,
+          //     colors: false,
+          //   })}`
+          // );
+          // logger.info(
+          //   `discount_value ::: ${util.inspect(discount_value, {
+          //     showHidden: false,
+          //     depth: null,
+          //     colors: false,
+          //   })}`
+          // );
 
       return {
         orderTotalAmount,

@@ -15,6 +15,17 @@ class OrderController {
       }),
     }).send(res);
   };
+
+  checkoutOrder = async (req, res, next) => {
+    new OK({
+      message: "checkoutOrder OK",
+      metadata: await OrderServices.checkoutOrder({
+        cartId:req.body.cartId,
+        userId:req.user._id,
+        orderItems:req.body.orderItems,
+      }),
+    }).send(res);
+  };
 }
 
 module.exports = new OrderController();

@@ -79,32 +79,81 @@ class OrderServices {
       checkCart.totalAmount += checkProductsPrice;
 
       if (shopDiscount.length > 0) {
-        const {orderTotalAmount,discountAmount} = await getDiscountsAmount({
+        const { orderTotalAmount, discountAmount } = await getDiscountsAmount({
           discount_code: shopDiscount[0].discount_code,
           discount_shopId: shopId,
           discount_used_userId: convertToObjectId(userId),
           products_order: checkProducts,
         });
+        checkCart.totalDiscount += discountAmount;
 
-        logger.info(
-          `orderTotalAmount ${i}::: ${util.inspect(orderTotalAmount, {
-            showHidden: false,
-            depth: null,
-            colors: false,
-          })}`
-        );
-        logger.info(
-          `discountAmount ${i}::: ${util.inspect(discountAmount, {
-            showHidden: false,
-            depth: null,
-            colors: false,
-          })}`
-        );
+        const orderItemNew = {
+          shopId,
+          shopDiscount,
+          itemProducts: checkProducts,
+          priceRaw: orderTotalAmount,
+          discounted: discountAmount,
+          priceAppliedDiscount: orderTotalAmount - discountAmount,
+        };
+
+        orderItemsNew.push(orderItemNew);
+
+        // logger.info(
+        //   `checkProducts ${i}::: ${util.inspect(checkProducts, {
+        //     showHidden: false,
+        //     depth: null,
+        //     colors: false,
+        //   })}`
+        // );
+        // logger.info(
+        //   `discountAmount ${i}::: ${util.inspect(discountAmount, {
+        //     showHidden: false,
+        //     depth: null,
+        //     colors: false,
+        //   })}`
+        // );
       }
     }
+    checkCart.totalAmountPay = checkCart.totalAmount - checkCart.totalDiscount;
+    // logger.info(
+    //   `checkCart::: ${util.inspect(checkCart, {
+    //     showHidden: false,
+    //     depth: null,
+    //     colors: false,
+    //   })}`
+    // );
+    return {
+      orderItems,
+      orderItemsNew,
+      checkCart,
+    };
+  };
 
-    const foundCart = foundCarts[0];
-    return checkCart;
+  static checkoutOrder = async ({
+    cartId,
+    userId,
+    orderItems = [],
+    userAddress = {},
+    userPayment = {},
+  }) => {
+    const { orderItemsNew } = await OrderServices.checkoutReviewCart({
+      cartId,
+      userId,
+      orderItems,
+    });
+
+    const products = orderItemsNew.flatMap((order) => order.itemProducts);
+
+    for (let i = 0; i < products.length; i++) {
+      const { quantity, price, productId } = products[i];
+    //   logger.info(
+    //     `products ${[i]}::: ${util.inspect(products[i], {
+    //       showHidden: false,
+    //       depth: null,
+    //       colors: false,
+    //     })}`
+    //   );
+    }
   };
 }
 
