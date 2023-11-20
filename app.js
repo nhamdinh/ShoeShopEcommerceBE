@@ -51,7 +51,18 @@ app.use(
 /* middleware */
 app.use(helmet()); //bao ve thong tin may chu
 app.use(morgan("dev")); //log
-app.use(compression()); // tiet kiem bang thong 100 lan, van chuyen du lieu
+app.use(
+  compression({
+    level: 6,
+    threshold: 100 * 1024, // nhieu hon thi gzip
+    fitter: (req, res) => {
+      if (req.headers["x—no—compress"]) {
+        return false;
+      }
+      return compression.fitter(req, res);
+    },
+  })
+); // tiet kiem bang thong 100 lan, van chuyen du lieu
 
 app.use(express.json());
 app.use(
