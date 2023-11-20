@@ -4,6 +4,7 @@ const app = require("./app");
 const server = require("./socket");
 const logger = require("./src/api/v1/log");
 
+/* chay voi bao nhieu core */
 process.env.UV_THREADPOOL_SIZE = Math.floor(Number(os.cpus().length) * 0.8);
 logger.info(
   "Number of UV_THREADPOOL_SIZE ::: " +
