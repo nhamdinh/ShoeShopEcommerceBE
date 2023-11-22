@@ -122,6 +122,20 @@ class UserServices {
   //   return list;
   // }
 
+  static getProfileShop = async ({ id }) => {
+    const user = await findUserByIdRepo(id);
+    if (!user) {
+      throw new ForbiddenRequestError("User not Found");
+    }
+    // logger.info(`admins ::: ${admins}`);
+    return {
+      ...getInfoData({
+        object: user,
+        fields: ["name", "email", "phone", "createdAt","productShopName"],
+      }),
+    };
+  };
+
   static getProfile = async ({ id }) => {
     const user = await findUserByIdRepo(id);
     if (!user) {

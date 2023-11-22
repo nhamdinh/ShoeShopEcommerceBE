@@ -166,6 +166,15 @@ class UserController {
     }).send(res);
   };
 
+  getProfileShop = async (req, res) => {
+    new OK({
+      message: "getProfileShop OK",
+      metadata: await UserServices.getProfileShop({
+        id: req.query.product_shop,
+      }),
+    }).send(res);
+  };
+
   getProfile = async (req, res) => {
     new OK({
       message: "getProfile OK",
