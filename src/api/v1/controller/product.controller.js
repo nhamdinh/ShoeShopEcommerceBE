@@ -319,7 +319,6 @@ class ProductController {
       message: "createProduct CREATED",
       metadata: await ProductServices.createProduct(req.body?.product_type, {
         ...req.body,
-        product_shop: req.user._id,
       }),
     }).send(res);
   };
@@ -372,13 +371,13 @@ class ProductController {
   };
 
   findAllProducts = async (req, res, next) => {
-    logger.info(
-      `req.query ::: ${util.inspect(req.query, {
-        showHidden: false,
-        depth: null,
-        colors: false,
-      })}`
-    );
+    // logger.info(
+    //   `req.query ::: ${util.inspect(req.query, {
+    //     showHidden: false,
+    //     depth: null,
+    //     colors: false,
+    //   })}`
+    // );
 
     new OK({
       message: "findAllProducts OK",
@@ -387,14 +386,6 @@ class ProductController {
   };
 
   findProductById = async (req, res, next) => {
-    // logger.info(
-    //   `req.params ::: ${util.inspect(req.params, {
-    //     showHidden: false,
-    //     depth: null,
-    //     colors: false,
-    //   })}`
-    // );
-
     new OK({
       message: "findProductById OK",
       metadata: await ProductServices.findProductById({

@@ -14,6 +14,7 @@ const {
   findProductByIdRepo,
   updateProductByIdRepo,
 } = require("../repositories/product.repo");
+const { findUserByIdRepo } = require("../repositories/user.repo");
 const { PRODUCT_MODEL } = require("../utils/constant");
 const {
   removeNullObject,
@@ -108,12 +109,12 @@ class ProductFactory {
     page = 1,
     filter = { isPublished: true },
     select = [
-      "product_name",
-      "product_shop",
-      "product_price",
-      "product_thumb",
-      "isDraft",
-      "isPublished",
+      // "product_name",
+      // "product_shop",
+      // "product_price",
+      // "product_thumb",
+      // "isDraft",
+      // "isPublished",
     ],
   }) => {
     return await findAllProductsRepo({
@@ -161,6 +162,12 @@ const classRefStrategy = (model) => {
   return class ClassRef extends Product {
     // CON
     async createProduct() {
+      const user = await findUserByIdRepo(this.product_shop);
+
+      if (!user) {
+        throw new ForbiddenRequestError("User not Found");
+      }
+
       const newProductType = await createProductModelRepo(model, {
         ...this.product_attributes,
         product_shop: this.product_shop,

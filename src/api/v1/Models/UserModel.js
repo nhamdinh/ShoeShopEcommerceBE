@@ -5,6 +5,12 @@ const COLLECTION_NAME = "Users";
 
 const userSchema = Schema(
   {
+    productShopName: {
+      type: String,
+      required: true,
+      trim: true,
+      maxLength: 150,
+    },
     name: {
       type: String,
       required: true,
