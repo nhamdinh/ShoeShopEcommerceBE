@@ -23,7 +23,7 @@ const findByIdAndUpdateTokenRepo = async (id, refreshToken) => {
 };
 
 const findUserByIdRepo = async (id) => {
-  return await UserModel.findById(id).lean().exec();
+  return await UserModel.findById(id);
   /* 
   lean(): giam size OBJECT, 
    tra ve 1 obj js original,
@@ -39,10 +39,19 @@ const createUserRepo = async (user) => {
   return await UserModel.create({ ...user });
 };
 
+const getAllUsersRepo = async () => {
+  const users = await UserModel.find({ status: "active" }).lean();
+  return {
+    totalCount: users.length ?? 0,
+    users,
+  };
+};
+
 module.exports = {
   findUserByEmailRepo,
   findByIdAndUpdateTokenRepo,
   findUserByIdRepo,
   findAllAdminUsersRepo,
   createUserRepo,
+  getAllUsersRepo,
 };

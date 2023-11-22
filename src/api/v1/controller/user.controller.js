@@ -18,17 +18,7 @@ const { ForbiddenRequestError } = require("../core/errorResponse");
 const UserServices = require("./../services/UserServices");
 const { CREATED, OK } = require("../core/successResponse");
 
-// const getAllUser = asyncHandler(async (req, res) => {
-//   try {
-//     const count = await User.countDocuments({});
-//     const users = await User.find({});
-//     res.json({ count, users });
-//   } catch (error) {
-//     throw new Error(error);
-//   }
-// });
-
-// const getAllUserByAdmin = asyncHandler(async (req, res) => {
+// const findAllUserByAdmin = asyncHandler(async (req, res) => {
 //   try {
 //     const searchBy = req.query?.searchBy || "email";
 
@@ -107,36 +97,6 @@ const { CREATED, OK } = require("../core/successResponse");
 //   }
 // });
 
-// const updateProfile = asyncHandler(async (req, res) => {
-//   try {
-//     const user = await User.findById(req.user._id);
-
-//     if (user) {
-//       user.name = req.body.name || user.name;
-//       user.email = req.body.email || user.email;
-//       user.phone = req.body.phone || user.phone;
-//       if (req.body.password) {
-//         user.password = req.body.password;
-//       }
-//       const updatedUser = await user.save();
-//       res.json({
-//         _id: updatedUser._id,
-//         name: updatedUser.name,
-//         email: updatedUser.email,
-//         phone: updatedUser.phone,
-//         isAdmin: updatedUser.isAdmin,
-//         createdAt: updatedUser.createdAt,
-//         // token: generateToken(updatedUser._id),
-//       });
-//     } else {
-//       res.status(200).json({ message: "User not Found" });
-//       throw new Error("User not found");
-//     }
-//   } catch (error) {
-//     throw new Error(error);
-//   }
-// });
-
 // /* =======================  CHAT STORIES ======================= */
 // const getAllChats = asyncHandler(async (req, res) => {
 //   try {
@@ -191,10 +151,8 @@ const { CREATED, OK } = require("../core/successResponse");
 // });
 
 // module.exports = {
-//   getAllUser,
-//   getAllUserByAdmin,
+//   findAllUserByAdmin,
 //   logout,
-//   updateProfile,
 //   getAllChats,
 //   getStory,
 //   clearCountChat,
@@ -211,7 +169,9 @@ class UserController {
   getProfile = async (req, res) => {
     new OK({
       message: "getProfile OK",
-      metadata: await UserServices.getProfile(req),
+      metadata: await UserServices.getProfile({
+        id: req.user._id,
+      }),
     }).send(res);
   };
 
@@ -219,6 +179,25 @@ class UserController {
     new OK({
       message: "login OK",
       metadata: await UserServices.login(req),
+    }).send(res);
+  };
+
+  getAllUsers = async (req, res) => {
+    new OK({
+      message: "getAllUsers OK",
+      metadata: await UserServices.getAllUsers(),
+    }).send(res);
+  };
+
+  updateProfile = async (req, res, next) => {
+    new CREATED({
+      message: "updateProfile CREATED",
+      metadata: await UserServices.updateProfile({
+        name: req.body.name,
+        email: req.body.email,
+        password: req.body.password,
+        id: req.user._id,
+      }),
     }).send(res);
   };
 }

@@ -3,18 +3,6 @@ const asyncHandler = require("express-async-handler");
 
 const { protect, admin } = require("./../../Middleware/AuthMiddleware");
 const productController = require("../../controller/product.controller");
-// const {
-//   getAllProduct,
-//   getAllProductWithout,
-//   getAllProductAdmin,
-//   getProductById,
-//   deleteProductById,
-//   createProduct,
-//   updateProduct,
-//   createProductReview,
-//   updateProductReview,
-//   checkUserIsBuy,
-// } = require("../../controller/product.controller");
 
 const productRoute = express.Router();
 /**
@@ -83,9 +71,6 @@ productRoute.patch(
   protect,
   asyncHandler(productController.updateProductById)
 );
-
-// // GET ALL PRODUCT
-// productRoute.get("/get-all", getAllProduct);
 
 // // USER GET ALL PRODUCT WITHOUT SEARCH AND PAGINATION
 // productRoute.get("/all-user", getAllProductWithout);

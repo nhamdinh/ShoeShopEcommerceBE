@@ -1,4 +1,7 @@
 "use strict";
+const util = require("util");
+const logger = require("../log");
+
 const { validationResult } = require("express-validator");
 const crypto = require("node:crypto");
 const bcrypt = require("bcrypt");
@@ -7,7 +10,6 @@ const { ForbiddenRequestError } = require("../core/errorResponse");
 const KeyTokenServices = require("./KeyTokenServices");
 const { getInfoData } = require("../utils/getInfo");
 const { createToken } = require("../utils/authUtils");
-const logger = require("../log");
 const generateRefreshToken = require("../utils/generateRefreshToken");
 const generateToken = require("../utils/generateToken");
 const {
@@ -16,9 +18,35 @@ const {
   findUserByIdRepo,
   findAllAdminUsersRepo,
   createUserRepo,
+  getAllUsersRepo,
 } = require("../repositories/user.repo");
 
 class UserServices {
+  static updateProfile = async ({ name, email, password, id }) => {
+    const user = await findUserByIdRepo(id);
+
+    if (!user) throw new ForbiddenRequestError("User not Found", 404);
+
+    user.name = name ?? user.name;
+    user.email = email ?? user.email;
+    if (password) {
+      user.password = password;
+    }
+
+    const updatedUser = await user.save();
+
+    return {
+      ...getInfoData({
+        object: updatedUser,
+        fields: ["_id", "name", "email", "phone", "isAdmin", "createdAt"],
+      }),
+    };
+  };
+
+  static getAllUsers = async () => {
+    return await getAllUsersRepo();
+  };
+
   static login = async (req) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -30,7 +58,7 @@ class UserServices {
 
     const { email, password } = req.body;
     const user = await findUserByEmailRepo({ email });
-    console.log(`user ::: ${user}`);
+    // console.log(`user ::: ${user}`);
 
     if (!user) {
       throw new ForbiddenRequestError("Wrong Email or Password");
@@ -57,8 +85,13 @@ class UserServices {
     // res.cookie('cookieName', 'cookieValue') // options is optional
     // res.send('')
 
-    logger.info("refreshToken ::: " + refreshToken);
-
+    // logger.info(
+    //   `refreshToken 11::: ${util.inspect(refreshToken, {
+    //     showHidden: false,
+    //     depth: null,
+    //     colors: false,
+    //   })}`
+    // );
     // res
     //   .cookie("access_token", "token")
     //   .json({ message: "Logged in successfully 😊 👌" });
@@ -89,8 +122,8 @@ class UserServices {
   //   return list;
   // }
 
-  static getProfile = async (req) => {
-    const user = await findUserByIdRepo(req.user._id);
+  static getProfile = async ({ id }) => {
+    const user = await findUserByIdRepo(id);
     if (!user) {
       throw new ForbiddenRequestError("User not Found");
     }

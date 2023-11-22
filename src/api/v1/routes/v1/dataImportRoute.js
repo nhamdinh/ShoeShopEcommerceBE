@@ -5,7 +5,7 @@ const users = require("./../../dataMock/users");
 const User = require("./../../Models/UserModel");
 
 const products = require("./../../dataMock/products");
-const Product = require("./../../Models/ProductModel");
+const ProductModel = require("../../Models/ProductModel");
 
 const categorys = require("./../../dataMock/categorys");
 const Category = require("./../../Models/CategoryModel");
@@ -27,8 +27,8 @@ ImportData.post(
 ImportData.post(
   "/products",
   asyncHandler(async (req, res) => {
-    await Product.remove({});
-    const importProducts = await Product.insertMany(products);
+    await ProductModel.product.remove({});
+    const importProducts = await ProductModel.product.insertMany(products);
     res.send({ importProducts });
   })
 );

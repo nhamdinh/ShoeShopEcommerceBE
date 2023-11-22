@@ -3,17 +3,6 @@ const asyncHandler = require("express-async-handler");
 
 const { protect, admin } = require("./../../Middleware/AuthMiddleware");
 
-// const {
-//   getAllUser,
-//   getAllUserByAdmin,
-//   login,
-//   logout,
-//   getProfile,
-//   updateProfile,
-//   getAllChats,
-//   getStory,
-//   clearCountChat,
-// } = require("../../controller/user.controller");
 const { validate } = require("../../validations");
 const userController = require("../../controller/user.controller");
 
@@ -39,14 +28,14 @@ userRouter.post(
 // PROFILE
 userRouter.get("/profile", protect, asyncHandler(userController.getProfile));
 
-// // UPDATE PROFILE
-// userRouter.put("/update-profile", protect, updateProfile);
+// UPDATE PROFILE
+userRouter.put("/update-profile", protect, userController.updateProfile);
 
 // // ADMIN GET ALL USER
-// userRouter.get("/all-admin", protect, admin, getAllUserByAdmin);
+// userRouter.get("/all-admin", protect, admin, findAllUserByAdmin);
 
-// // GET ALL USER
-// userRouter.get("/get-all", getAllUser);
+// GET ALL USER
+userRouter.get("/get-all", userController.getAllUsers);
 // /* =======================  CHAT STORIES ======================= */
 // // GET ALL CHAT STORIES
 // userRouter.get("/get-all-chats", getAllChats);

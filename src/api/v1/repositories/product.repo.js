@@ -108,6 +108,7 @@ const findAllProductsRepo = async ({ limit, sort, page, filter, select }) => {
     .sort(sortBy)
     .skip(skip)
     .limit(limit)
+    .populate({ path: "product_shop" })
     .select(getSelectData(select))
     .lean();
 
