@@ -327,16 +327,24 @@ class ProductController {
     new OK({
       message: "findAllDaftByShop OK",
       metadata: await ProductServices.findAllDaftByShop({
-        product_shop: req.user._id,
+        product_shop: req.query.product_shop,
       }),
     }).send(res);
   };
 
   findAllPublishedByShop = async (req, res, next) => {
+    // logger.info(
+    //   `req.query 1::: ${util.inspect(req.query, {
+    //     showHidden: false,
+    //     depth: null,
+    //     colors: false,
+    //   })}`
+    // );
+
     new OK({
       message: "findAllPublishedByShop OK",
       metadata: await ProductServices.findAllPublishedByShop({
-        product_shop: req.user._id,
+        product_shop: req.query.product_shop,
       }),
     }).send(res);
   };
@@ -371,14 +379,6 @@ class ProductController {
   };
 
   findAllProducts = async (req, res, next) => {
-    // logger.info(
-    //   `req.query ::: ${util.inspect(req.query, {
-    //     showHidden: false,
-    //     depth: null,
-    //     colors: false,
-    //   })}`
-    // );
-
     new OK({
       message: "findAllProducts OK",
       metadata: await ProductServices.findAllProducts(req.query),

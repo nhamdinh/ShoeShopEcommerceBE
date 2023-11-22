@@ -34,14 +34,12 @@ productRoute.put(
 // GET DRAFT PRODUCT
 productRoute.get(
   "/draft/all",
-  protect,
   asyncHandler(productController.findAllDaftByShop)
 );
 
 // GET PUBLISHED PRODUCT
 productRoute.get(
   "/published/all",
-  protect,
   asyncHandler(productController.findAllPublishedByShop)
 );
 
@@ -53,11 +51,7 @@ productRoute.get(
 );
 
 // GET ALL PRODUCTS
-productRoute.get(
-  "/all",
-  protect,
-  asyncHandler(productController.findAllProducts)
-);
+productRoute.get("/all", asyncHandler(productController.findAllProducts));
 
 // GET PRODUCT BY ID
 productRoute.get(
