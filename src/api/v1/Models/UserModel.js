@@ -43,6 +43,11 @@ const userSchema = Schema(
       required: true,
       default: false,
     },
+    isShop: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
     buyer: {
       type: Array,
       required: false,
@@ -56,6 +61,7 @@ const userSchema = Schema(
       enum: ["active", "inactive"],
       default: "active",
     },
+
     verify: {
       type: Boolean,
       default: true,

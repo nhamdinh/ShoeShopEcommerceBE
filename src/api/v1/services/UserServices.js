@@ -22,6 +22,21 @@ const {
 } = require("../repositories/user.repo");
 
 class UserServices {
+  static updateIsShop = async ({ id }) => {
+    const user = await findUserByIdRepo(id);
+
+    if (!user) throw new ForbiddenRequestError("User not Found", 404);
+    user.isShop = !user.isShop;
+    const updatedUser = await user.save();
+
+    return {
+      ...getInfoData({
+        object: updatedUser,
+        fields: ["_id", "name", "email", "phone", "isShop", "createdAt"],
+      }),
+    };
+  };
+
   static updateProfile = async ({ name, email, password, id }) => {
     const user = await findUserByIdRepo(id);
 
@@ -131,7 +146,7 @@ class UserServices {
     return {
       ...getInfoData({
         object: user,
-        fields: ["name", "email", "phone", "createdAt","productShopName"],
+        fields: ["name", "email", "phone", "createdAt", "productShopName"],
       }),
     };
   };
@@ -146,7 +161,15 @@ class UserServices {
     return {
       ...getInfoData({
         object: user,
-        fields: ["_id", "name", "email", "phone", "isAdmin", "createdAt"],
+        fields: [
+          "_id",
+          "name",
+          "email",
+          "phone",
+          "isAdmin",
+          "createdAt",
+          "isShop",
+        ],
       }),
       admins,
     };

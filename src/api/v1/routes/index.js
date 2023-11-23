@@ -18,6 +18,7 @@ routes.use("/api/address", require("./v1/addressRoutes"));
 routes.use("/api/categorys", require("./v1/categoryRoutes"));
 routes.use("/api/discounts", require("./v1/discountRoutes"));
 routes.use("/api/inventories", require("./v1/inventoryRoutes"));
+routes.use("/api/codes", require("./v1/mainCodeRoutes"));
 routes.use("/api", require("./v1/sendEmailRoutes"));
 
 module.exports = routes;

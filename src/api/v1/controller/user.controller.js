@@ -209,6 +209,15 @@ class UserController {
       }),
     }).send(res);
   };
+
+  updateIsShop = async (req, res, next) => {
+    new CREATED({
+      message: "updateIsShop CREATED",
+      metadata: await UserServices.updateIsShop({
+        id: req.user._id,
+      }),
+    }).send(res);
+  };
 }
 
 module.exports = new UserController();
