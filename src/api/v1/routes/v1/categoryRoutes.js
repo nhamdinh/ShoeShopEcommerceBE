@@ -18,7 +18,7 @@ const categoryRoutes = express.Router();
 categoryRoutes.get("/get-all", getAllCategory);
 
 // ADMIN GET ALL CATEGORY WITHOUT SEARCH AND PAGINATION
-categoryRoutes.get("/all-admin", protect, getAllCategoryByAdmin);
+categoryRoutes.get("/all-admin", getAllCategoryByAdmin);
 
 // DELETE CATEGORY
 categoryRoutes.post("/delete/:id", protect, admin, deleteCategoryById);
