@@ -7,7 +7,7 @@ const userSchema = Schema(
   {
     productShopName: {
       type: String,
-      required: true,
+      required: false,
       trim: true,
       maxLength: 150,
     },

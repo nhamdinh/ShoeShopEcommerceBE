@@ -22,11 +22,12 @@ const {
 } = require("../repositories/user.repo");
 
 class UserServices {
-  static updateIsShop = async ({ id }) => {
+  static updateIsShop = async ({ id, productShopName }) => {
     const user = await findUserByIdRepo(id);
 
     if (!user) throw new ForbiddenRequestError("User not Found", 404);
     user.isShop = !user.isShop;
+    user.productShopName = productShopName;
     const updatedUser = await user.save();
 
     return {
@@ -169,6 +170,7 @@ class UserServices {
           "isAdmin",
           "createdAt",
           "isShop",
+          "productShopName",
         ],
       }),
       admins,

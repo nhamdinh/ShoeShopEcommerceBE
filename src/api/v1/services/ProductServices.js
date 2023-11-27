@@ -36,7 +36,7 @@ class ProductFactory {
         model
       ]; /* = class ClassRef extends Product */
     if (!productModelClass)
-      throw new ForbiddenRequestError(`Invalid Product model ::: ${model}`);
+      throw new ForbiddenRequestError(`Invalid Product model 2 ::: ${model}`);
 
     // logger.info(
     //   `payload ::: ${util.inspect(payload, {
@@ -53,7 +53,7 @@ class ProductFactory {
     const productModelClass = ProductFactory.productModelStrategy[model];
 
     if (!productModelClass)
-      throw new ForbiddenRequestError(`Invalid Product model ::: ${model}`);
+      throw new ForbiddenRequestError(`Invalid Product model 1 ::: ${model}`);
 
     return new productModelClass(payload).updateProductById(product_id);
     /**
