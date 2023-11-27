@@ -169,6 +169,7 @@ class UserServices {
           "isAdmin",
           "createdAt",
           "isShop",
+          "productShopName",
         ],
       }),
       admins,
