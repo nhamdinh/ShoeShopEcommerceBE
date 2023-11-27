@@ -215,6 +215,7 @@ class UserController {
       message: "updateIsShop CREATED",
       metadata: await UserServices.updateIsShop({
         id: req.user._id,
+        productShopName: req.body.productShopName,
       }),
     }).send(res);
   };
