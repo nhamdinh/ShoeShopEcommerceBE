@@ -168,21 +168,20 @@ class DiscountServices {
           ? discount_value
           : ((+orderTotalAmount * discount_value) / 100).toFixed(0);
 
-
-          // logger.info(
-          //   `orderTotalAmount ::: ${util.inspect(orderTotalAmount, {
-          //     showHidden: false,
-          //     depth: null,
-          //     colors: false,
-          //   })}`
-          // );
-          // logger.info(
-          //   `discount_value ::: ${util.inspect(discount_value, {
-          //     showHidden: false,
-          //     depth: null,
-          //     colors: false,
-          //   })}`
-          // );
+      // logger.info(
+      //   `orderTotalAmount ::: ${util.inspect(orderTotalAmount, {
+      //     showHidden: false,
+      //     depth: null,
+      //     colors: false,
+      //   })}`
+      // );
+      // logger.info(
+      //   `discount_value ::: ${util.inspect(discount_value, {
+      //     showHidden: false,
+      //     depth: null,
+      //     colors: false,
+      //   })}`
+      // );
 
       return {
         orderTotalAmount,
@@ -232,7 +231,7 @@ class Discount {
     this.discount_description = discount_description;
     this.discount_type = discount_type;
     this.discount_value = discount_value;
-    this.discount_code = discount_code;
+    this.discount_code = discount_code.toUpperCase();
     this.discount_start = discount_start;
     this.discount_end = discount_end;
     this.discount_quantity = discount_quantity;
