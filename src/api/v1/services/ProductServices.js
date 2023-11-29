@@ -87,15 +87,14 @@ class ProductFactory {
     limit = 50,
     skip = 0,
   }) => {
-    product_shop;
-    logger.info(
-      `    product_shop
-      ::: ${util.inspect(product_shop, {
-        showHidden: false,
-        depth: null,
-        colors: false,
-      })}`
-    );
+    // logger.info(
+    //   `    product_shop
+    //   ::: ${util.inspect(product_shop, {
+    //     showHidden: false,
+    //     depth: null,
+    //     colors: false,
+    //   })}`
+    // );
     const query = { product_shop, isPublished: true };
     return await findAllProductsByShopRepo({ query, limit, skip });
   };

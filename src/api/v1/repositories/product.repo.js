@@ -22,7 +22,7 @@ const createProductModelRepo = async (model, product) => {
 const findAllProductsByShopRepo = async ({ query, limit, skip }) => {
   const products = await ProductModel.product
     .find(query)
-    .populate("product_shop", "name email productShopName -_id")
+    .populate("product_shop", "name email productShopName _id")
     .sort({ updatedAt: -1 })
     .skip(skip)
     .limit(limit)
@@ -122,6 +122,13 @@ const findProductById1Repo = async ({ product_id }) => {
 };
 
 const findOneProductRepo = async ({ filter }) => {
+  // logger.info(
+  //   `filter Repo ::: ${util.inspect(filter, {
+  //     showHidden: false,
+  //     depth: null,
+  //     colors: false,
+  //   })}`
+  // );
   return await ProductModel.product.findOne(filter).lean();
 };
 
