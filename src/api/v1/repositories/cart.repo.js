@@ -13,7 +13,9 @@ const findOneRepo = async ({ filter }) => {
 };
 
 const findCartsRepo = async ({ filter }) => {
-  return await CartModel.find(filter);
+  return await CartModel.find(filter)
+    .populate("cart_userId", "name email  _id")
+    .populate("cart_shopId", "name email productShopName _id");
 };
 
 const createCartRepo = async (cart) => {
