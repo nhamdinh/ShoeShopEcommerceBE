@@ -11,6 +11,7 @@ const {
 } = require("../repositories/discount.repo");
 const { convertToObjectId, removeNullObject } = require("../utils/getInfo");
 const { findAllProductsRepo } = require("../repositories/product.repo");
+const ProductServices = require("./ProductServices");
 
 /**
  * 1. Generator Discount Code [Shop | Admin]
@@ -95,6 +96,10 @@ class DiscountServices {
 
     unSelect = ["__v"],
   }) => {
+    const metadataProducts = await ProductServices.findAllPublishedByShop({
+      product_shop: discount_shopId,
+    });
+
     const foundDiscounts = await getAllDiscountsByShopRepo({
       limit: +limit,
       page: +page,
@@ -107,6 +112,30 @@ class DiscountServices {
     });
     if (!foundDiscounts)
       throw new ForbiddenRequestError(`Discount is not exist`, 404);
+
+    let discounts = foundDiscounts?.discounts;
+    discounts.map((item) => {
+      if (item?.discount_productIds.length > 0) {
+        let productsIds = item?.discount_productIds;
+
+        let mergedArray = [];
+
+        for (let i = 0; i < productsIds.length; i++) {
+          let _id = productsIds[i];
+
+          let product = metadataProducts.products.find(
+            (item) => item._id.toString() === _id
+          );
+
+          if (product) {
+            let mergedProduct = { ...product, _id };
+            mergedArray.push(mergedProduct);
+          }
+        }
+
+        item.discount_productIds = mergedArray;
+      }
+    });
 
     return foundDiscounts;
   };

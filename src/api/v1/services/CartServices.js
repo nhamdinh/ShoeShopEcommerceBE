@@ -12,7 +12,10 @@ const {
   findCartsRepo,
 } = require("../repositories/cart.repo");
 
-const { findProductById1Repo } = require("../repositories/product.repo");
+const {
+  findProductById1Repo,
+  findOneProductRepo,
+} = require("../repositories/product.repo");
 const { convertToObjectId } = require("../utils/getInfo");
 
 /**
@@ -29,8 +32,8 @@ class CartServices {
     return await getAllCartRepo({ filter: { cart_state: "active" } });
   };
 
-  static createCart = async ({ cart_userId, product }) => {
-    return await createCartRepo({ cart_userId });
+  static createCart = async ({ cart_userId, cart_shopId, product }) => {
+    return await createCartRepo({ cart_userId, cart_shopId });
     // const query = {
     //     cart_userId,
     //   },
@@ -64,82 +67,95 @@ class CartServices {
     product = {},
     cart_userId = convertToObjectId(cart_userId),
   }) => {
-    const { product_id, quantity } = product;
-    const foundProduct = await findProductById1Repo({
-      product_id,
+    const { cart_shopId, product_id, quantity } = product;
+    const foundProduct = await findOneProductRepo({
+      filter: {
+        product_shop: convertToObjectId(cart_shopId),
+        _id: convertToObjectId(product_id),
+      },
     });
 
     if (!foundProduct || quantity < 0) {
       throw new ForbiddenRequestError("Product not found", 404);
     }
 
-    const cartCurrent = await CartServices.getCurrentCart({
+    const cartCurrents = await CartServices.getCurrentCart({
       cart_userId,
+      cart_shopId,
     });
-    /* add new item */
-    if (cartCurrent.cart_products.length === 0 && quantity > 0) {
-      cartCurrent.cart_products = [
-        {
-          product_id,
-          quantity,
-          price: +foundProduct.product_price,
-        },
-      ];
-      return await cartCurrent.save();
-    }
-    /* add new item */
+    for (let i = 0; i < cartCurrents.length; i++) {
+      const cartCurrent = cartCurrents[i];
 
-    const productArr = cartCurrent.cart_products.filter(
-      (product) => product.product_id === product_id
-    );
-    /* add new item */
-    if (productArr.length === 0 && quantity > 0) {
-      cartCurrent.cart_products = [
-        ...cartCurrent.cart_products,
-        {
-          product_id,
-          quantity,
-          price: +foundProduct.product_price,
-        },
-      ];
-      return await cartCurrent.save();
-    }
-    /* add new item */
+      if (cartCurrent?.cart_shopId.toString() == cart_shopId) {
+        /* add new item */
+        if (cartCurrent.cart_products.length === 0 && quantity > 0) {
+          cartCurrent.cart_products = [
+            {
+              product_id,
+              quantity,
+              price: +foundProduct.product_price,
+            },
+          ];
+          return await cartCurrent.update(cartCurrent);
+        }
+        /* add new item */
 
-    /* update quantity item */
-    if (quantity === 0) {
-      //delete ; tracking
+        const productArr = cartCurrent.cart_products.filter(
+          (product) => product.product_id === product_id
+        );
+        /* add new item */
+        if (productArr.length === 0 && quantity > 0) {
+          cartCurrent.cart_products = [
+            ...cartCurrent.cart_products,
+            {
+              product_id,
+              quantity,
+              price: +foundProduct.product_price,
+            },
+          ];
+          return await cartCurrent.update(cartCurrent);
+        }
+        /* add new item */
 
-      const productDeletedArr = cartCurrent.cart_products_deleted.filter(
-        (productId) => productId === product_id
-      );
-      if (productDeletedArr.length === 0) {
-        cartCurrent.cart_products_deleted = [
-          ...cartCurrent.cart_products_deleted,
-          product_id,
-        ];
+        /* update quantity item */
+        if (quantity === 0) {
+          //delete ; tracking
+
+          const productDeletedArr = cartCurrent.cart_products_deleted.filter(
+            (productId) => productId === product_id
+          );
+          if (productDeletedArr.length === 0) {
+            cartCurrent.cart_products_deleted = [
+              ...cartCurrent.cart_products_deleted,
+              product_id,
+            ];
+          }
+
+          const updateProductArr = cartCurrent.cart_products.filter(
+            (product) => product.product_id !== product_id
+          );
+          cartCurrent.cart_products = updateProductArr;
+          return await cartCurrent.update(cartCurrent);
+        }
+
+        cartCurrent.cart_products.map((product) => {
+          if (product.product_id === product_id) {
+            product.quantity = quantity;
+            product.price = +foundProduct.product_price;
+          }
+        });
+
+        /* update quantity item */
+
+        return await cartCurrent.update(cartCurrent);
       }
-
-      const updateProductArr = cartCurrent.cart_products.filter(
-        (product) => product.product_id !== product_id
-      );
-      cartCurrent.cart_products = updateProductArr;
-      return await cartCurrent.save();
     }
-
-    cartCurrent.cart_products.map((product) => {
-      if (product.product_id === product_id) {
-        product.quantity = quantity;
-        product.price = +foundProduct.product_price;
-      }
-    });
-    /* update quantity item */
-
-    return await cartCurrent.save();
+    throw new ForbiddenRequestError("Cart not found", 404);
   };
 
   static getCurrentCart = async ({
     cart_userId = convertToObjectId(cart_userId),
+    cart_shopId,
   }) => {
     const foundCarts = await findCartsRepo({
       filter: {
@@ -148,12 +164,14 @@ class CartServices {
       },
     });
     if (foundCarts.length === 0) {
-      return await CartServices.createCart({
+      const newCart = await CartServices.createCart({
         cart_userId,
+        cart_shopId: convertToObjectId(cart_shopId),
       });
+      return [newCart];
     }
 
-    return foundCarts[0];
+    return foundCarts;
 
     // const foundCart = await findOneRepo({
     //   filter: {
@@ -184,13 +202,7 @@ class CartServices {
     }
     const foundCart = foundCarts[0];
     foundCart.cart_state = "failed";
-    // logger.info(
-    //   `foundCart ::: ${util.inspect(foundCart, {
-    //     showHidden: false,
-    //     depth: null,
-    //     colors: false,
-    //   })}`
-    // );
+
     const { modifiedCount } = await foundCart.update(foundCart);
 
     return modifiedCount;
