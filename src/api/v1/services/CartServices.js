@@ -67,7 +67,7 @@ class CartServices {
     product = {},
     cart_userId = convertToObjectId(cart_userId),
   }) => {
-    const { cart_shopId, product_id, quantity } = product;
+    const { cart_shopId, product_id, quantity, name, image } = product;
     const foundProduct = await findOneProductRepo({
       filter: {
         product_shop: convertToObjectId(cart_shopId),
@@ -83,15 +83,18 @@ class CartServices {
       cart_userId,
       cart_shopId,
     });
+
     for (let i = 0; i < cartCurrents.length; i++) {
       const cartCurrent = cartCurrents[i];
 
-      if (cartCurrent?.cart_shopId.toString() == cart_shopId) {
+      if (cartCurrent?.cart_shopId._id.toString() === cart_shopId) {
         /* add new item */
         if (cartCurrent.cart_products.length === 0 && quantity > 0) {
           cartCurrent.cart_products = [
             {
               product_id,
+              image,
+              name,
               quantity,
               price: +foundProduct.product_price,
             },
@@ -109,6 +112,8 @@ class CartServices {
             ...cartCurrent.cart_products,
             {
               product_id,
+              image,
+              name,
               quantity,
               price: +foundProduct.product_price,
             },
@@ -150,7 +155,7 @@ class CartServices {
         return await cartCurrent.update(cartCurrent);
       }
     }
-    throw new ForbiddenRequestError("Cart not found", 404);
+    throw new ForbiddenRequestError("Cart not found 1", 404);
   };
 
   static getCurrentCart = async ({
@@ -163,7 +168,20 @@ class CartServices {
         cart_state: "active",
       },
     });
-    if (foundCarts.length === 0) {
+
+    const foundCart = foundCarts.filter(
+      (cartt) => cartt.cart_shopId._id.toString() === cart_shopId
+    );
+
+    // logger.info(
+    //   `foundCart 22::: ${util.inspect(foundCart, {
+    //     showHidden: false,
+    //     depth: null,
+    //     colors: false,
+    //   })}`
+    // );
+
+    if (foundCart.length === 0 && cart_shopId) {
       const newCart = await CartServices.createCart({
         cart_userId,
         cart_shopId: convertToObjectId(cart_shopId),
