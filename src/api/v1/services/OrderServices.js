@@ -16,25 +16,30 @@ const { getDiscountsAmount } = require("./DiscountServices");
 
 class OrderServices {
   /**
-    orderItems: [
     {
-        shopId,
-        shopDiscount: [
+      cartId: "65675236908dc0d252909123",
+      orderItems: [
         {
-            shopId,
-            code,
-            discountId,
+          shopId: "655ddd78b15c27c5c9a5e021",
+          itemProducts: [
+            {
+              product_id: "65644a8de4b05d0287f50570",
+              image:
+                "http://localhost:5000/products-img/1701073459629sg-11134201-22110-q7p5kylmwrjv91.jpg",
+              name: "sai 2111111111",
+              quantity: 10,
+              price: 22,
+            },
+          ],
+          shopDiscount: [
+            {
+              discount_shopId: "6566d9bb48178823d8d43919",
+              discount_code: "TANG40",
+            },
+          ],
         },
-        ],
-        itemProducts: [
-        {
-            productId,
-            quantity,
-            price,
-        },
-        ],
-    },
-    ];
+      ],
+    }
  **/
 
   static checkoutReviewCart = async ({ cartId, userId, orderItems = [] }) => {
@@ -69,7 +74,7 @@ class OrderServices {
       });
 
       const totalAmountProducts = checkProducts.reduce((access, product) => {
-        return access + +product.price * +product.quantity;
+        return +access + +product.price * +product.quantity;
       }, 0);
       checkCart.totalAmount = totalAmountProducts;
 
