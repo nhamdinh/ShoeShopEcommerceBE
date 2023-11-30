@@ -152,14 +152,13 @@ const checkProductsRepo = async (products) => {
   return await Promise.all(
     products.map(async (product) => {
       const foundProduct = await ProductModel.product.findById(
-        convertToObjectId(product?.productId)
+        convertToObjectId(product?.product_id)
       );
 
       if (foundProduct) {
         return {
+          ...product,
           price: foundProduct?.product_price,
-          productId: product?.productId,
-          quantity: product?.quantity,
         };
       }
     })

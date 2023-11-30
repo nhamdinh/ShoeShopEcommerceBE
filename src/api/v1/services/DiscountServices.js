@@ -163,27 +163,20 @@ class DiscountServices {
       discount_used_users,
       discount_type,
       discount_value,
+      discount_applyTo,
+      discount_productIds,
     } = foundDiscount;
 
-    if (
-      !discount_isActive ||
-      discount_quantity === 0 ||
-      new Date() > new Date(discount_end) ||
-      new Date() < new Date(discount_start)
-    )
-      throw new ForbiddenRequestError(`Discount is out`);
+    // if (
+    //   !discount_isActive ||
+    //   discount_quantity === 0 ||
+    //   new Date() > new Date(discount_end) ||
+    //   new Date() < new Date(discount_start)
+    // )
+    //   throw new ForbiddenRequestError(`Discount is out`);
 
     let orderTotalAmount = 0;
     if (discount_order_minValue > 0) {
-      orderTotalAmount = products_order.reduce((acc, product) => {
-        return acc + +product.price * +product.quantity;
-      }, 0);
-
-      if (+orderTotalAmount < discount_order_minValue)
-        throw new ForbiddenRequestError(
-          `orderTotalAmount require minimum is ${discount_order_minValue}`
-        );
-
       /* check */
       if (discount_useMax_user > 0) {
         const userUsed = discount_used_users.find(
@@ -191,34 +184,68 @@ class DiscountServices {
         );
         if (userUsed) throw new ForbiddenRequestError(`Your turn is over`);
       }
+
+      orderTotalAmount = products_order.reduce((acc, product) => {
+        return +acc + +product.price * +product.quantity;
+      }, 0);
+
+      if (+orderTotalAmount < discount_order_minValue)
+        throw new ForbiddenRequestError(
+          `orderTotalAmount require minimum is ${discount_order_minValue}`
+        );
+
       /* => tinh lai discount cho tung mon */
-      const discountAmount =
-        discount_type === "fixed_amount"
-          ? discount_value
-          : ((+orderTotalAmount * discount_value) / 100).toFixed(0);
+      if (discount_applyTo === "products_special") {
+        const productsDiscount = products_order.filter((order) => {
+          return discount_productIds.includes(order.product_id);
+        });
 
-      // logger.info(
-      //   `orderTotalAmount ::: ${util.inspect(orderTotalAmount, {
-      //     showHidden: false,
-      //     depth: null,
-      //     colors: false,
-      //   })}`
-      // );
-      // logger.info(
-      //   `discount_value ::: ${util.inspect(discount_value, {
-      //     showHidden: false,
-      //     depth: null,
-      //     colors: false,
-      //   })}`
-      // );
+        if (productsDiscount.length > 0) {
+          let discountAmount = 0;
+          if (discount_type === "fixed_amount") {
+            discountAmount = productsDiscount.length * discount_value;
+          }
+          if (discount_type === "percent") {
+            discountAmount = productsDiscount.reduce((acc, product) => {
+              return (
+                +acc +
+                +(
+                  (+product?.price * +product?.quantity * discount_value) /
+                  100
+                ).toFixed(0)
+              );
+            }, 0);
+          }
+          return {
+            orderTotalAmount,
+            discountAmount: +discountAmount,
+            orderTotalAmountPay:
+              orderTotalAmount - discountAmount < 1
+                ? 1
+                : orderTotalAmount - discountAmount,
+          };
+        }
+        return { orderTotalAmount, discountAmount: 0, orderTotalAmountPay: 0 };
+      }
 
-      return {
-        orderTotalAmount,
-        discountAmount: +discountAmount,
-        orderTotalAmountPay: orderTotalAmount - discountAmount,
-      };
+      if (discount_applyTo === "all") {
+        const discountAmount =
+          discount_type === "fixed_amount"
+            ? discount_value
+            : ((+orderTotalAmount * discount_value) / 100).toFixed(0);
+
+        return {
+          orderTotalAmount,
+          discountAmount: +discountAmount,
+          orderTotalAmountPay:
+            orderTotalAmount - discountAmount < 1
+              ? 1
+              : orderTotalAmount - discountAmount,
+        };
+      }
+      throw new ForbiddenRequestError(`Discount is out`);
     }
-    return { orderTotalAmount };
+    return { orderTotalAmount, discountAmount: 0, orderTotalAmountPay: 0 };
   };
 
   static deleteDiscountByShop = async ({ codeId, discount_shopId }) => {
