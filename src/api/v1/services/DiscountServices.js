@@ -165,13 +165,13 @@ class DiscountServices {
       discount_value,
     } = foundDiscount;
 
-    if (
-      !discount_isActive ||
-      discount_quantity === 0 ||
-      new Date() > new Date(discount_end) ||
-      new Date() < new Date(discount_start)
-    )
-      throw new ForbiddenRequestError(`Discount is out`);
+    // if (
+    //   !discount_isActive ||
+    //   discount_quantity === 0 ||
+    //   new Date() > new Date(discount_end) ||
+    //   new Date() < new Date(discount_start)
+    // )
+    //   throw new ForbiddenRequestError(`Discount is out`);
 
     let orderTotalAmount = 0;
     if (discount_order_minValue > 0) {

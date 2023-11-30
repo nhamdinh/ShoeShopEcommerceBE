@@ -19,7 +19,7 @@ DiscountRouter.post(
 // GET ALL DISCOUNTS BY SHOP
 DiscountRouter.get(
   "/get-all-by-shop",
-  protect,
+  // protect,
   asyncHandler(discountController.getAllDiscountsByShop)
 );
 

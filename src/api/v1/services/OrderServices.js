@@ -38,13 +38,6 @@ class OrderServices {
  **/
 
   static checkoutReviewCart = async ({ cartId, userId, orderItems = [] }) => {
-    // logger.info(
-    //   `checkProducts ${i}::: ${util.inspect(checkProducts, {
-    //     showHidden: false,
-    //     depth: null,
-    //     colors: false,
-    //   })}`
-    // );
     const foundCarts = await findCartsRepo({
       filter: {
         _id: convertToObjectId(cartId),
@@ -65,63 +58,74 @@ class OrderServices {
       orderItemsNew = [];
 
     for (let i = 0; i < orderItems.length; i++) {
+      /* orderItems length = 1 always */
       const { shopId, shopDiscount = [], itemProducts = [] } = orderItems[i];
       const checkProducts = await checkProductsRepo(itemProducts);
+
       checkProducts.map((checkProduct) => {
         if (!checkProduct) {
           throw new ForbiddenRequestError("Order Wrong!");
         }
       });
 
-      const checkProductsPrice = checkProducts.reduce((access, product) => {
+      const totalAmountProducts = checkProducts.reduce((access, product) => {
         return access + +product.price * +product.quantity;
       }, 0);
-      checkCart.totalAmount += checkProductsPrice;
+      checkCart.totalAmount = totalAmountProducts;
 
       if (shopDiscount.length > 0) {
-        const { orderTotalAmount, discountAmount } = await getDiscountsAmount({
-          discount_code: shopDiscount[0].discount_code,
-          discount_shopId: shopId,
-          discount_used_userId: convertToObjectId(userId),
-          products_order: checkProducts,
+        const calculateDiscounts = await Promise.all(
+          shopDiscount.map(async (coupon) => {
+            const objDiscount = await getDiscountsAmount({
+              discount_code: coupon.discount_code,
+              discount_shopId: shopId,
+              discount_used_userId: convertToObjectId(userId),
+              products_order: checkProducts,
+            });
+
+            if (objDiscount) {
+              return objDiscount;
+            }
+          })
+        );
+
+        calculateDiscounts.map((checkDiscount, index) => {
+          if (!checkDiscount) {
+            throw new ForbiddenRequestError("Order Wrong!");
+          }
+          const { discountAmount } = checkDiscount;
+
+          checkCart.totalDiscount += discountAmount;
+
+          // logger.info(
+          //   `discountAmount ${index}::: ${util.inspect(discountAmount, {
+          //     showHidden: false,
+          //     depth: null,
+          //     colors: false,
+          //   })}`
+          // );
         });
-        checkCart.totalDiscount += discountAmount;
 
         const orderItemNew = {
           shopId,
           shopDiscount,
           itemProducts: checkProducts,
-          priceRaw: orderTotalAmount,
-          discounted: discountAmount,
-          priceAppliedDiscount: orderTotalAmount - discountAmount,
+          priceRaw: checkCart.totalAmount,
+          discounted: checkCart.totalDiscount,
+          priceAppliedDiscount:
+            checkCart.totalAmount - checkCart.totalDiscount < 1
+              ? 1
+              : checkCart.totalAmount - checkCart.totalDiscount,
         };
 
         orderItemsNew.push(orderItemNew);
-
-        // logger.info(
-        //   `checkProducts ${i}::: ${util.inspect(checkProducts, {
-        //     showHidden: false,
-        //     depth: null,
-        //     colors: false,
-        //   })}`
-        // );
-        // logger.info(
-        //   `discountAmount ${i}::: ${util.inspect(discountAmount, {
-        //     showHidden: false,
-        //     depth: null,
-        //     colors: false,
-        //   })}`
-        // );
       }
     }
-    checkCart.totalAmountPay = checkCart.totalAmount - checkCart.totalDiscount;
-    // logger.info(
-    //   `checkCart::: ${util.inspect(checkCart, {
-    //     showHidden: false,
-    //     depth: null,
-    //     colors: false,
-    //   })}`
-    // );
+    checkCart.totalAmountPay =
+      checkCart.totalAmount - checkCart.totalDiscount < 1
+        ? 1
+        : checkCart.totalAmount - checkCart.totalDiscount;
+
     return {
       orderItems,
       orderItemsNew,
@@ -146,13 +150,13 @@ class OrderServices {
 
     for (let i = 0; i < products.length; i++) {
       const { quantity, price, productId } = products[i];
-    //   logger.info(
-    //     `products ${[i]}::: ${util.inspect(products[i], {
-    //       showHidden: false,
-    //       depth: null,
-    //       colors: false,
-    //     })}`
-    //   );
+      //   logger.info(
+      //     `products ${[i]}::: ${util.inspect(products[i], {
+      //       showHidden: false,
+      //       depth: null,
+      //       colors: false,
+      //     })}`
+      //   );
     }
   };
 }
