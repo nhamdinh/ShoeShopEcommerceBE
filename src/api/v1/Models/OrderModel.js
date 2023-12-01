@@ -1,52 +1,50 @@
-const mongoose = require("mongoose");
+"use strict";
 
-const orderSchema = mongoose.Schema(
+const { Schema, model } = require("mongoose"); // Erase if already required
+
+//!dmbg
+const DOCUMENT_NAME = "Order";
+const COLLECTION_NAME = "Orders";
+
+const orderSchema = Schema(
   {
     userId: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       required: true,
       ref: "User",
     },
-    user: {
-      name: { type: String, required: true },
-      email: { type: String, required: true },
-      phone: { type: String, required: true },
-      user: {
-        type: mongoose.Schema.Types.ObjectId,
-        required: true,
-        ref: "User",
-      },
+    shopId: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: "User",
     },
-    cart: {
-      type: mongoose.Schema.Types.ObjectId,
+    cartId: {
+      type: Schema.Types.ObjectId,
       required: true,
       ref: "Cart",
     },
     shippingAddress: {
-      street: { type: String, required: false },
-      city: { type: String, required: false },
-      postalCode: { type: String, required: false },
-      country: { type: String, required: false },
-      address: {
-        type: mongoose.Schema.Types.ObjectId,
-        required: false,
-        ref: "Address",
-      },
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: "Address",
     },
-    orderItems: [
-      {
-        name: { type: String, required: true },
-        qty: { type: Number, required: true },
-        image: { type: String, required: true },
-        price: { type: Number, required: true },
-        product: {
-          type: String,
-          required: true,
-          ref: "Product",
-        },
-      },
-    ],
-
+    // orderItems: [
+    //   {
+    //     name: { type: String, required: true },
+    //     qty: { type: Number, required: true },
+    //     image: { type: String, required: true },
+    //     price: { type: Number, required: true },
+    //     product: {
+    //       type: String,
+    //       required: true,
+    //       ref: "Product",
+    //     },
+    //   },
+    // ],
+    orderItems: {
+      type: Array,
+      default: [],
+    },
     paymentMethod: {
       type: String,
       required: true,
@@ -63,17 +61,22 @@ const orderSchema = mongoose.Schema(
       required: true,
       default: 0.0,
     },
-    shippingPrice: {
+    feeShip: {
       type: Number,
       required: true,
       default: 0.0,
     },
-    totalPriceItems: {
+    totalAmount: {
       type: Number,
       required: true,
       default: 0.0,
     },
-    totalPrice: {
+    totalAmountPay: {
+      type: Number,
+      required: true,
+      default: 0.0,
+    },
+    totalDiscount: {
       type: Number,
       required: true,
       default: 0.0,
@@ -94,10 +97,9 @@ const orderSchema = mongoose.Schema(
     },
   },
   {
+    collection: COLLECTION_NAME,
     timestamps: true,
   }
 );
 
-const Order = mongoose.model("Order", orderSchema);
-
-module.exports = Order;
+module.exports = model(DOCUMENT_NAME, orderSchema);

@@ -12,6 +12,13 @@ const findOneRepo = async ({ filter }) => {
   return await CartModel.findOne({ filter });
 };
 
+const findByIdAndUpdateCartRepo = async ({ id }) => {
+  return CartModel.findByIdAndUpdate(id, {
+    completedAt: Date.now(),
+    cart_state: "completed",
+  }).exec();
+};
+
 const findCartsRepo = async ({ filter }) => {
   return await CartModel.find(filter)
     .populate("cart_userId", "name email  _id")
@@ -42,4 +49,5 @@ module.exports = {
   updateCartRepo,
   createCartRepo,
   getAllCartRepo,
+  findByIdAndUpdateCartRepo,
 };

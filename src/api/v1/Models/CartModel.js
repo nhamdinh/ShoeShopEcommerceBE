@@ -30,6 +30,7 @@ const cartSchema = new Schema(
       required: true,
       ref: "User",
     },
+    completedAt: { type: Date, required: false, default: null },
   },
   {
     collection: COLLECTION_NAME,

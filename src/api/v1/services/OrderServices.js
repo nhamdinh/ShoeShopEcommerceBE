@@ -3,10 +3,16 @@ const util = require("util");
 const logger = require("../log");
 
 const { ForbiddenRequestError } = require("../core/errorResponse");
-const { findCartsRepo } = require("../repositories/cart.repo");
+const {
+  findCartsRepo,
+  findByIdAndUpdateCartRepo,
+} = require("../repositories/cart.repo");
 const { convertToObjectId } = require("../utils/getInfo");
 const { checkProductsRepo } = require("../repositories/product.repo");
 const { getDiscountsAmount } = require("./DiscountServices");
+const Order = require("../Models/OrderModel");
+const { createOrderRepo } = require("../repositories/order.repo");
+const { findAddressByUserRepo } = require("../repositories/address.repo");
 /**
  * 1. Create New Order [User]
  * 2. Query Orders [User]
@@ -15,6 +21,69 @@ const { getDiscountsAmount } = require("./DiscountServices");
  **/
 
 class OrderServices {
+  static createOrder = async ({ req }) => {
+    try {
+      const {
+        orderItems,
+        shippingAddress,
+        paymentMethod,
+        taxPrice,
+        cart,
+        shippingPrice,
+        totalPriceItems,
+        totalPrice,
+        user,
+      } = req.body;
+
+      if (orderItems && orderItems.length === 0) {
+        throw new ForbiddenRequestError("Wrong product model", 400);
+      } else {
+        // const order = new Order({
+        //   orderItems,
+        //   user: {
+        //     ...user,
+        //     user: req.user._id,
+        //   },
+        //   userId: req.user._id,
+        //   shippingAddress,
+        //   paymentMethod,
+        //   taxPrice,
+        //   cart,
+        //   shippingPrice,
+        //   totalPriceItems,
+        //   totalPrice,
+        // });
+        // const createOrder = await order.save();
+
+        return await Order.create({
+          orderItems,
+          userId: req.user._id,
+          shippingAddress,
+          paymentMethod,
+          taxPrice,
+          cart,
+          shippingPrice,
+          totalPriceItems,
+          totalPrice,
+        });
+
+        // const cart1 = await Cart.findById(cart);
+
+        // if (cart1) {
+        //   cart1.deletedAt = Date.now();
+        //   const updatedCart = await cart1.save();
+        // } else {
+        //   res.status(200).json({ message: "Cart not Found" });
+        //   throw new Error("Cart not found");
+        // }
+
+        return { createOrder };
+      }
+    } catch (error) {
+      throw new Error(error);
+    }
+  };
+
   /**
     {
       cartId: "65675236908dc0d252909123",
@@ -55,8 +124,10 @@ class OrderServices {
     }
 
     const checkCart = {
+        userId,
+        cartId,
         totalAmount: 0,
-        feeShip: 0,
+        feeShip: 9,
         totalDiscount: 0,
         totalAmountPay: 0,
       },
@@ -127,9 +198,9 @@ class OrderServices {
       }
     }
     checkCart.totalAmountPay =
-      checkCart.totalAmount - checkCart.totalDiscount < 1
+      checkCart.totalAmount - checkCart.totalDiscount - checkCart.feeShip < 1
         ? 1
-        : checkCart.totalAmount - checkCart.totalDiscount;
+        : checkCart.totalAmount - checkCart.totalDiscount - checkCart.feeShip;
 
     return {
       orderItems,
@@ -186,14 +257,43 @@ class OrderServices {
       if (obj) cartReviewed.push(obj);
     }
 
-    // logger.info(
-    //   `cartReviewed ::: ${util.inspect(cartReviewed, {
-    //     showHidden: false,
-    //     depth: null,
-    //     colors: false,
-    //   })}`
-    // );
-    return cartReviewed;
+    const addressArr = await findAddressByUserRepo({
+      userId: convertToObjectId(userId),
+    });
+
+    let createAddress = {};
+    if (addressArr.length > 0) {
+      createAddress = addressArr[0];
+    } else {
+      throw new ForbiddenRequestError("User have Address YET", 400);
+    }
+
+    const orders = await Promise.all(
+      cartReviewed.map(async (cart) => {
+        const order = await createOrderRepo({
+          userId: convertToObjectId(cart?.checkCart?.userId),
+          shippingAddress: createAddress?._id,
+          cartId: convertToObjectId(cart?.checkCart?.cartId),
+          shopId: convertToObjectId(cart?.orderItems[0]?.shopId),
+
+          orderItems: cart?.orderItems,
+          paymentMethod: "Paypal",
+          taxPrice: 0,
+          feeShip: cart?.checkCart?.feeShip,
+          totalAmount: cart?.checkCart?.totalAmount,
+          totalAmountPay: cart?.checkCart?.totalAmountPay,
+          totalDiscount: cart?.checkCart?.totalDiscount,
+        });
+
+        await findByIdAndUpdateCartRepo({
+          id: convertToObjectId(cart?.checkCart?.cartId),
+        });
+
+        if (order) return order;
+      })
+    );
+
+    return orders;
 
     // const { orderItemsNew } = await OrderServices.checkoutReviewCart({
     //   cartId,
