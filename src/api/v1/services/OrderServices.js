@@ -10,9 +10,9 @@ const {
 const { convertToObjectId } = require("../utils/getInfo");
 const { checkProductsRepo } = require("../repositories/product.repo");
 const { getDiscountsAmount } = require("./DiscountServices");
-const Order = require("../Models/OrderModel");
 const { createOrderRepo } = require("../repositories/order.repo");
 const { findAddressByUserRepo } = require("../repositories/address.repo");
+const OrderModel = require("../Models/OrderModel");
 /**
  * 1. Create New Order [User]
  * 2. Query Orders [User]
@@ -21,67 +21,129 @@ const { findAddressByUserRepo } = require("../repositories/address.repo");
  **/
 
 class OrderServices {
-  static createOrder = async ({ req }) => {
-    try {
-      const {
-        orderItems,
-        shippingAddress,
-        paymentMethod,
-        taxPrice,
-        cart,
-        shippingPrice,
-        totalPriceItems,
-        totalPrice,
-        user,
-      } = req.body;
+  static getAllOrderByAdmin = async ({ query }) => {
+    const searchBy = query?.searchBy || "email";
 
-      if (orderItems && orderItems.length === 0) {
-        throw new ForbiddenRequestError("Wrong product model", 400);
-      } else {
-        // const order = new Order({
-        //   orderItems,
-        //   user: {
-        //     ...user,
-        //     user: req.user._id,
-        //   },
-        //   userId: req.user._id,
-        //   shippingAddress,
-        //   paymentMethod,
-        //   taxPrice,
-        //   cart,
-        //   shippingPrice,
-        //   totalPriceItems,
-        //   totalPrice,
-        // });
-        // const createOrder = await order.save();
+    const keyword = query?.keyword
+      ? searchBy === "email"
+        ? {
+            "user.email": {
+              $regex: query?.keyword,
+              $options: "i",
+            },
+          }
+        : {
+            "user.phone": {
+              $regex: query?.keyword,
+              $options: "i",
+            },
+          }
+      : {};
 
-        return await Order.create({
-          orderItems,
-          userId: req.user._id,
-          shippingAddress,
-          paymentMethod,
-          taxPrice,
-          cart,
-          shippingPrice,
-          totalPriceItems,
-          totalPrice,
-        });
+    const orders = await OrderModel.find({ ...keyword })
+      .populate("userId")
+      .populate("shopId")
+      .populate("cartId")
+      .populate("shippingAddress")
+      .sort({
+        createdAt: -1,
+      });
 
-        // const cart1 = await Cart.findById(cart);
-
-        // if (cart1) {
-        //   cart1.deletedAt = Date.now();
-        //   const updatedCart = await cart1.save();
-        // } else {
-        //   res.status(200).json({ message: "Cart not Found" });
-        //   throw new Error("Cart not found");
-        // }
-
-        return { createOrder };
-      }
-    } catch (error) {
-      throw new Error(error);
+    if (orders.length === 0) {
+      throw new ForbiddenRequestError("Orders not found", 404);
     }
+    return orders;
+  };
+
+  static orderIsDelivered = async ({ id }) => {
+    const order = await OrderModel.findById(convertToObjectId(id));
+
+    if (!order) {
+      throw new ForbiddenRequestError("Order not found", 404);
+    }
+    order.isDelivered = true;
+    order.deliveredAt = Date.now();
+
+    const updatedOrder = await order.save();
+    return updatedOrder;
+  };
+
+  static orderIsPaid = async ({ id, body }) => {
+    const order = await OrderModel.findById(convertToObjectId(id));
+
+    if (!order) {
+      throw new ForbiddenRequestError("Order not found", 404);
+    }
+    order.isPaid = true;
+    order.paidAt = Date.now();
+    order.paymentResult = {
+      id: body.id,
+      status: body.status,
+      update_time: body.update_time,
+      email_address: body.email_address,
+    };
+
+    const updatedOrder = await order.save();
+
+    /* ADD  product TO user.buyer */
+    // const user = await User.findById(user._id);
+    // const buyerArr = user?.buyer;
+    // let orderItems = [];
+    // order?.orderItems?.map((or) => {
+    //   orderItems.push(or?.product);
+    // });
+
+    // const arr = Array.from(new Set([...buyerArr, ...orderItems]));
+    // user.buyer = [...arr];
+    // await user.save();
+    // /* ADD  product TO user.buyer */
+
+    // let productList = [];
+
+    // /* UPDATE countInStock product */
+    // order?.orderItems?.map((or) => {
+    //   productList.push({
+    //     id: or?.product,
+    //     qty: or?.qty,
+    //   });
+    // });
+
+    // for (let i = 0; i < productList.length; i++) {
+    //   const product = await Product.findById(productList[i]?.id);
+    //   if (product) {
+    //     product.countInStock =
+    //       Number(product?.countInStock) - Number(productList[i]?.qty);
+    //     await product.save();
+    //   }
+    // }
+    /* UPDATE countInStock product */
+
+    return updatedOrder;
+  };
+
+  static getOrderById = async ({ id }) => {
+    const order = await OrderModel.findById(convertToObjectId(id))
+      .populate("userId")
+      .populate("shopId")
+      .populate("cartId")
+      .populate("shippingAddress");
+
+    if (order) {
+      return order;
+    }
+    throw new ForbiddenRequestError("order not found", 404);
+  };
+
+  static getAllOrderByUser = async ({ userId }) => {
+    const orders = await OrderModel.find({ userId }).sort({
+      _id: -1,
+    });
+
+    if (orders.length === 0) {
+      throw new ForbiddenRequestError("orders not found", 404);
+    }
+
+    return orders;
   };
 
   /**
