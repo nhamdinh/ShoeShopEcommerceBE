@@ -22,6 +22,40 @@ orderRoute.post(
   protect,
   asyncHandler(orderController.checkoutOrder)
 );
+
+// GET ALL ORDERS BY USER
+orderRoute.get(
+  "/all",
+  protect,
+  asyncHandler(orderController.getAllOrderByUser)
+);
+
+// GET ORDER BY ID
+orderRoute.get(
+  "/detail/:id",
+  protect,
+  asyncHandler(orderController.getOrderById)
+);
+
+// ORDER IS PAID
+orderRoute.put("/:id/pay", protect, asyncHandler(orderController.orderIsPaid));
+
+// ORDER IS DELIVERED
+orderRoute.put(
+  "/:id/delivered",
+  protect,
+  admin,
+  asyncHandler(orderController.orderIsDelivered)
+);
+
+// ADMIN GET ALL ORDERS
+orderRoute.get(
+  "/all-admin",
+  protect,
+  admin,
+  asyncHandler(orderController.getAllOrderByAdmin)
+);
+
 module.exports = orderRoute;
 
 // const express = require("express");
@@ -29,36 +63,12 @@ module.exports = orderRoute;
 // const { protect, admin } = require("./../../Middleware/AuthMiddleware");
 
 // const {
-//   getAllOrderByAdmin,
 //   getAllOrder,
-//   getAllOrderByUser,
-//   getOrderById,
-//   createOrder,
-//   orderIsPaid,
-//   orderIsDelivered,
 // } = require("../../controller/order.controller");
 
 // const orderRouter = express.Router();
 
 // // GET ALL ORDERS
 // orderRouter.get("/get-all", getAllOrder);
-
-// // ADMIN GET ALL ORDERS
-// orderRouter.get("/all-admin", protect, admin, getAllOrderByAdmin);
-
-// // GET ALL ORDERS BY USER
-// orderRouter.get("/all", protect, getAllOrderByUser);
-
-// // CREATE ORDER
-// orderRouter.post("/create-order", protect, createOrder);
-
-// // GET ORDER BY ID
-// orderRouter.get("/detail/:id", protect, getOrderById);
-
-// // ORDER IS PAID
-// orderRouter.put("/:id/pay", protect, orderIsPaid);
-
-// // ORDER IS DELIVERED
-// orderRouter.put("/:id/delivered", protect, admin, orderIsDelivered);
 
 // module.exports = orderRouter;

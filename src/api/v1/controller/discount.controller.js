@@ -30,18 +30,19 @@ class DiscountController {
   };
 
   getAllDiscountsByShop = async (req, res, next) => {
-    // logger.info(
-    //   `req.query ::: ${util.inspect(req.query, {
-    //     showHidden: false,
-    //     depth: null,
-    //     colors: false,
-    //   })}`
-    // );
-
     new OK({
       message: "getAllDiscountsByShop OK",
       metadata: await DiscountServices.getAllDiscountsByShop({
         discount_shopId: req.query?.discount_shopId,
+      }),
+    }).send(res);
+  };
+
+  getAllDiscountsByShops = async (req, res, next) => {
+    new OK({
+      message: "getAllDiscountsByShops OK",
+      metadata: await DiscountServices.getAllDiscountsByShops({
+        discount_shopIds: req.body?.discount_shopIds,
       }),
     }).send(res);
   };

@@ -3,10 +3,16 @@ const util = require("util");
 const logger = require("../log");
 
 const { ForbiddenRequestError } = require("../core/errorResponse");
-const { findCartsRepo } = require("../repositories/cart.repo");
+const {
+  findCartsRepo,
+  findByIdAndUpdateCartRepo,
+} = require("../repositories/cart.repo");
 const { convertToObjectId } = require("../utils/getInfo");
 const { checkProductsRepo } = require("../repositories/product.repo");
 const { getDiscountsAmount } = require("./DiscountServices");
+const { createOrderRepo } = require("../repositories/order.repo");
+const { findAddressByUserRepo } = require("../repositories/address.repo");
+const OrderModel = require("../Models/OrderModel");
 /**
  * 1. Create New Order [User]
  * 2. Query Orders [User]
@@ -15,6 +21,131 @@ const { getDiscountsAmount } = require("./DiscountServices");
  **/
 
 class OrderServices {
+  static getAllOrderByAdmin = async ({ query }) => {
+    const searchBy = query?.searchBy || "email";
+
+    const keyword = query?.keyword
+      ? searchBy === "email"
+        ? {
+            "user.email": {
+              $regex: query?.keyword,
+              $options: "i",
+            },
+          }
+        : {
+            "user.phone": {
+              $regex: query?.keyword,
+              $options: "i",
+            },
+          }
+      : {};
+
+    const orders = await OrderModel.find({ ...keyword })
+      .populate("userId")
+      .populate("shopId")
+      .populate("cartId")
+      .populate("shippingAddress")
+      .sort({
+        createdAt: -1,
+      });
+
+    if (orders.length === 0) {
+      throw new ForbiddenRequestError("Orders not found", 404);
+    }
+    return orders;
+  };
+
+  static orderIsDelivered = async ({ id }) => {
+    const order = await OrderModel.findById(convertToObjectId(id));
+
+    if (!order) {
+      throw new ForbiddenRequestError("Order not found", 404);
+    }
+    order.isDelivered = true;
+    order.deliveredAt = Date.now();
+
+    const updatedOrder = await order.save();
+    return updatedOrder;
+  };
+
+  static orderIsPaid = async ({ id, body }) => {
+    const order = await OrderModel.findById(convertToObjectId(id));
+
+    if (!order) {
+      throw new ForbiddenRequestError("Order not found", 404);
+    }
+    order.isPaid = true;
+    order.paidAt = Date.now();
+    order.paymentResult = {
+      id: body.id,
+      status: body.status,
+      update_time: body.update_time,
+      email_address: body.email_address,
+    };
+
+    const updatedOrder = await order.save();
+
+    /* ADD  product TO user.buyer */
+    // const user = await User.findById(user._id);
+    // const buyerArr = user?.buyer;
+    // let orderItems = [];
+    // order?.orderItems?.map((or) => {
+    //   orderItems.push(or?.product);
+    // });
+
+    // const arr = Array.from(new Set([...buyerArr, ...orderItems]));
+    // user.buyer = [...arr];
+    // await user.save();
+    // /* ADD  product TO user.buyer */
+
+    // let productList = [];
+
+    // /* UPDATE countInStock product */
+    // order?.orderItems?.map((or) => {
+    //   productList.push({
+    //     id: or?.product,
+    //     qty: or?.qty,
+    //   });
+    // });
+
+    // for (let i = 0; i < productList.length; i++) {
+    //   const product = await Product.findById(productList[i]?.id);
+    //   if (product) {
+    //     product.countInStock =
+    //       Number(product?.countInStock) - Number(productList[i]?.qty);
+    //     await product.save();
+    //   }
+    // }
+    /* UPDATE countInStock product */
+
+    return updatedOrder;
+  };
+
+  static getOrderById = async ({ id }) => {
+    const order = await OrderModel.findById(convertToObjectId(id))
+      .populate("userId")
+      .populate("shopId")
+      .populate("cartId")
+      .populate("shippingAddress");
+
+    if (order) {
+      return order;
+    }
+    throw new ForbiddenRequestError("order not found", 404);
+  };
+
+  static getAllOrderByUser = async ({ userId }) => {
+    const orders = await OrderModel.find({ userId }).sort({
+      _id: -1,
+    });
+
+    if (orders.length === 0) {
+      throw new ForbiddenRequestError("orders not found", 404);
+    }
+
+    return orders;
+  };
+
   /**
     {
       cartId: "65675236908dc0d252909123",
@@ -42,7 +173,7 @@ class OrderServices {
     }
  **/
 
-  static checkoutReviewCart = async ({ cartId, userId, orderItems = [] }) => {
+  static checkoutReviewCart11 = async ({ cartId, userId, orderItems = [] }) => {
     const foundCarts = await findCartsRepo({
       filter: {
         _id: convertToObjectId(cartId),
@@ -55,8 +186,10 @@ class OrderServices {
     }
 
     const checkCart = {
+        userId,
+        cartId,
         totalAmount: 0,
-        feeShip: 0,
+        feeShip: 9,
         totalDiscount: 0,
         totalAmountPay: 0,
       },
@@ -127,9 +260,9 @@ class OrderServices {
       }
     }
     checkCart.totalAmountPay =
-      checkCart.totalAmount - checkCart.totalDiscount < 1
+      checkCart.totalAmount - checkCart.totalDiscount - checkCart.feeShip < 1
         ? 1
-        : checkCart.totalAmount - checkCart.totalDiscount;
+        : checkCart.totalAmount - checkCart.totalDiscount - checkCart.feeShip;
 
     return {
       orderItems,
@@ -138,31 +271,110 @@ class OrderServices {
     };
   };
 
-  static checkoutOrder = async ({
-    cartId,
+  static checkoutReviewCart = async ({
+    // cartId,
+    // orderItems = [],
     userId,
-    orderItems = [],
-    userAddress = {},
-    userPayment = {},
+    cartsReview,
   }) => {
-    const { orderItemsNew } = await OrderServices.checkoutReviewCart({
-      cartId,
-      userId,
-      orderItems,
+    const cartReviewed = [];
+    for (let i = 0; i < cartsReview.length; i++) {
+      const cartReview = cartsReview[i];
+      const { cartId, orderItems } = cartReview;
+      const obj = await OrderServices.checkoutReviewCart11({
+        cartId,
+        userId,
+        orderItems,
+      });
+
+      if (obj) cartReviewed.push(obj);
+    }
+
+    // logger.info(
+    //   `cartReviewed ::: ${util.inspect(cartReviewed, {
+    //     showHidden: false,
+    //     depth: null,
+    //     colors: false,
+    //   })}`
+    // );
+    return cartReviewed;
+  };
+
+  static checkoutOrder = async ({
+    // cartId,
+    // orderItems = [],
+    userId,
+    cartsReview,
+  }) => {
+    const cartReviewed = [];
+    for (let i = 0; i < cartsReview.length; i++) {
+      const cartReview = cartsReview[i];
+      const { cartId, orderItems } = cartReview;
+      const obj = await OrderServices.checkoutReviewCart11({
+        cartId,
+        userId,
+        orderItems,
+      });
+
+      if (obj) cartReviewed.push(obj);
+    }
+
+    const addressArr = await findAddressByUserRepo({
+      userId: convertToObjectId(userId),
     });
 
-    const products = orderItemsNew.flatMap((order) => order.itemProducts);
-
-    for (let i = 0; i < products.length; i++) {
-      const { quantity, price, productId } = products[i];
-      //   logger.info(
-      //     `products ${[i]}::: ${util.inspect(products[i], {
-      //       showHidden: false,
-      //       depth: null,
-      //       colors: false,
-      //     })}`
-      //   );
+    let createAddress = {};
+    if (addressArr.length > 0) {
+      createAddress = addressArr[0];
+    } else {
+      throw new ForbiddenRequestError("User have Address YET", 400);
     }
+
+    const orders = await Promise.all(
+      cartReviewed.map(async (cart) => {
+        const order = await createOrderRepo({
+          userId: convertToObjectId(cart?.checkCart?.userId),
+          shippingAddress: createAddress?._id,
+          cartId: convertToObjectId(cart?.checkCart?.cartId),
+          shopId: convertToObjectId(cart?.orderItems[0]?.shopId),
+
+          orderItems: cart?.orderItems,
+          paymentMethod: "Paypal",
+          taxPrice: 0,
+          feeShip: cart?.checkCart?.feeShip,
+          totalAmount: cart?.checkCart?.totalAmount,
+          totalAmountPay: cart?.checkCart?.totalAmountPay,
+          totalDiscount: cart?.checkCart?.totalDiscount,
+        });
+
+        await findByIdAndUpdateCartRepo({
+          id: convertToObjectId(cart?.checkCart?.cartId),
+        });
+
+        if (order) return order;
+      })
+    );
+
+    return orders;
+
+    // const { orderItemsNew } = await OrderServices.checkoutReviewCart({
+    //   cartId,
+    //   userId,
+    //   orderItems,
+    // });
+    /* check product again */
+    // const products = orderItemsNew.flatMap((order) => order.itemProducts);
+
+    // for (let i = 0; i < products.length; i++) {
+    //   const { quantity, price, productId } = products[i];
+    //   //   logger.info(
+    //   //     `products ${[i]}::: ${util.inspect(products[i], {
+    //   //       showHidden: false,
+    //   //       depth: null,
+    //   //       colors: false,
+    //   //     })}`
+    //   //   );
+    // }
   };
 }
 
