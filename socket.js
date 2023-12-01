@@ -1,9 +1,9 @@
 const http = require("http");
 const app = require("./app");
-
+const util = require("util");
 const ChatStory = require("./src/api/v1/Models/ChatStoryModel");
-const User = require("./src/api/v1/Models/UserModel");
 const logger = require("./src/api/v1/log");
+const UserModel = require("./src/api/v1/Models/UserModel");
 
 const server = http.createServer(app);
 const socketIo = require("socket.io")(server, {
@@ -40,13 +40,26 @@ socketIo.on("connection", (socket) => {
     };
 
     const updateUser = async () => {
-      let users = await User.find({
+      let users = await UserModel.find({
         email: data?.sendFrom,
       });
       if (users?.length > 0) {
         users[0].countChat = +users[0].countChat + 1;
       }
-      await users[0].save();
+      // logger.info(
+      //   `users ::: ${util.inspect(users, {
+      //     showHidden: false,
+      //     depth: null,
+      //     colors: false,
+      //   })}`
+      // );
+
+      UserModel.findByIdAndUpdate(users[0]._id, {
+        countChat: users[0].countChat,
+      }).exec();
+
+      // await users[0].save();
+      // await users[0].update(users[0]);
     };
 
     updateStory();

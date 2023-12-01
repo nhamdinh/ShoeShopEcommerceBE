@@ -18,40 +18,6 @@ const { ForbiddenRequestError } = require("../core/errorResponse");
 const UserServices = require("./../services/UserServices");
 const { CREATED, OK } = require("../core/successResponse");
 
-// const findAllUserByAdmin = asyncHandler(async (req, res) => {
-//   try {
-//     const searchBy = req.query?.searchBy || "email";
-
-//     const keyword = req.query?.keyword
-//       ? searchBy === "email"
-//         ? {
-//             email: {
-//               $regex: req.query?.keyword,
-//               $options: "i",
-//             },
-//           }
-//         : {
-//             phone: {
-//               $regex: req.query?.keyword,
-//               $options: "i",
-//             },
-//           }
-//       : {};
-
-//     const count = await User.countDocuments({
-//       ...keyword,
-//     });
-//     const users = await User.find({
-//       ...keyword,
-//     })
-//       .select("-password")
-//       .sort({ createdAt: -1 });
-//     res.json({ count, users });
-//   } catch (error) {
-//     throw new Error(error);
-//   }
-// });
-
 // const logout = asyncHandler(async (req, res) => {
 //   try {
 //     // const cookie = req.headers?.cookie;
@@ -108,53 +74,9 @@ const { CREATED, OK } = require("../core/successResponse");
 //   }
 // });
 
-// const getStory = asyncHandler(async (req, res) => {
-//   try {
-//     let chatStories = await ChatStory.find({
-//       fromTo: [req.query?.user1, req.query?.user2],
-//     });
-
-//     if (chatStories?.length === 0) {
-//       chatStories = await ChatStory.find({
-//         fromTo: [req.query?.user2, req.query?.user1],
-//       });
-//     }
-
-//     if (chatStories?.length === 0) {
-//       res.json({ chatStories: {} });
-//     } else {
-//       res.json({ chatStories: chatStories[0] });
-//     }
-//   } catch (error) {
-//     console.error(error);
-//     res.status(401).json({ message: "chatStories not found" });
-//     throw new Error("chatStories not found");
-//   }
-// });
-
-// const clearCountChat = asyncHandler(async (req, res) => {
-//   try {
-//     let users = await User.find({
-//       email: req.body.email,
-//     });
-//     console.log("users :::", users);
-//     if (users?.length > 0) {
-//       users[0].countChat = 0;
-//     }
-//     const user = await users[0].save();
-//     res.json({ user });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(401).json({ message: "User not found" });
-//     throw new Error("User not found");
-//   }
-// });
-
 // module.exports = {
-//   findAllUserByAdmin,
 //   logout,
 //   getAllChats,
-//   getStory,
 //   clearCountChat,
 // };
 
@@ -216,6 +138,33 @@ class UserController {
       metadata: await UserServices.updateIsShop({
         id: req.user._id,
         productShopName: req.body.productShopName,
+      }),
+    }).send(res);
+  };
+
+  clearCountChat = async (req, res, next) => {
+    new CREATED({
+      message: "clearCountChat CREATED",
+      metadata: await UserServices.clearCountChat({
+        req,
+      }),
+    }).send(res);
+  };
+
+  findAllUserByAdmin = async (req, res, next) => {
+    new OK({
+      message: "findAllUserByAdmin OK",
+      metadata: await UserServices.findAllUserByAdmin({
+        req,
+      }),
+    }).send(res);
+  };
+
+  getStory = async (req, res, next) => {
+    new OK({
+      message: "getStory OK",
+      metadata: await UserServices.getStory({
+        req,
       }),
     }).send(res);
   };

@@ -20,8 +20,84 @@ const {
   createUserRepo,
   getAllUsersRepo,
 } = require("../repositories/user.repo");
+const UserModel = require("../Models/UserModel");
+const ChatStory = require("../Models/ChatStoryModel");
 
 class UserServices {
+  static clearCountChat = async ({ req }) => {
+    try {
+      let users = await UserModel.find({
+        email: req.body.email,
+      });
+      // console.log("users :::", users);
+      if (users?.length > 0) {
+        users[0].countChat = 0;
+      }
+      const user = await users[0].save();
+      return { user };
+    } catch (error) {
+      console.error(error);
+      throw new ForbiddenRequestError("User not Found", 404);
+    }
+  };
+
+  static getStory = async ({ req }) => {
+    try {
+      let chatStories = await ChatStory.find({
+        fromTo: [req.query?.user1, req.query?.user2],
+      });
+
+      if (chatStories?.length === 0) {
+        chatStories = await ChatStory.find({
+          fromTo: [req.query?.user2, req.query?.user1],
+        });
+      }
+
+      if (chatStories?.length === 0) {
+        return { chatStories: {} };
+      } else {
+        return { chatStories: chatStories[0] };
+      }
+    } catch (error) {
+      console.error(error);
+      throw new ForbiddenRequestError("chatStories not Found", 404);
+    }
+  };
+
+  static findAllUserByAdmin = async ({ req }) => {
+    try {
+      const searchBy = req.query?.searchBy || "email";
+
+      const keyword = req.query?.keyword
+        ? searchBy === "email"
+          ? {
+              email: {
+                $regex: req.query?.keyword,
+                $options: "i",
+              },
+            }
+          : {
+              phone: {
+                $regex: req.query?.keyword,
+                $options: "i",
+              },
+            }
+        : {};
+
+      const count = await UserModel.countDocuments({
+        ...keyword,
+      });
+      const users = await UserModel.find({
+        ...keyword,
+      })
+        .select("-password")
+        .sort({ createdAt: -1 });
+      return { count, users };
+    } catch (error) {
+      throw new ForbiddenRequestError("Users not Found", 404);
+    }
+  };
+
   static updateIsShop = async ({ id, productShopName }) => {
     const user = await findUserByIdRepo(id);
 

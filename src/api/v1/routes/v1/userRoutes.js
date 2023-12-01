@@ -38,7 +38,7 @@ userRouter.put("/update-profile", protect, userController.updateProfile);
 userRouter.put("/update-is-shop", protect, userController.updateIsShop);
 
 // // ADMIN GET ALL USER
-// userRouter.get("/all-admin", protect, admin, findAllUserByAdmin);
+userRouter.get("/all-admin", protect, admin, userController.findAllUserByAdmin);
 
 // GET ALL USER
 userRouter.get("/get-all", userController.getAllUsers);
@@ -46,8 +46,13 @@ userRouter.get("/get-all", userController.getAllUsers);
 // // GET ALL CHAT STORIES
 // userRouter.get("/get-all-chats", getAllChats);
 
-// userRouter.get("/get-story", protect, getStory);
+userRouter.get("/get-story", protect, userController.getStory);
 
-// userRouter.put("/clear-count-chat", protect, admin, clearCountChat);
+userRouter.put(
+  "/clear-count-chat",
+  protect,
+  admin,
+  userController.clearCountChat
+);
 
 module.exports = userRouter;
