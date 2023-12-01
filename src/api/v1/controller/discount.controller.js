@@ -31,7 +31,7 @@ class DiscountController {
 
   getAllDiscountsByShop = async (req, res, next) => {
     // logger.info(
-    //   `req.query ::: ${util.inspect(req.query, {
+    //   `req.body ::: ${util.inspect(req.body, {
     //     showHidden: false,
     //     depth: null,
     //     colors: false,
@@ -41,7 +41,7 @@ class DiscountController {
     new OK({
       message: "getAllDiscountsByShop OK",
       metadata: await DiscountServices.getAllDiscountsByShop({
-        discount_shopId: req.query?.discount_shopId,
+        discount_shopIds: req.body?.discount_shopIds,
       }),
     }).send(res);
   };

@@ -89,53 +89,76 @@ class DiscountServices {
     limit = 50,
     sort = "ctime",
     page = 1,
-    discount_shopId = convertToObjectId(discount_shopId),
+    discount_shopIds = [],
     filter = {
       discount_isActive: true,
     },
 
     unSelect = ["__v"],
   }) => {
-    const metadataProducts = await ProductServices.findAllPublishedByShop({
-      product_shop: discount_shopId,
-    });
+    const foundDiscounts = await Promise.all(
+      discount_shopIds.map(async (id, index) => {
+        const objDiscount = await getAllDiscountsByShopRepo({
+          limit: +limit,
+          page: +page,
+          sort,
+          filter: {
+            ...filter,
+            discount_shopId: convertToObjectId(id),
+          },
+          unSelect,
+        });
 
-    const foundDiscounts = await getAllDiscountsByShopRepo({
-      limit: +limit,
-      page: +page,
-      sort,
-      filter: {
-        ...filter,
-        discount_shopId,
-      },
-      unSelect,
-    });
-    if (!foundDiscounts)
-      throw new ForbiddenRequestError(`Discount is not exist`, 404);
-
-    let discounts = foundDiscounts?.discounts;
-    discounts.map((item) => {
-      if (item?.discount_productIds.length > 0) {
-        let productsIds = item?.discount_productIds;
-
-        let mergedArray = [];
-
-        for (let i = 0; i < productsIds.length; i++) {
-          let _id = productsIds[i];
-
-          let product = metadataProducts.products.find(
-            (item) => item._id.toString() === _id
-          );
-
-          if (product) {
-            let mergedProduct = { ...product, _id };
-            mergedArray.push(mergedProduct);
-          }
+        if (objDiscount) {
+          return {
+            ...objDiscount,
+            discount_shopId: id,
+          };
         }
+      })
+    );
 
-        item.discount_productIds = mergedArray;
+    foundDiscounts.map((checkDiscount, index) => {
+      if (!checkDiscount) {
+        throw new ForbiddenRequestError(`Discount is not exist`, 404);
       }
     });
+
+    // logger.info(
+    //   `foundDiscounts ::: ${util.inspect(foundDiscounts, {
+    //     showHidden: false,
+    //     depth: null,
+    //     colors: false,
+    //   })}`
+    // );
+
+    // const metadataProducts = await ProductServices.findAllPublishedByShop({
+    //   product_shop: discount_shopId,
+    // });
+
+    // let discounts = foundDiscounts?.discounts;
+    // discounts.map((item) => {
+    //   if (item?.discount_productIds.length > 0) {
+    //     let productsIds = item?.discount_productIds;
+
+    //     let mergedArray = [];
+
+    //     for (let i = 0; i < productsIds.length; i++) {
+    //       let _id = productsIds[i];
+
+    //       let product = metadataProducts.products.find(
+    //         (item) => item._id.toString() === _id
+    //       );
+
+    //       if (product) {
+    //         let mergedProduct = { ...product, _id };
+    //         mergedArray.push(mergedProduct);
+    //       }
+    //     }
+
+    //     item.discount_productIds = mergedArray;
+    //   }
+    // });
 
     return foundDiscounts;
   };
