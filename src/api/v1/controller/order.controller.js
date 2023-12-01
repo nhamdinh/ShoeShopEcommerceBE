@@ -9,9 +9,8 @@ class OrderController {
     new OK({
       message: "checkoutReviewCart OK",
       metadata: await OrderServices.checkoutReviewCart({
-        cartId:req.body.cartId,
-        userId:req.user._id,
-        orderItems:req.body.orderItems,
+        userId: req.user._id,
+        cartsReview: req.body,
       }),
     }).send(res);
   };
@@ -20,9 +19,8 @@ class OrderController {
     new OK({
       message: "checkoutOrder OK",
       metadata: await OrderServices.checkoutOrder({
-        cartId:req.body.cartId,
-        userId:req.user._id,
-        orderItems:req.body.orderItems,
+        userId: req.user._id,
+        cartsReview: req.body,
       }),
     }).send(res);
   };

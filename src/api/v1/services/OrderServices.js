@@ -42,7 +42,7 @@ class OrderServices {
     }
  **/
 
-  static checkoutReviewCart = async ({ cartId, userId, orderItems = [] }) => {
+  static checkoutReviewCart11 = async ({ cartId, userId, orderItems = [] }) => {
     const foundCarts = await findCartsRepo({
       filter: {
         _id: convertToObjectId(cartId),
@@ -138,31 +138,81 @@ class OrderServices {
     };
   };
 
-  static checkoutOrder = async ({
-    cartId,
+  static checkoutReviewCart = async ({
+    // cartId,
+    // orderItems = [],
     userId,
-    orderItems = [],
-    userAddress = {},
-    userPayment = {},
+    cartsReview,
   }) => {
-    const { orderItemsNew } = await OrderServices.checkoutReviewCart({
-      cartId,
-      userId,
-      orderItems,
-    });
+    const cartReviewed = [];
+    for (let i = 0; i < cartsReview.length; i++) {
+      const cartReview = cartsReview[i];
+      const { cartId, orderItems } = cartReview;
+      const obj = await OrderServices.checkoutReviewCart11({
+        cartId,
+        userId,
+        orderItems,
+      });
 
-    const products = orderItemsNew.flatMap((order) => order.itemProducts);
-
-    for (let i = 0; i < products.length; i++) {
-      const { quantity, price, productId } = products[i];
-      //   logger.info(
-      //     `products ${[i]}::: ${util.inspect(products[i], {
-      //       showHidden: false,
-      //       depth: null,
-      //       colors: false,
-      //     })}`
-      //   );
+      if (obj) cartReviewed.push(obj);
     }
+
+    // logger.info(
+    //   `cartReviewed ::: ${util.inspect(cartReviewed, {
+    //     showHidden: false,
+    //     depth: null,
+    //     colors: false,
+    //   })}`
+    // );
+    return cartReviewed;
+  };
+
+  static checkoutOrder = async ({
+    // cartId,
+    // orderItems = [],
+    userId,
+    cartsReview,
+  }) => {
+    const cartReviewed = [];
+    for (let i = 0; i < cartsReview.length; i++) {
+      const cartReview = cartsReview[i];
+      const { cartId, orderItems } = cartReview;
+      const obj = await OrderServices.checkoutReviewCart11({
+        cartId,
+        userId,
+        orderItems,
+      });
+
+      if (obj) cartReviewed.push(obj);
+    }
+
+    // logger.info(
+    //   `cartReviewed ::: ${util.inspect(cartReviewed, {
+    //     showHidden: false,
+    //     depth: null,
+    //     colors: false,
+    //   })}`
+    // );
+    return cartReviewed;
+
+    // const { orderItemsNew } = await OrderServices.checkoutReviewCart({
+    //   cartId,
+    //   userId,
+    //   orderItems,
+    // });
+    /* check product again */
+    // const products = orderItemsNew.flatMap((order) => order.itemProducts);
+
+    // for (let i = 0; i < products.length; i++) {
+    //   const { quantity, price, productId } = products[i];
+    //   //   logger.info(
+    //   //     `products ${[i]}::: ${util.inspect(products[i], {
+    //   //       showHidden: false,
+    //   //       depth: null,
+    //   //       colors: false,
+    //   //     })}`
+    //   //   );
+    // }
   };
 }
 

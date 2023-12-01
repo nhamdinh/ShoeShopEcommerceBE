@@ -89,6 +89,61 @@ class DiscountServices {
     limit = 50,
     sort = "ctime",
     page = 1,
+    discount_shopId = convertToObjectId(discount_shopId),
+    filter = {
+      discount_isActive: true,
+    },
+
+    unSelect = ["__v"],
+  }) => {
+    const metadataProducts = await ProductServices.findAllPublishedByShop({
+      product_shop: discount_shopId,
+    });
+
+    const foundDiscounts = await getAllDiscountsByShopRepo({
+      limit: +limit,
+      page: +page,
+      sort,
+      filter: {
+        ...filter,
+        discount_shopId,
+      },
+      unSelect,
+    });
+    if (!foundDiscounts)
+      throw new ForbiddenRequestError(`Discount is not exist`, 404);
+
+    let discounts = foundDiscounts?.discounts;
+    discounts.map((item) => {
+      if (item?.discount_productIds.length > 0) {
+        let productsIds = item?.discount_productIds;
+
+        let mergedArray = [];
+
+        for (let i = 0; i < productsIds.length; i++) {
+          let _id = productsIds[i];
+
+          let product = metadataProducts.products.find(
+            (item) => item._id.toString() === _id
+          );
+
+          if (product) {
+            let mergedProduct = { ...product, _id };
+            mergedArray.push(mergedProduct);
+          }
+        }
+
+        item.discount_productIds = mergedArray;
+      }
+    });
+
+    return foundDiscounts;
+  };
+
+  static getAllDiscountsByShops = async ({
+    limit = 50,
+    sort = "ctime",
+    page = 1,
     discount_shopIds = [],
     filter = {
       discount_isActive: true,
@@ -226,14 +281,16 @@ class DiscountServices {
         if (productsDiscount.length > 0) {
           let discountAmount = 0;
           if (discount_type === "fixed_amount") {
-            discountAmount = productsDiscount.length * discount_value;
+            discountAmount = productsDiscount.reduce((acc, product) => {
+              return +acc + +(+product?.quantity * discount_value).toFixed(0);
+            }, 0);
           }
           if (discount_type === "percent") {
             discountAmount = productsDiscount.reduce((acc, product) => {
               return (
                 +acc +
                 +(
-                  (+product?.price * +product?.quantity * discount_value) /
+                  (+product?.quantity * +product?.price * discount_value) /
                   100
                 ).toFixed(0)
               );
