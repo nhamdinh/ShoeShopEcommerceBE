@@ -8,15 +8,21 @@ const reviewSchema = new Schema(
   {
     rating: {
       type: Number,
+      // required: true,
       default: 4,
       min: [1, "Rating must be above 1"],
       max: [5, "Rating must be below 5"],
-      set: (val) => {
-        Math.round(val * 10) / 10;
-      },
+      // set: (val) => {
+      //   Math.round(val * 10) / 10;
+      // },
     },
     comment: { type: String, required: true },
     userId: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: "User",
+    },
+    shopId: {
       type: Schema.Types.ObjectId,
       required: true,
       ref: "User",

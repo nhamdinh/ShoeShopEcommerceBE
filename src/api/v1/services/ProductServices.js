@@ -22,6 +22,7 @@ const {
   convertToObjectId,
 } = require("../utils/getInfo");
 const InventoryServices = require("./InventoryServices");
+const { createReviewRepo } = require("../repositories/review.repo");
 
 class ProductFactory {
   static productModelStrategy = {
@@ -182,33 +183,46 @@ class ProductFactory {
     return hasBuyer;
   };
 
-  static createProductReview = async (req, res) => {
-    const product = await findProductByIdRepo(req.params.id);
+  static createProductReview = async (req) => {
+    const product = await findProductByIdRepo({
+      product_id: req.params?.id,
+    });
+
     if (!product) throw new ForbiddenRequestError("Product not Found");
 
-    const { rating, comment } = req.body;
-    
-    const alreadyReviewed = product.reviews.find(
-      (r) => r.user.toString() === req.user._id.toString()
-    );
-    if (alreadyReviewed) {
-      throw new ForbiddenRequestError("Product already Reviewed");
-    }
+    const { rating = +req.body?.rating ?? 5, comment, shopId } = req.body;
+
+
+    let productReviews = product?.reviews ?? [];
+
+    // const alreadyReviewed = productReviews.find(
+    //   (r) => r?.userId?.toString() === req.user._id.toString()
+    // );
+
+    // if (alreadyReviewed) {
+    //   throw new ForbiddenRequestError("Product already Reviewed");
+    // }
+
     const review = {
-      name: req.user.name,
-      rating: Number(rating),
+      rating: +rating,
       comment,
-      user: req.user._id,
+      userId: convertToObjectId(req.user._id),
+      shopId: convertToObjectId(shopId),
     };
+
+    const newReview = await createReviewRepo(review);
+
+    if (!newReview) throw new ForbiddenRequestError("createReview Error");
+
     product.reviews.push(review);
     product.numReviews = product.reviews.length;
-    product.rating = (
+    product.product_ratings = (
       product.reviews.reduce((acc, item) => item.rating + acc, 0) /
       product.reviews.length
     ).toFixed(1);
 
     await product.save();
-    res.status(201).json({ message: "Reviewed Added" });
+    return newReview;
   };
 }
 

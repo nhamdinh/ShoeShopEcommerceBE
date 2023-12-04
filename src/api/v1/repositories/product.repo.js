@@ -121,7 +121,7 @@ const findProductByIdRepo = async ({ product_id, unSelect = [] }) => {
   return await ProductModel.product
     .findById(product_id)
     .select(getUnSelectData(unSelect))
-    .lean();
+    // .lean();
 };
 
 const findProductById1Repo = async ({ product_id }) => {
