@@ -31,8 +31,8 @@ const findUserByIdRepo = async (id) => {
   exec(): async await trong db
   */
 };
-const findAllAdminUsersRepo = async (select = { email: 1, phone: 2 }) => {
-  return await UserModel.find({ isAdmin: true }).select(select).lean().exec();
+const findAllAdminUsersRepo = async (select = { _id: 0 }) => {
+  return await UserModel.find({ isAdmin: true }).select(select).lean();
 };
 
 const createUserRepo = async (user) => {
@@ -47,6 +47,10 @@ const getAllUsersRepo = async () => {
   };
 };
 
+const findAllUsersOrdersRepo = async (filter) => {
+  return await UserModel.find(filter).select({ _id: 1 }).lean();
+};
+
 module.exports = {
   findUserByEmailRepo,
   findByIdAndUpdateTokenRepo,
@@ -54,4 +58,5 @@ module.exports = {
   findAllAdminUsersRepo,
   createUserRepo,
   getAllUsersRepo,
+  findAllUsersOrdersRepo,
 };

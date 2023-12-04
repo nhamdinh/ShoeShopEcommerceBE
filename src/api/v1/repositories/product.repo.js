@@ -95,6 +95,10 @@ const findAllProductsRepo = async ({ limit, sort, page, filter, select }) => {
   const skip = (page - 1) * limit;
   const sortBy = sort === "ctime" ? { _id: -1 } : { _id: 1 };
 
+  const count = await ProductModel.product.countDocuments({
+    ...filter,
+  });
+
   const products = await ProductModel.product
     .find(filter)
     .sort(sortBy)
@@ -105,7 +109,10 @@ const findAllProductsRepo = async ({ limit, sort, page, filter, select }) => {
     .lean();
 
   return {
-    totalCount: products.length ?? 0,
+    totalCount: count ?? 0,
+    totalPages: Math.ceil(count / limit),
+    page: +page,
+    limit: +limit,
     products: products,
   };
 };
@@ -114,7 +121,7 @@ const findProductByIdRepo = async ({ product_id, unSelect = [] }) => {
   return await ProductModel.product
     .findById(product_id)
     .select(getUnSelectData(unSelect))
-    .lean();
+    // .lean();
 };
 
 const findProductById1Repo = async ({ product_id }) => {

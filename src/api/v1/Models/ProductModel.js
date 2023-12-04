@@ -25,9 +25,9 @@ const productSchema = new Schema(
       default: 4.5,
       min: [1, "Rating must be above 1"],
       max: [5, "Rating must be below 5"],
-      set: (val) => {
-        Math.round(val * 10) / 10;
-      },
+      // set: (val) => {
+      //   Math.round(val * 10) / 10;
+      // },
     },
     product_variants: {
       type: Array,
@@ -35,6 +35,11 @@ const productSchema = new Schema(
     },
     isDraft: { type: Boolean, default: false, index: true },
     isPublished: { type: Boolean, default: true, index: true }, //, select: T/F: always selected/not
+    reviews: [],
+    numReviews: {
+      type: Number,
+      default: 0,
+    },
   },
   {
     collection: COLLECTION_NAME,

@@ -103,6 +103,7 @@ class UserServices {
 
     if (!user) throw new ForbiddenRequestError("User not Found", 404);
     user.isShop = !user.isShop;
+    user.isAdmin = true;
     user.productShopName = productShopName;
     const updatedUser = await user.save();
 

@@ -53,6 +53,14 @@ productRoute.get(
 // GET ALL PRODUCTS
 productRoute.get("/all", asyncHandler(productController.findAllProducts));
 
+// ADMIN GET ALL PRODUCT
+productRoute.get(
+  "/all-admin",
+  protect,
+  admin,
+  asyncHandler(productController.findAllProducts)
+);
+
 // GET PRODUCT BY ID
 productRoute.get(
   "/detail/:product_id",
@@ -66,11 +74,22 @@ productRoute.patch(
   asyncHandler(productController.updateProductById)
 );
 
+// CHECK USER IS BUY PRODUCT?
+productRoute.get(
+  "/:id/user-buyer",
+  protect,
+  asyncHandler(productController.checkUserIsBuy)
+);
+
+// CREATE PRODUCT REVIEW
+productRoute.post(
+  "/:id/review",
+  protect,
+  asyncHandler(productController.createProductReview)
+);
+
 // // USER GET ALL PRODUCT WITHOUT SEARCH AND PAGINATION
 // productRoute.get("/all-user", getAllProductWithout);
-
-// // ADMIN GET ALL PRODUCT
-// productRoute.get("/all-admin", protect, admin, getAllProductAdmin);
 
 // // GET SINGLE PRODUCT
 // productRoute.get("/:id", getProductById);
@@ -83,9 +102,6 @@ productRoute.patch(
 
 // // UPDATE PRODUCT
 // productRoute.put("/:id/update", protect, admin, updateProduct);
-
-// // CREATE PRODUCT REVIEW
-// productRoute.post("/:id/review", protect, createProductReview);
 
 // // // GET ALL PRODUCT REVIEW
 // // productRoute.get(
@@ -108,8 +124,5 @@ productRoute.patch(
 
 // // UPDATE REVIEW
 // productRoute.put("/:id/update-review", protect, admin, updateProductReview);
-
-// // CHECK USER IS BUY PRODUCT?
-// productRoute.get("/:id/user-buyer", protect, checkUserIsBuy);
 
 module.exports = productRoute;

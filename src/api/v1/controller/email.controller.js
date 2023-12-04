@@ -23,11 +23,11 @@ const sendEmail = asyncHandler(async (request, response) => {
       const mail_option = {
         from: "nhamnd.hmu@gmail.com",
         to: request.body?.email,
-        subject: "YOUR MESSAGE FROM GEAR",
+        subject: "YOUR MESSAGE FROM BESTBUY SHOP",
         //   text: (
         //     Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000
         //   ).toString(),
-        text: "you are member",
+        text: `Welcome to ${request.body?.productShopName}`,
       };
 
       transporter.sendMail(mail_option, (error, info) => {
