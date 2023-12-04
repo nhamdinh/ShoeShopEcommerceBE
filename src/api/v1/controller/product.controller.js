@@ -1,9 +1,9 @@
 const asyncHandler = require("express-async-handler");
 const util = require("util");
+const logger = require("../log");
 
 const Product = require("../Models/ProductModel");
 const User = require("../Models/UserModel");
-const logger = require("../log");
 const ProductServices = require("../services/ProductServices");
 const { CREATED, OK } = require("../core/successResponse");
 
@@ -62,54 +62,6 @@ const { CREATED, OK } = require("../core/successResponse");
 //       createdAt: -1,
 //     });
 //     res.json({ code: "success", count, products });
-//   } catch (error) {
-//     throw new Error(error);
-//   }
-// });
-
-// const getAllProductAdmin = asyncHandler(async (req, res) => {
-//   try {
-//     const page = Number(req.query?.page) || 1;
-//     const PAGE_SIZE = Number(req.query?.limit) || 6;
-//     const orderBy = req.query?.orderBy || "createdAt";
-//     let brand = req.query?.brand ?? "";
-
-//     if (brand === "" || brand === "All") {
-//       brand = {};
-//     } else {
-//       brand = {
-//         "category.brand": brand,
-//       };
-//     }
-
-//     const keyword = req.query?.keyword
-//       ? {
-//           name: {
-//             $regex: req.query?.keyword,
-//             $options: "i",
-//           },
-//         }
-//       : {};
-//     const count = await Product.countDocuments({
-//       ...keyword,
-//       ...brand,
-//       deletedAt: null,
-//     });
-//     const products = await Product.find({
-//       ...keyword,
-//       ...brand,
-//       deletedAt: null,
-//     })
-//       .limit(PAGE_SIZE)
-//       .skip(PAGE_SIZE * (page - 1))
-//       .sort({ _id: -1 });
-//     res.json({
-//       count,
-//       products,
-//       page,
-//       totalPages: Math.ceil(count / PAGE_SIZE),
-//       limit: PAGE_SIZE,
-//     });
 //   } catch (error) {
 //     throw new Error(error);
 //   }
@@ -204,43 +156,6 @@ const { CREATED, OK } = require("../core/successResponse");
 //   }
 // });
 
-// const createProductReview = asyncHandler(async (req, res) => {
-//   try {
-//     const { rating, comment } = req.body;
-//     const product = await Product.findById(req.params.id);
-
-//     if (product) {
-//       const alreadyReviewed = product.reviews.find(
-//         (r) => r.user.toString() === req.user._id.toString()
-//       );
-//       if (alreadyReviewed) {
-//         res.status(400).json({ message: "Product already Reviewed" });
-//         throw new Error("Product already Reviewed");
-//       }
-//       const review = {
-//         name: req.user.name,
-//         rating: Number(rating),
-//         comment,
-//         user: req.user._id,
-//       };
-//       product.reviews.push(review);
-//       product.numReviews = product.reviews.length;
-//       product.rating = (
-//         product.reviews.reduce((acc, item) => item.rating + acc, 0) /
-//         product.reviews.length
-//       ).toFixed(1);
-
-//       await product.save();
-//       res.status(201).json({ message: "Reviewed Added" });
-//     } else {
-//       res.status(200).json({ message: "Product not Found" });
-//       throw new Error("Product not Found");
-//     }
-//   } catch (error) {
-//     throw new Error(error);
-//   }
-// });
-
 // const updateProductReview = asyncHandler(async (req, res) => {
 //   try {
 //     const { comment, productId } = req.body;
@@ -266,37 +181,14 @@ const { CREATED, OK } = require("../core/successResponse");
 //   }
 // });
 
-// const checkUserIsBuy = asyncHandler(async (req, res) => {
-//   try {
-//     const user = await User.findById(req.user._id);
-
-//     if (user) {
-//       const buyerArr = user?.buyer;
-//       let hasBuyer = false;
-//       buyerArr?.map((buyer) => {
-//         if (req.params.id === buyer) hasBuyer = true;
-//       });
-//       res.status(201).json({ hasBuyer });
-//     } else {
-//       res.status(200).json({ message: "User not Found" });
-//       throw new Error("User not Found");
-//     }
-//   } catch (error) {
-//     throw new Error(error);
-//   }
-// });
-
 // module.exports = {
 //   getAllProduct,
 //   getAllProductWithout,
-//   getAllProductAdmin,
 //   getProductById,
 //   deleteProductById,
 //   createProduct,
 //   updateProduct,
-//   createProductReview,
 //   updateProductReview,
-//   checkUserIsBuy,
 // };
 
 class ProductController {
@@ -333,14 +225,6 @@ class ProductController {
   };
 
   findAllPublishedByShop = async (req, res, next) => {
-    // logger.info(
-    //   `req.query 1::: ${util.inspect(req.query, {
-    //     showHidden: false,
-    //     depth: null,
-    //     colors: false,
-    //   })}`
-    // );
-
     new OK({
       message: "findAllPublishedByShop OK",
       metadata: await ProductServices.findAllPublishedByShop({
@@ -381,7 +265,9 @@ class ProductController {
   findAllProducts = async (req, res, next) => {
     new OK({
       message: "findAllProducts OK",
-      metadata: await ProductServices.findAllProducts(req.query),
+      metadata: await ProductServices.findAllProducts({
+        query: req.query,
+      }),
     }).send(res);
   };
 
@@ -391,6 +277,20 @@ class ProductController {
       metadata: await ProductServices.findProductById({
         product_id: req.params.product_id,
       }),
+    }).send(res);
+  };
+
+  checkUserIsBuy = async (req, res, next) => {
+    new OK({
+      message: "checkUserIsBuy OK",
+      metadata: await ProductServices.checkUserIsBuy(req),
+    }).send(res);
+  };
+
+  createProductReview = async (req, res, next) => {
+    new CREATED({
+      message: "createProductReview CREATED",
+      metadata: await ProductServices.createProductReview(req),
     }).send(res);
   };
 }

@@ -19,6 +19,7 @@ const { PRODUCT_MODEL } = require("../utils/constant");
 const {
   removeNullObject,
   updateNestedObjectParser,
+  convertToObjectId,
 } = require("../utils/getInfo");
 const InventoryServices = require("./InventoryServices");
 
@@ -111,27 +112,103 @@ class ProductFactory {
     return await searchProductsRepo({ keySearch });
   };
 
-  static findAllProducts = async ({
-    limit = 50,
-    sort = "ctime",
-    page = 1,
-    filter = { isPublished: true },
-    select = [
-      // "product_name",
-      // "product_shop",
-      // "product_price",
-      // "product_thumb",
-      // "isDraft",
-      // "isPublished",
-    ],
-  }) => {
+  static findAllProducts = async ({ query }) => {
+    let {
+      sort = "ctime",
+      page = +query?.page ?? 1,
+      limit = +query?.limit ?? 50,
+      product_shop = query?.product_shop ?? "",
+      keyword = query?.keyword ?? "",
+      select = [
+        // "product_name",
+        // "product_shop",
+        // "product_price",
+        // "product_thumb",
+        // "isDraft",
+        // "isPublished",
+      ],
+    } = query;
+    if (product_shop === "") {
+      product_shop = {};
+    } else {
+      product_shop = {
+        product_shop: convertToObjectId(product_shop),
+      };
+    }
+
+    if (keyword === "") {
+      keyword = {};
+    } else {
+      keyword = {
+        product_name: {
+          $regex: keyword,
+          $options: "i",
+        },
+      };
+    }
+
+    const filter = {
+      isPublished: true,
+      ...product_shop,
+      ...keyword,
+    };
+
+    // logger.info(
+    //   `filter ::: ${util.inspect(filter, {
+    //     showHidden: false,
+    //     depth: null,
+    //     colors: false,
+    //   })}`
+    // );
     return await findAllProductsRepo({
-      limit,
       sort,
+      limit,
       page,
       filter,
       select,
     });
+  };
+
+  static checkUserIsBuy = async (req) => {
+    const user = await findUserByIdRepo(req.user._id);
+
+    if (!user) throw new ForbiddenRequestError("User not Found");
+
+    const buyerArr = user?.buyer;
+    let hasBuyer = false;
+    buyerArr?.map((buyer) => {
+      if (req.params.id === buyer) hasBuyer = true;
+    });
+    return hasBuyer;
+  };
+
+  static createProductReview = async (req, res) => {
+    const product = await findProductByIdRepo(req.params.id);
+    if (!product) throw new ForbiddenRequestError("Product not Found");
+
+    const { rating, comment } = req.body;
+    
+    const alreadyReviewed = product.reviews.find(
+      (r) => r.user.toString() === req.user._id.toString()
+    );
+    if (alreadyReviewed) {
+      throw new ForbiddenRequestError("Product already Reviewed");
+    }
+    const review = {
+      name: req.user.name,
+      rating: Number(rating),
+      comment,
+      user: req.user._id,
+    };
+    product.reviews.push(review);
+    product.numReviews = product.reviews.length;
+    product.rating = (
+      product.reviews.reduce((acc, item) => item.rating + acc, 0) /
+      product.reviews.length
+    ).toFixed(1);
+
+    await product.save();
+    res.status(201).json({ message: "Reviewed Added" });
   };
 }
 

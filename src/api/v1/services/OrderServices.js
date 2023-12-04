@@ -10,9 +10,17 @@ const {
 const { convertToObjectId } = require("../utils/getInfo");
 const { checkProductsRepo } = require("../repositories/product.repo");
 const { getDiscountsAmount } = require("./DiscountServices");
-const { createOrderRepo } = require("../repositories/order.repo");
+const {
+  createOrderRepo,
+  findOrdersRepo,
+  getOrderByIdRepo,
+} = require("../repositories/order.repo");
 const { findAddressByUserRepo } = require("../repositories/address.repo");
 const OrderModel = require("../Models/OrderModel");
+const {
+  findAllUsersOrdersRepo,
+  findUserByIdRepo,
+} = require("../repositories/user.repo");
 /**
  * 1. Create New Order [User]
  * 2. Query Orders [User]
@@ -22,36 +30,56 @@ const OrderModel = require("../Models/OrderModel");
 
 class OrderServices {
   static getAllOrderByAdmin = async ({ query }) => {
-    const searchBy = query?.searchBy || "email";
+    const searchBy = query?.searchBy ?? "email";
+    let shopId = query?.shopId ?? "";
+
+    if (shopId === "") {
+      shopId = {};
+    } else {
+      shopId = {
+        shopId: convertToObjectId(shopId),
+      };
+    }
 
     const keyword = query?.keyword
       ? searchBy === "email"
         ? {
-            "user.email": {
+            email: {
               $regex: query?.keyword,
               $options: "i",
             },
           }
         : {
-            "user.phone": {
+            phone: {
               $regex: query?.keyword,
               $options: "i",
             },
           }
       : {};
 
-    const orders = await OrderModel.find({ ...keyword })
-      .populate("userId")
-      .populate("shopId")
-      .populate("cartId")
-      .populate("shippingAddress")
-      .sort({
-        createdAt: -1,
-      });
+    const users = await findAllUsersOrdersRepo({ ...keyword });
 
-    if (orders.length === 0) {
-      throw new ForbiddenRequestError("Orders not found", 404);
-    }
+    if (users.length === 0) return [];
+
+    const userIds = [];
+    users.map((us) => {
+      userIds.push(convertToObjectId(us._id));
+    });
+
+    const orders = await findOrdersRepo({
+      userId: { $in: [...userIds] },
+      ...shopId,
+    });
+
+    // logger.info(
+    //   `users ::: ${util.inspect(users, {
+    //     showHidden: false,
+    //     depth: null,
+    //     colors: false,
+    //   })}`
+    // );
+
+    if (orders.length === 0) return [];
     return orders;
   };
 
@@ -85,17 +113,25 @@ class OrderServices {
 
     const updatedOrder = await order.save();
 
-    /* ADD  product TO user.buyer */
-    // const user = await User.findById(user._id);
-    // const buyerArr = user?.buyer;
-    // let orderItems = [];
-    // order?.orderItems?.map((or) => {
-    //   orderItems.push(or?.product);
-    // });
+    // logger.info(
+    //   `order ::: ${util.inspect(order, {
+    //     showHidden: false,
+    //     depth: null,
+    //     colors: false,
+    //   })}`
+    // );
 
-    // const arr = Array.from(new Set([...buyerArr, ...orderItems]));
-    // user.buyer = [...arr];
-    // await user.save();
+    /* ADD  product TO user.buyer */
+    const user = await findUserByIdRepo(order?.userId);
+    const buyerArr = user?.buyer;
+    let orderItems = [];
+    order?.orderItems[0]?.itemProducts?.map((or) => {
+      orderItems.push(or?.product_id);
+    });
+
+    const arr = Array.from(new Set([...buyerArr, ...orderItems]));
+    user.buyer = [...arr];
+    await user.save();
     // /* ADD  product TO user.buyer */
 
     // let productList = [];
@@ -122,12 +158,7 @@ class OrderServices {
   };
 
   static getOrderById = async ({ id }) => {
-    const order = await OrderModel.findById(convertToObjectId(id))
-      .populate("userId")
-      .populate("shopId")
-      .populate("cartId")
-      .populate("shippingAddress");
-
+    const order = await getOrderByIdRepo(convertToObjectId(id));
     if (order) {
       return order;
     }
