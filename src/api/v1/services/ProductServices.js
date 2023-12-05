@@ -23,6 +23,7 @@ const {
 } = require("../utils/getInfo");
 const InventoryServices = require("./InventoryServices");
 const { createReviewRepo } = require("../repositories/review.repo");
+const ReviewServices = require("./ReviewServices");
 
 class ProductFactory {
   static productModelStrategy = {
@@ -190,23 +191,36 @@ class ProductFactory {
 
     if (!product) throw new ForbiddenRequestError("Product not Found");
 
-    const { rating = +req.body?.rating ?? 5, comment, shopId } = req.body;
+    const {
+      rating = +req.body?.rating ?? 5,
+      comment,
+      productId,
+      shopId,
+    } = req.body;
 
+    const productReviews = product?.reviews ?? [];
 
-    let productReviews = product?.reviews ?? [];
+    logger.info(
+      `productReviews ::: ${util.inspect(productReviews, {
+        showHidden: false,
+        depth: null,
+        colors: false,
+      })}`
+    );
 
-    // const alreadyReviewed = productReviews.find(
-    //   (r) => r?.userId?.toString() === req.user._id.toString()
-    // );
+    const alreadyReviewed = productReviews.find(
+      (re) => re?.toString() === productId.toString()
+    );
 
-    // if (alreadyReviewed) {
-    //   throw new ForbiddenRequestError("Product already Reviewed");
-    // }
+    if (alreadyReviewed) {
+      throw new ForbiddenRequestError("Product already Reviewed");
+    }
 
     const review = {
       rating: +rating,
       comment,
       userId: convertToObjectId(req.user._id),
+      productId: convertToObjectId(productId),
       shopId: convertToObjectId(shopId),
     };
 
@@ -214,11 +228,14 @@ class ProductFactory {
 
     if (!newReview) throw new ForbiddenRequestError("createReview Error");
 
-    product.reviews.push(review);
-    product.numReviews = product.reviews.length;
+    const foundReviews = await ReviewServices.getReviewsByProduct({
+      productId: req.params?.id,
+    });
+    product.reviews.push(productId);
+    product.numReviews = +foundReviews?.length ?? 1;
     product.product_ratings = (
-      product.reviews.reduce((acc, item) => item.rating + acc, 0) /
-      product.reviews.length
+      foundReviews.reduce((acc, item) => +acc + +item?.rating, 0) /
+        foundReviews?.length ?? 1
     ).toFixed(1);
 
     await product.save();
@@ -288,6 +305,14 @@ const classRefStrategy = (model) => {
         inven_stock: this.product_quantity,
         inven_location: "unknown",
       });
+
+      logger.info(
+        `newProduct ::: ${util.inspect(newProduct, {
+          showHidden: false,
+          depth: null,
+          colors: false,
+        })}`
+      );
 
       return newProduct;
     }

@@ -35,11 +35,11 @@ const productSchema = new Schema(
     },
     isDraft: { type: Boolean, default: false, index: true },
     isPublished: { type: Boolean, default: true, index: true }, //, select: T/F: always selected/not
-    reviews: [],
     numReviews: {
       type: Number,
       default: 0,
     },
+    reviews: [],
   },
   {
     collection: COLLECTION_NAME,

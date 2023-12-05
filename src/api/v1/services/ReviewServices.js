@@ -10,6 +10,9 @@ class ReviewServices {
   static getReviewsByShop = async ({ shopId }) => {
     return await findReviewsRepo({ shopId: convertToObjectId(shopId) });
   };
+  static getReviewsByProduct = async ({ productId }) => {
+    return await findReviewsRepo({ productId: convertToObjectId(productId) });
+  };
 }
 
 module.exports = ReviewServices;

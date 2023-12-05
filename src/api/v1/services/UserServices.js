@@ -152,7 +152,13 @@ class UserServices {
     const { email, password } = req.body;
     const user = await findUserByEmailRepo({ email });
     // console.log(`user ::: ${user}`);
-
+    logger.info(
+      `user login ::: ${util.inspect(user, {
+        showHidden: false,
+        depth: null,
+        colors: false,
+      })}`
+    );
     if (!user) {
       throw new ForbiddenRequestError("Wrong Email or Password");
     }
@@ -279,6 +285,15 @@ class UserServices {
     if (!newUser) {
       throw new ForbiddenRequestError("Invalid User Data");
     }
+    logger.info(
+      `newUser register ::: ${util.inspect(newUser, {
+        showHidden: false,
+        depth: null,
+        colors: false,
+      })}`
+    );
+
+
 
     /* create public key; private key; createKeyToken by key */
     const { publicKey, privateKey } = crypto.generateKeyPairSync("rsa", {
