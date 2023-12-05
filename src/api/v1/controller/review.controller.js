@@ -27,6 +27,15 @@ class ReviewController {
       }),
     }).send(res);
   };
+
+  getReviewsByProduct = async (req, res) => {
+    new OK({
+      message: "getReviewsByProduct OK",
+      metadata: await ReviewServices.getReviewsByProduct({
+        productId: req.params?.id,
+      }),
+    }).send(res);
+  };
 }
 
 module.exports = new ReviewController();

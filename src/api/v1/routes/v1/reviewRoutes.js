@@ -14,4 +14,10 @@ reviewRoutes.get(
   asyncHandler(ReviewController.getReviewsByShop)
 );
 
+// GET REVIEWS BY PRODUCT
+reviewRoutes.get(
+  "/get-by-product/:id",
+  asyncHandler(ReviewController.getReviewsByProduct)
+);
+
 module.exports = reviewRoutes;
