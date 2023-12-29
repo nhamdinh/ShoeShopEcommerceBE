@@ -204,7 +204,7 @@ class OrderServices {
     }
  **/
 
-  static checkoutReviewCart11 = async ({ cartId, userId, orderItems = [] }) => {
+  static checkoutCartUtil = async ({ cartId, userId, orderItems = [] }) => {
     const foundCarts = await findCartsRepo({
       filter: {
         _id: convertToObjectId(cartId),
@@ -312,7 +312,7 @@ class OrderServices {
     for (let i = 0; i < cartsReview.length; i++) {
       const cartReview = cartsReview[i];
       const { cartId, orderItems } = cartReview;
-      const obj = await OrderServices.checkoutReviewCart11({
+      const obj = await OrderServices.checkoutCartUtil({
         cartId,
         userId,
         orderItems,
@@ -341,7 +341,7 @@ class OrderServices {
     for (let i = 0; i < cartsReview.length; i++) {
       const cartReview = cartsReview[i];
       const { cartId, orderItems } = cartReview;
-      const obj = await OrderServices.checkoutReviewCart11({
+      const obj = await OrderServices.checkoutCartUtil({
         cartId,
         userId,
         orderItems,
