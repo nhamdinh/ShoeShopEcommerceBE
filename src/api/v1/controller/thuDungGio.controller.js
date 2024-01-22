@@ -16,6 +16,32 @@ class ThuDungGioController {
       metadata: await ThuDungGioServices.getAllThuDungGios(),
     }).send(res);
   };
+
+  updatedOrderPay = async (req, res) => {
+    new OK({
+      message: "updatedOrderPay OK",
+      metadata: await ThuDungGioServices.updatedOrderPay({ id: req.body.id }),
+    }).send(res);
+  };
+
+  findThuDungGioById = async (req, res) => {
+    new OK({
+      message: "findThuDungGioById OK",
+      metadata: await ThuDungGioServices.findThuDungGioById({
+        id: req.body.id,
+      }),
+    }).send(res);
+  };
+
+  updatedOrderById = async (req, res) => {
+    new OK({
+      message: "updatedOrderById OK",
+      metadata: await ThuDungGioServices.updatedOrderById({
+        id: req.body.id,
+        objectParams: req.body.objectParams,
+      }),
+    }).send(res);
+  };
 }
 
 module.exports = new ThuDungGioController();
