@@ -15,11 +15,35 @@ thuDungGioRouter.post(
   asyncHandler(thuDungGioController.createThuDungGio)
 );
 
+// findThuDungGioById ThuDungGio
+thuDungGioRouter.post(
+  "/detail",
+  asyncHandler(thuDungGioController.findThuDungGioById)
+);
+
+// updatedOrderPay ThuDungGio
+thuDungGioRouter.put(
+  "/updatedOrderPay",
+  protect,
+  asyncHandler(thuDungGioController.updatedOrderPay)
+);
+
+// updatedOrderById ThuDungGio
+thuDungGioRouter.put(
+  "/updatedOrderById",
+  protect,
+  asyncHandler(thuDungGioController.updatedOrderById)
+);
+
 // // ADMIN GET ALL ThuDungGio
-thuDungGioRouter.get("/all-admin", protect, admin, thuDungGioController.getAllThuDungGios);
+thuDungGioRouter.get(
+  "/all-admin",
+  protect,
+  admin,
+  thuDungGioController.getAllThuDungGios
+);
 
 // GET ALL ThuDungGio
 thuDungGioRouter.get("/get-all", thuDungGioController.getAllThuDungGios);
-
 
 module.exports = thuDungGioRouter;

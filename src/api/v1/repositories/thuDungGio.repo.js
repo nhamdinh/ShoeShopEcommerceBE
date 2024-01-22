@@ -6,8 +6,20 @@ const createThuDungGioRepo = async (thuDungGio) => {
   return await ThuDungGioModel.create({ ...thuDungGio });
 };
 
-const getAllThuDungGiosRepo = async (query) => {
-  const thuDungGios = await ThuDungGioModel.find({ ...query }).lean();
+const findByIdAndUpdateRepo = async ({ id, objectParams }) => {
+  return await ThuDungGioModel.findByIdAndUpdate(id, objectParams, {
+    new: false,
+  });
+};
+
+const findByIdRepo = async (id) => {
+  return await ThuDungGioModel.findById(id);
+};
+
+const getAllThuDungGiosRepo = async (query, sort) => {
+  const thuDungGios = await ThuDungGioModel.find({ ...query })
+    .sort({ ...sort })
+    .lean();
   return {
     totalCount: thuDungGios.length ?? 0,
     thuDungGios,
@@ -17,4 +29,6 @@ const getAllThuDungGiosRepo = async (query) => {
 module.exports = {
   createThuDungGioRepo,
   getAllThuDungGiosRepo,
+  findByIdRepo,
+  findByIdAndUpdateRepo,
 };

@@ -14,6 +14,12 @@ const thuDungGioSchema = Schema(
     buyName: {
       type: String,
     },
+    address: {
+      type: String,
+    },
+    phone: {
+      type: String,
+    },
     orderItems: {
       type: Array,
       default: [],
@@ -23,6 +29,9 @@ const thuDungGioSchema = Schema(
       required: true,
       default: false,
     },
+    isPaidAt: {
+      type: Date,
+    },
     isDelivered: {
       type: Boolean,
       required: true,
@@ -30,6 +39,11 @@ const thuDungGioSchema = Schema(
     },
     metadata: {
       type: String,
+    },
+    isBan: {
+      type: Boolean,
+      required: true,
+      default: true,
     },
   },
   {
