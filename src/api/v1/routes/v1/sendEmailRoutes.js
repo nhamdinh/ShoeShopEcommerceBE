@@ -1,9 +1,15 @@
 const express = require("express");
-const { sendEmail } = require("../../controller/email.controller");
+const asyncHandler = require("express-async-handler");
+
 const { validate } = require("../../validations");
+const emailController = require("../../controller/email.controller");
 const sendEmailRoute = express.Router();
 
 // SEND EMAIL
-sendEmailRoute.post("/send-email", validate.validateEmail(), sendEmail);
+sendEmailRoute.post(
+  "/send-email",
+  validate.validateEmail(),
+  asyncHandler(emailController.sendEmail)
+);
 
 module.exports = sendEmailRoute;

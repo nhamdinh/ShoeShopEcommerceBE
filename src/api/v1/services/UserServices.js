@@ -1,6 +1,7 @@
 "use strict";
 const util = require("util");
 const logger = require("../log");
+const nodemailer = require("nodemailer");
 
 const { validationResult } = require("express-validator");
 const crypto = require("node:crypto");
@@ -23,7 +24,56 @@ const {
 const UserModel = require("../Models/UserModel");
 const ChatStory = require("../Models/ChatStoryModel");
 
+const { SENDER } = process.env || "nhamnd.hmu@gmail.com";
+
 class UserServices {
+  static sendEmail = async ({ request }) => {
+    const errors = validationResult(request);
+
+    if (!errors.isEmpty())
+      throw new ForbiddenRequestError(
+        errors.array().length > 0
+          ? errors.array().reduce((acc, item) => {
+              return acc + item.msg + " ; ";
+            }, [])
+          : "Invalid input sendEmail()",
+        422
+      );
+    const transporter = nodemailer.createTransport({
+      service: "Gmail",
+      auth: {
+        user: SENDER,
+        pass: "ylzumnpdvgxjmrzw",
+      },
+    });
+
+    const mail_option = {
+      from: SENDER,
+      to: request.body?.email,
+      subject: "YOUR MESSAGE FROM BESTBUY SHOP",
+      //   text: (
+      //     Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000
+      //   ).toString(),
+      text: `Welcome to ${request.body?.productShopName}`,
+    };
+
+    transporter.sendMail(mail_option, (error, info) => {
+      if (error) {
+        logger.error(
+          `sendMail() ::: ${util.inspect(error, {
+            showHidden: false,
+            depth: null,
+            colors: false,
+          })}`
+        );
+        throw new ForbiddenRequestError("sendMail error");
+      } else {
+        return { message: "send email success" };
+      }
+    });
+    return { message: "send email success" };
+  };
+
   static clearCountChat = async ({ req }) => {
     try {
       let users = await UserModel.find({
@@ -144,7 +194,11 @@ class UserServices {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       throw new ForbiddenRequestError(
-        errors.array().length > 0 ? errors.array()[0]?.msg : "Invalid input",
+        errors.array().length > 0
+          ? errors.array().reduce((acc, item) => {
+              return acc + item.msg + " ; ";
+            }, [])
+          : "Invalid input login()",
         422
       );
     }
@@ -292,8 +346,6 @@ class UserServices {
         colors: false,
       })}`
     );
-
-
 
     /* create public key; private key; createKeyToken by key */
     const { publicKey, privateKey } = crypto.generateKeyPairSync("rsa", {

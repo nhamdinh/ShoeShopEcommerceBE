@@ -32,27 +32,40 @@ userRouter.get("/profile", protect, asyncHandler(userController.getProfile));
 userRouter.get("/profile-shop", asyncHandler(userController.getProfileShop));
 
 // UPDATE PROFILE
-userRouter.put("/update-profile", protect, userController.updateProfile);
+userRouter.put(
+  "/update-profile",
+  protect,
+  asyncHandler(userController.updateProfile)
+);
 
 // UPDATE ISSHOP??
-userRouter.put("/update-is-shop", protect, userController.updateIsShop);
+userRouter.put(
+  "/update-is-shop",
+  protect,
+  asyncHandler(userController.updateIsShop)
+);
 
 // // ADMIN GET ALL USER
-userRouter.get("/all-admin", protect, admin, userController.findAllUserByAdmin);
+userRouter.get(
+  "/all-admin",
+  protect,
+  admin,
+  asyncHandler(userController.findAllUserByAdmin)
+);
 
 // GET ALL USER
-userRouter.get("/get-all", userController.getAllUsers);
+userRouter.get("/get-all", asyncHandler(userController.getAllUsers));
 // /* =======================  CHAT STORIES ======================= */
 // // GET ALL CHAT STORIES
 // userRouter.get("/get-all-chats", getAllChats);
 
-userRouter.get("/get-story", protect, userController.getStory);
+userRouter.get("/get-story", protect, asyncHandler(userController.getStory));
 
 userRouter.put(
   "/clear-count-chat",
   protect,
   admin,
-  userController.clearCountChat
+  asyncHandler(userController.clearCountChat)
 );
 
 module.exports = userRouter;
