@@ -37,8 +37,8 @@ class ThuDungGioServices {
     return updatedOrder;
   };
 
-  static getAllThuDungGios = async () => {
-    return await getAllThuDungGiosRepo({ isBan: true }, { createdAt: -1 });
+  static getAllThuDungGios = async ({isBan}) => {
+    return await getAllThuDungGiosRepo({ isBan }, { createdAt: -1 });
   };
 
   static createThuDungGio = async (req) => {
