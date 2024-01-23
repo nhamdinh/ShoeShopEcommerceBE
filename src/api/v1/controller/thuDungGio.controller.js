@@ -1,7 +1,8 @@
 "use strict";
 const { CREATED, OK } = require("../core/successResponse");
 const ThuDungGioServices = require("../services/thuDungGio.services");
-
+const util = require("util");
+const logger = require("../log");
 class ThuDungGioController {
   createThuDungGio = async (req, res) => {
     new CREATED({
@@ -13,7 +14,9 @@ class ThuDungGioController {
   getAllThuDungGios = async (req, res) => {
     new OK({
       message: "getAllThuDungGios OK",
-      metadata: await ThuDungGioServices.getAllThuDungGios(),
+      metadata: await ThuDungGioServices.getAllThuDungGios({
+        isBan: req.query.isBan,
+      }),
     }).send(res);
   };
 
