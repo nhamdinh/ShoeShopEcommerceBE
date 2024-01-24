@@ -1,16 +1,16 @@
 const express = require("express");
 const asyncHandler = require("express-async-handler");
 
-const users = require("./../../dataMock/users");
+const users = require("./../../dataMock/Users");
 const User = require("./../../Models/UserModel");
 
-const products = require("./../../dataMock/products");
+const products = require("./../../dataMock/Products");
 const ProductModel = require("../../Models/ProductModel");
 
-const categorys = require("./../../dataMock/categorys");
+const categorys = require("./../../dataMock/Categorys");
 const Category = require("./../../Models/CategoryModel");
 
-const brands = require("./../../dataMock/brands");
+const brands = require("./../../dataMock/Brands");
 const Brand = require("./../../Models/BrandModel");
 
 const ImportData = express.Router();
