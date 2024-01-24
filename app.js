@@ -24,7 +24,7 @@ const app = express();
 const cookieParser = require("cookie-parser");
 // app.use(cookieParser("randomsecretstring"));
 app.use(cookieParser());
-app.use(cors());
+// app.use(cors());
 app.use(
   cors({
     origin: "*",
@@ -96,7 +96,7 @@ app.post(
   "/api/cookie",
   asyncHandler(async (req, res) => {
     // res.cookie("name", "express").send("cookie set"); //Sets name = express
-    res.header("Access-Control-Allow-Origin", "http://localhost:3000"); // update to match the domain you will make the request from
+    res.header("Access-Control-Allow-Origin", process.env.HOST_STATE); // update to match the domain you will make the request from
     res.header(
       "Access-Control-Allow-Headers",
       "Origin, X-Requested-With, Content-Type, Accept"
