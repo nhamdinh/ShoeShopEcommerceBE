@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon server.js",
-    "server": "set NODE_ENV=production && set URL_SERVER=http://104.154.49.183:5000/ && set URL_CLIENT=http://104.154.49.183:3000 && nodemon ./server.js",
-    "dev": "set NODE_ENV=dev && set URL_SERVER=http://localhost:5000/ && set URL_CLIENT=http://localhost:3000 && nodemon ./server.js"
+    "server": "set NODE_ENV=production&& set URL_SERVER=http://104.154.49.183:5000/&& set URL_CLIENT=http://104.154.49.183:3000&& nodemon ./server.js",
+    "dev": "set NODE_ENV=dev&& set URL_SERVER=http://localhost:5000/&& set URL_CLIENT=http://localhost:3000&& nodemon ./server.js"
   },
   "author": "",
   "license": "ISC",
