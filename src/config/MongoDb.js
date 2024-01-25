@@ -23,7 +23,7 @@ const pro = {
   },
 };
 const configDb = { dev, pro };
-const envDb = process.env.NODE_ENV ?? "dev";
+const envDb = process.env.NODE_ENV ?? "development";
 
 // console.log(configDb[envDb]);
 class DataBase {

@@ -16,9 +16,9 @@ server.listen(SOCKET_PORT, () => {
   console.log(`Server socketIo run in port ${SOCKET_PORT}`);
 });
 
-const { PORT } = process.env || 5000;
+const { PORT, NODE_ENV } = process.env || 5000;
 app.listen(PORT, () => {
-  console.log(`server run in port ${PORT}`);
+  console.log(`server run in port ${PORT} ::: ${NODE_ENV}`);
 });
 
 process.on("SIGINT", () => {

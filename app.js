@@ -91,12 +91,11 @@ app.get("/api/config/paypal", (req, res) => {
   res.send(process.env.PAYPAL_CLIENT_ID);
 });
 app.post("/api/upload", storageUpload.single("file"), uploadPhoto);
-
 app.post(
   "/api/cookie",
   asyncHandler(async (req, res) => {
     // res.cookie("name", "express").send("cookie set"); //Sets name = express
-    res.header("Access-Control-Allow-Origin", process.env.HOST_STATE); // update to match the domain you will make the request from
+    res.header("Access-Control-Allow-Origin", process.env.URL_CLIENT); // update to match the domain you will make the request from
     res.header(
       "Access-Control-Allow-Headers",
       "Origin, X-Requested-With, Content-Type, Accept"
