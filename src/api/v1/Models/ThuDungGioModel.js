@@ -24,6 +24,11 @@ const thuDungGioSchema = Schema(
       type: Array,
       default: [],
     },
+    isGif: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
     isPaid: {
       type: Boolean,
       required: true,
