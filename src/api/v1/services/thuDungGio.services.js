@@ -37,12 +37,12 @@ class ThuDungGioServices {
     return updatedOrder;
   };
 
-  static getAllThuDungGios = async ({isBan}) => {
+  static getAllThuDungGios = async ({ isBan }) => {
     return await getAllThuDungGiosRepo({ isBan }, { createdAt: -1 });
   };
 
   static createThuDungGio = async (req) => {
-    const { newModelArr } = req.body;
+    const { newModel } = req.body;
 
     const {
       buyName,
@@ -54,7 +54,8 @@ class ThuDungGioServices {
       isDelivered,
       metadata,
       isBan,
-    } = newModelArr;
+      isGif,
+    } = newModel;
     const newThuDungGio = await createThuDungGioRepo({
       buyName,
       sellDate,
@@ -65,6 +66,7 @@ class ThuDungGioServices {
       address,
       phone,
       isBan,
+      isGif,
     });
     if (!newThuDungGio) {
       throw new ForbiddenRequestError("Invalid ThuDungGio Data");
