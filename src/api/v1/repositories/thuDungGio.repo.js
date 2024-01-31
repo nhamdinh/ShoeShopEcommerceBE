@@ -16,10 +16,13 @@ const findByIdRepo = async (id) => {
   return await ThuDungGioModel.findById(id);
 };
 
-const getAllThuDungGiosRepo = async (query, sort) => {
+const getAllThuDungGiosRepo = async ({ query, sort, skip, limit }) => {
   const thuDungGios = await ThuDungGioModel.find({ ...query })
-    .sort({ ...sort })
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit)
     .lean();
+
   return {
     totalCount: thuDungGios.length ?? 0,
     thuDungGios,

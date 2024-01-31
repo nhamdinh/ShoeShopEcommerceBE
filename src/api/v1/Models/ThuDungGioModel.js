@@ -13,12 +13,23 @@ const thuDungGioSchema = Schema(
     },
     buyName: {
       type: String,
+      trim: true,
+    },
+    buyNameEng: {
+      type: String,
+      trim: true,
     },
     address: {
       type: String,
+      trim: true,
+    },
+    discount: {
+      type: Number,
+      default: 0,
     },
     phone: {
       type: String,
+      trim: true,
     },
     orderItems: {
       type: Array,

@@ -6,6 +6,7 @@ const {
   convertToObjectId,
   updateNestedObjectParser,
   removeNullObject,
+  toNonAccentVietnamese,
 } = require("../utils/getInfo");
 
 const {
@@ -37,8 +38,35 @@ class ThuDungGioServices {
     return updatedOrder;
   };
 
-  static getAllThuDungGios = async ({ isBan }) => {
-    return await getAllThuDungGiosRepo({ isBan }, { createdAt: -1 });
+  static getAllThuDungGios = async ({
+    isBan,
+    limit = 10,
+    skip = 0,
+    isPaid = 0,
+    keySearch,
+  }) => {
+    const regexSearch = new RegExp(toNonAccentVietnamese(keySearch), "i");
+    // logger.info(
+    //   `regexSearch  ::: ${util.inspect(regexSearch, {
+    //     showHidden: false,
+    //     depth: null,
+    //     colors: false,
+    //   })}`
+    // );
+
+    const query = {
+      isBan,
+      isPaid: {
+        $in: +isPaid === 1 ? [true] : +isPaid === -1 ? [false] : [true, false],
+      },
+      buyNameEng: { $regex: regexSearch },
+    };
+
+    return await getAllThuDungGiosRepo({
+      query,
+      limit,
+      skip,
+    });
   };
 
   static createThuDungGio = async (req) => {
@@ -55,6 +83,7 @@ class ThuDungGioServices {
       metadata,
       isBan,
       isGif,
+      discount,
     } = newModel;
     const newThuDungGio = await createThuDungGioRepo({
       buyName,
@@ -67,6 +96,8 @@ class ThuDungGioServices {
       phone,
       isBan,
       isGif,
+      discount,
+      buyNameEng: toNonAccentVietnamese(buyName),
     });
     if (!newThuDungGio) {
       throw new ForbiddenRequestError("Invalid ThuDungGio Data");

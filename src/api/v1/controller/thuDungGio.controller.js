@@ -15,7 +15,11 @@ class ThuDungGioController {
     new OK({
       message: "getAllThuDungGios OK",
       metadata: await ThuDungGioServices.getAllThuDungGios({
-        isBan: req.query.isBan,
+        isBan: req.query.isBan ?? true,
+        limit: req.query.limit ?? 1000,
+        skip: req.query.skip ?? 0,
+        isPaid: req.query.isPaid ?? 0,
+        keySearch: req.query.keySearch ?? "",
       }),
     }).send(res);
   };
