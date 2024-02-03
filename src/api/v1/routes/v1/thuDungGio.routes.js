@@ -11,6 +11,7 @@ const thuDungGioRouter = express.Router();
 // CREATE ThuDungGio
 thuDungGioRouter.post(
   "/create",
+  admin,
   validate.validateRegisterUser(),
   asyncHandler(thuDungGioController.createThuDungGio)
 );
@@ -18,32 +19,34 @@ thuDungGioRouter.post(
 // findThuDungGioById ThuDungGio
 thuDungGioRouter.post(
   "/detail",
+  admin,
+
   asyncHandler(thuDungGioController.findThuDungGioById)
 );
 
 // updatedOrderPay ThuDungGio
 thuDungGioRouter.put(
   "/updatedOrderPay",
-  protect,
+  admin,
+
   asyncHandler(thuDungGioController.updatedOrderPay)
 );
 
 // updatedOrderById ThuDungGio
 thuDungGioRouter.put(
   "/updatedOrderById",
-  protect,
+  admin,
   asyncHandler(thuDungGioController.updatedOrderById)
 );
 
 // // ADMIN GET ALL ThuDungGio
 thuDungGioRouter.get(
   "/all-admin",
-  protect,
   admin,
   thuDungGioController.getAllThuDungGios
 );
 
 // GET ALL ThuDungGio
-thuDungGioRouter.get("/get-all", thuDungGioController.getAllThuDungGios);
+thuDungGioRouter.get("/get-all", admin, thuDungGioController.getAllThuDungGios);
 
 module.exports = thuDungGioRouter;
