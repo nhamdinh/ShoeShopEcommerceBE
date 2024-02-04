@@ -11,10 +11,10 @@ process.env.UV_THREADPOOL_SIZE = Math.floor(Number(os.cpus().length) * 0.8);
 //     Math.floor(Number(os.cpus().length) * 0.8)
 // );
 
-// const { SOCKET_PORT } = process.env || 6000;
-// server.listen(SOCKET_PORT, () => {
-//   console.log(`Server socketIo run in port ${SOCKET_PORT}`);
-// });
+const { SOCKET_PORT } =  6000;
+server.listen(SOCKET_PORT, () => {
+  console.log(`Server socketIo run in port ${SOCKET_PORT}`);
+});
 
 const { PORT, NODE_ENV } = process.env || 5000;
 app.listen(PORT, () => {
