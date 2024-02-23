@@ -25,6 +25,7 @@ const cookieParser = require("cookie-parser");
 // app.use(cookieParser("randomsecretstring"));
 app.use(cookieParser());
 // app.use(cors());
+
 app.use(
   cors({
     origin: "*",
@@ -74,6 +75,12 @@ app.use(
 );
 
 // app.use(morgan("combined"));
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "*");
+  next();
+});
+
 /* middleware */
 
 /* API */
