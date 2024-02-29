@@ -115,10 +115,18 @@ class ProductFactory {
   };
 
   static findAllProducts = async ({ query }) => {
+
+    logger.info(
+      `query ::: ${util.inspect(query, {
+        showHidden: false,
+        depth: null,
+        colors: false,
+      })}`
+    );
     let {
       sort = "ctime",
-      page = +query?.page ?? 1,
-      limit = +query?.limit ?? 50,
+      page = +(query?.page ?? 1),
+      limit = +(query?.limit ?? 50),
       product_shop = query?.product_shop ?? "",
       keyword = query?.keyword ?? "",
       select = [
@@ -155,13 +163,20 @@ class ProductFactory {
       ...keyword,
     };
 
-    // logger.info(
-    //   `filter ::: ${util.inspect(filter, {
-    //     showHidden: false,
-    //     depth: null,
-    //     colors: false,
-    //   })}`
-    // );
+    logger.info(
+      `filter ::: ${util.inspect({
+        sort,
+        limit,
+        page,
+        filter,
+        select,
+      }, {
+        showHidden: false,
+        depth: null,
+        colors: false,
+      })}`
+    );
+
     return await findAllProductsRepo({
       sort,
       limit,

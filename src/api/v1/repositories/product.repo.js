@@ -108,7 +108,7 @@ const findAllProductsRepo = async ({ limit, sort, page, filter, select }) => {
     .select(getSelectData(select))
     .lean();
 
-  return {
+    return {
     totalCount: count ?? 0,
     totalPages: Math.ceil(count / limit),
     page: +page,
