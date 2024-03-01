@@ -20,6 +20,7 @@ const {
   removeNullObject,
   updateNestedObjectParser,
   convertToObjectId,
+  toNonAccentVietnamese,
 } = require("../utils/getInfo");
 const InventoryServices = require("./InventoryServices");
 const { createReviewRepo } = require("../repositories/review.repo");
@@ -115,14 +116,13 @@ class ProductFactory {
   };
 
   static findAllProducts = async ({ query }) => {
-
-    logger.info(
-      `query ::: ${util.inspect(query, {
-        showHidden: false,
-        depth: null,
-        colors: false,
-      })}`
-    );
+    // logger.info(
+    //   `query ::: ${util.inspect(query, {
+    //     showHidden: false,
+    //     depth: null,
+    //     colors: false,
+    //   })}`
+    // );
     let {
       sort = "ctime",
       page = +(query?.page ?? 1),
@@ -149,11 +149,10 @@ class ProductFactory {
     if (keyword === "") {
       keyword = {};
     } else {
+      const regexSearch = new RegExp(toNonAccentVietnamese(keyword), "i");
+
       keyword = {
-        product_name: {
-          $regex: keyword,
-          $options: "i",
-        },
+        product_name_nonVi: { $regex: regexSearch },
       };
     }
 
@@ -163,19 +162,22 @@ class ProductFactory {
       ...keyword,
     };
 
-    logger.info(
-      `filter ::: ${util.inspect({
-        sort,
-        limit,
-        page,
-        filter,
-        select,
-      }, {
-        showHidden: false,
-        depth: null,
-        colors: false,
-      })}`
-    );
+    // logger.info(
+    //   `filter ::: ${util.inspect(
+    //     {
+    //       sort,
+    //       limit,
+    //       page,
+    //       filter,
+    //       select,
+    //     },
+    //     {
+    //       showHidden: false,
+    //       depth: null,
+    //       colors: false,
+    //     }
+    //   )}`
+    // );
 
     return await findAllProductsRepo({
       sort,
@@ -270,7 +272,8 @@ class Product {
     product_shop,
     product_attributes,
   }) {
-    this.product_name = product_name;
+    this.product_name = toNonAccentVietnamese(product_name);
+    this.product_name_nonVi = product_name;
     this.product_thumb = product_thumb;
     this.product_description = product_description;
     this.product_price = product_price;

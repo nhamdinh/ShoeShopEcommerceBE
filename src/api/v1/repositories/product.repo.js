@@ -92,6 +92,16 @@ const searchProductsRepo = async ({ keySearch }) => {
 };
 
 const findAllProductsRepo = async ({ limit, sort, page, filter, select }) => {
+  // const products1 = await ProductModel.product.find({});
+
+  // for (let i = 0; i < products1.length; i++) {
+  //   const item = products1[i];
+  //   item.product_name_nonVi = toNonAccentVietnamese(item.product_name);
+  //   await item.update(item);
+  // }
+
+
+
   const skip = (page - 1) * limit;
   const sortBy = sort === "ctime" ? { _id: -1 } : { _id: 1 };
 

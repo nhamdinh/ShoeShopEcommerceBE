@@ -7,7 +7,8 @@ const COLLECTION_NAME = "Products";
 
 const productSchema = new Schema(
   {
-    product_name: { type: String, required: true },
+    product_name: { type: String, required: true, trim: true, },
+    product_name_nonVi: { type: String, required: true, trim: true, },
     product_thumb: { type: String, required: true },
     product_description: String,
     product_slug: String,
