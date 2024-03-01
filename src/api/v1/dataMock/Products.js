@@ -9,7 +9,7 @@ const products = [
     product_quantity: 999,
     product_shop: "655ddd78b15c27c5c9a5e020",
     product_attributes: {
-      brand: "APPLE",
+      brand: "LENOVO",
       size: "10inch",
       material: "gold",
     },
@@ -25,7 +25,7 @@ const products = [
     product_quantity: 999,
     product_shop: "655ddd78b15c27c5c9a5e020",
     product_attributes: {
-      brand: "APPLE",
+      brand: "LENOVO",
       size: "10inch",
       material: "gold",
     },
@@ -41,7 +41,7 @@ const products = [
     product_quantity: 999,
     product_shop: "655ddd78b15c27c5c9a5e020",
     product_attributes: {
-      brand: "APPLE",
+      brand: "LENOVO",
       size: "10inch",
       material: "gold",
     },
@@ -57,7 +57,7 @@ const products = [
     product_quantity: 999,
     product_shop: "655ddd78b15c27c5c9a5e021",
     product_attributes: {
-      brand: "APPLE",
+      brand: "LENOVO",
       size: "10inch",
       material: "gold",
     },
@@ -73,7 +73,7 @@ const products = [
     product_quantity: 999,
     product_shop: "655ddd78b15c27c5c9a5e021",
     product_attributes: {
-      brand: "APPLE",
+      brand: "LENOVO",
       size: "10inch",
       material: "gold",
     },

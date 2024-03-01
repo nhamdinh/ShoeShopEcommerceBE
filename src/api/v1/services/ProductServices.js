@@ -117,7 +117,7 @@ class ProductFactory {
 
   static findAllProducts = async ({ query }) => {
     // logger.info(
-    //   `query ::: ${util.inspect(query, {
+    //   `limit ::: ${util.inspect(query?.limit, {
     //     showHidden: false,
     //     depth: null,
     //     colors: false,
@@ -129,6 +129,7 @@ class ProductFactory {
       limit = +(query?.limit ?? 50),
       product_shop = query?.product_shop ?? "",
       keyword = query?.keyword ?? "",
+      brand = query?.brand ?? "",
       select = [
         // "product_name",
         // "product_shop",
@@ -155,11 +156,13 @@ class ProductFactory {
         product_name_nonVi: { $regex: regexSearch },
       };
     }
+    const regexSearchBrand = new RegExp(toNonAccentVietnamese(brand), "i");
 
     const filter = {
       isPublished: true,
       ...product_shop,
       ...keyword,
+      'product_attributes.brand': { $regex: regexSearchBrand }
     };
 
     // logger.info(
