@@ -116,13 +116,6 @@ class ProductFactory {
   };
 
   static findAllProducts = async ({ query }) => {
-    // logger.info(
-    //   `limit ::: ${util.inspect(query?.limit, {
-    //     showHidden: false,
-    //     depth: null,
-    //     colors: false,
-    //   })}`
-    // );
     let {
       sort = "ctime",
       page = +(query?.page ?? 1),
@@ -139,6 +132,7 @@ class ProductFactory {
         // "isPublished",
       ],
     } = query;
+
     if (product_shop === "") {
       product_shop = {};
     } else {
@@ -156,13 +150,13 @@ class ProductFactory {
         product_name_nonVi: { $regex: regexSearch },
       };
     }
-    const regexSearchBrand = new RegExp(toNonAccentVietnamese(brand), "i");
+    const regexSearchBrand = new RegExp(toNonAccentVietnamese(brand !== "All" ? brand : ""), "i");
 
     const filter = {
       isPublished: true,
       ...product_shop,
       ...keyword,
-      'product_attributes.brand': { $regex: regexSearchBrand }
+      "product_attributes.brand": { $regex: regexSearchBrand },
     };
 
     // logger.info(
