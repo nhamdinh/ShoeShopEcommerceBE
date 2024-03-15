@@ -1,0 +1,18 @@
+version: '3'
+services:
+  be_app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 5001:5000   #5000: port server; 5001: port docker
+      - 3002:3002
+    volumes:
+      - .:/app
+    # command: npm run dev
+  fe_app:
+    build:
+      context: ../ShoeShopEcommerceFE/
+    ports:
+      - 3000:3000
+    network_mode: "host"
