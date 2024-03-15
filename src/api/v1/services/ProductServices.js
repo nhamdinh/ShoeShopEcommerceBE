@@ -150,7 +150,7 @@ class ProductFactory {
         product_name_nonVi: { $regex: regexSearch },
       };
     }
-    const regexSearchBrand = new RegExp(toNonAccentVietnamese(brand !== "All" ? brand : ""), "i");
+    const regexSearchBrand = new RegExp(toNonAccentVietnamese(brand.toUpperCase() !== "ALL" ? brand : ""), "i");
 
     const filter = {
       isPublished: true,
