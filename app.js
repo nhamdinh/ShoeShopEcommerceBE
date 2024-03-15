@@ -7,9 +7,6 @@ const compression = require("compression");
 const cors = require("cors");
 const path = require("path");
 
-
-
-
 const {
   notFound,
   errorHandler,
