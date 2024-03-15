@@ -157,6 +157,8 @@ class ProductFactory {
       ...product_shop,
       ...keyword,
       "product_attributes.brand": { $regex: regexSearchBrand },
+
+      
     };
 
     // logger.info(
