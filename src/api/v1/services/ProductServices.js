@@ -40,18 +40,22 @@ class ProductFactory {
         type
       ]; /* = class ClassRef extends Product */
     if (!productTypeClass)
-      throw new ForbiddenRequestError(`Invalid Product type createProductType ::: ${type}`);
+      throw new ForbiddenRequestError(
+        `Invalid Product type createProductType ::: ${type}`
+      );
 
     return new productTypeClass(payload).createProductType(); // create CON -> CHA
   };
 
-  static updateProductById = async (type, product_id, payload) => {
+  static updateProductTypeById = async (type, product_id, payload) => {
     const productTypeClass = ProductFactory.productTypeStrategy[type];
 
     if (!productTypeClass)
-      throw new ForbiddenRequestError(`Invalid Product type updateProductById ::: ${type}`);
+      throw new ForbiddenRequestError(
+        `Invalid Product type updateProductTypeById ::: ${type}`
+      );
 
-    return new productTypeClass(payload).updateProductById(product_id);
+    return new productTypeClass(payload).updateProductTypeById(product_id);
     /**
      * const productModel = new productTypeClass(payload)
      * update CON -> CHA
@@ -83,14 +87,6 @@ class ProductFactory {
     limit = 50,
     skip = 0,
   }) => {
-    // logger.info(
-    //   `    product_shop
-    //   ::: ${util.inspect(product_shop, {
-    //     showHidden: false,
-    //     depth: null,
-    //     colors: false,
-    //   })}`
-    // );
     const query = { product_shop, isPublished: true };
     return await findAllProductsByShopRepo({ query, limit, skip });
   };
@@ -304,27 +300,21 @@ const classRefStrategy = (type) => {
       const newProduct = await super.createProduct(newProductType._id);
       if (!newProduct)
         throw new ForbiddenRequestError("Wrong create new Product");
+
       await InventoryServices.createInventory({
         inven_productId: newProduct._id,
         inven_shopId: this.product_shop,
+        inven_product_slug: this.product_slug,
         inven_stock: this.product_quantity,
         inven_location: "unknown",
       });
 
-      // logger.info(
-      //   `newProduct ::: ${util.inspect(newProduct, {
-      //     showHidden: false,
-      //     depth: null,
-      //     colors: false,
-      //   })}`
-      // );
-
       return newProduct;
     }
 
-    async updateProductById(product_id) {
+    async updateProductTypeById(product_id) {
       const objectParams = removeNullObject(this);
-
+      
       const foundProduct = await findProductByIdRepo({
         product_id,
       });
@@ -353,6 +343,8 @@ const classRefStrategy = (type) => {
           bodyUpdate: updateNestedObjectParser(objectParams.product_attributes),
         });
       }
+
+      delete objectParams["product_shop"];
 
       const updateProduct = await super.updateProductById(
         product_id,

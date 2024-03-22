@@ -11,6 +11,7 @@ const {
 } = require("../utils/getInfo");
 const logger = require("../log");
 const { toNonAccentVietnamese } = require("../utils/functionHelpers");
+const InventoryServices = require("../services/InventoryServices");
 
 const createProductRepo = async (product) => {
   return await ProductModel.product.create({ ...product });
@@ -92,8 +93,10 @@ const searchProductsRepo = async ({ keySearch }) => {
   return result;
 };
 
-const findAllProductsRepo = async ({ limit, sort, page, filter, select = [] }) => {
-  // const products1 = await ProductModel.product.find({});
+const updateAll = async () => {
+  const products1 = await ProductModel.product.find({}).sort({
+    _id: -1,
+  });
 
   // for (let i = 0; i < products1.length; i++) {
   //   const item = products1[i];
@@ -101,22 +104,32 @@ const findAllProductsRepo = async ({ limit, sort, page, filter, select = [] }) =
   //   await item.update(item);
   // }
 
-  // const startTime = performance.now()
+  const startTime = performance.now();
   // await Promise.all(
   //   products1.map(async (product) => {
   //     product.product_slug = toNonAccentVietnamese(product.product_name).replaceAll(" ","-");
   //     await product.update(product);
   //   })
   // );
-  // const endTime = performance.now()
 
-  // logger.info(
-  //   `endTime - startTime ::: ${util.inspect(endTime - startTime, {
-  //     showHidden: false,
-  //     depth: null,
-  //     colors: false,
-  //   })}`
-  // );
+  const endTime = performance.now();
+  logger.info(
+    `endTime - startTime ::: ${util.inspect(endTime - startTime, {
+      showHidden: false,
+      depth: null,
+      colors: false,
+    })}`
+  );
+};
+
+const findAllProductsRepo = async ({
+  limit,
+  sort,
+  page,
+  filter,
+  select = [],
+}) => {
+  // updateAll();
 
   const skip = (page - 1) * limit;
   const sortBy = sort === "ctime" ? { _id: -1 } : { _id: 1 };

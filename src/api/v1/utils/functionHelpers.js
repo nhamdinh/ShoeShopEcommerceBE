@@ -10,9 +10,9 @@ const removeNullObject = (obj) => {
       delete obj[key];
     } else if (typeof obj[key] === "object" && !Array.isArray(obj[key])) {
       obj[key] = removeNullObject(obj[key]);
-      if (Object.keys(obj[key]).length === 0) {
-        delete obj[key];
-      }
+      // if (Object.keys(obj[key]).length === 0) {
+      //   delete obj[key];
+      // }
     }
   }
 
