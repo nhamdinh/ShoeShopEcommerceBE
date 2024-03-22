@@ -209,7 +209,7 @@ class ProductController {
   createProduct = async (req, res, next) => {
     new CREATED({
       message: "createProduct CREATED",
-      metadata: await ProductServices.createProduct(req.body?.product_type, {
+      metadata: await ProductServices.createProductType(req.body?.product_type, {
         ...req.body,
       }),
     }).send(res);

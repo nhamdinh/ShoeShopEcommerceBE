@@ -16,8 +16,8 @@ const createProductRepo = async (product) => {
   return await ProductModel.product.create({ ...product });
 };
 
-const createProductModelRepo = async (model, product) => {
-  return await ProductModel[model].create({ ...product });
+const createProductModelRepo = async (type, product) => {
+  return await ProductModel[type].create({ ...product });
 };
 
 const findAllProductsByShopRepo = async ({ query, limit, skip }) => {
@@ -92,7 +92,7 @@ const searchProductsRepo = async ({ keySearch }) => {
   return result;
 };
 
-const findAllProductsRepo = async ({ limit, sort, page, filter, select }) => {
+const findAllProductsRepo = async ({ limit, sort, page, filter, select = [] }) => {
   // const products1 = await ProductModel.product.find({});
 
   // for (let i = 0; i < products1.length; i++) {
@@ -166,7 +166,7 @@ const findOneProductRepo = async ({ filter }) => {
 };
 
 const updateProductByIdRepo = async (
-  model,
+  type,
   { product_id, bodyUpdate, isNew = true }
 ) => {
   // logger.info(
@@ -176,7 +176,7 @@ const updateProductByIdRepo = async (
   //     colors: false,
   //   })}`
   // );
-  return await ProductModel[model].findByIdAndUpdate(product_id, bodyUpdate, {
+  return await ProductModel[type].findByIdAndUpdate(product_id, bodyUpdate, {
     new: isNew,
   });
 };

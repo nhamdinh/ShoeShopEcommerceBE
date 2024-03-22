@@ -40,7 +40,7 @@ const createUserRepo = async (user) => {
   return await UserModel.create({ ...user });
 };
 
-const findAllUsersRepo = async ({ limit, sort, page, filter, select }) => {
+const findAllUsersRepo = async ({ limit, sort, page, filter, select = [] }) => {
   const skip = (page - 1) * limit;
   const sortBy = sort === "ctime" ? { _id: -1 } : { _id: 1 };
   const count = await UserModel.countDocuments({

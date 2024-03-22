@@ -1,14 +1,14 @@
 const { Schema, model } = require("mongoose"); // Erase if already required
 // const slugify = require("slugify");
 
-const { PRODUCT_MODEL } = require("../utils/constant");
+const { PRODUCT_TYPE } = require("../utils/constant");
 const { toNonAccentVietnamese } = require("../utils/functionHelpers");
 const DOCUMENT_NAME = "Product";
 const COLLECTION_NAME = "Products";
 
 const productSchema = new Schema(
   {
-    product_name: { type: String, required: true, trim: true, },
+    product_name: { type: String, required: true, trim: true },
     // product_name_nonVi: { type: String, required: true, trim: true, },
     product_slug: String,
     product_thumb: { type: String, required: true },
@@ -18,7 +18,7 @@ const productSchema = new Schema(
     product_type: {
       type: String,
       required: true,
-      enum: [...PRODUCT_MODEL],
+      enum: [...PRODUCT_TYPE],
     },
     product_shop: { type: Schema.Types.ObjectId, ref: "User" },
     product_attributes: { type: Schema.Types.Mixed, required: true },
@@ -41,7 +41,10 @@ const productSchema = new Schema(
       type: Number,
       default: 0,
     },
-    reviews: [],
+    reviews: {
+      type: Array,
+      default: [],
+    },
   },
   {
     collection: COLLECTION_NAME,
@@ -54,7 +57,7 @@ productSchema.index({
 });
 
 productSchema.pre("save", async function (next) {
-  this.product_slug = toNonAccentVietnamese(this.product_name).replaceAll(" ","-")
+  this.product_slug = toNonAccentVietnamese(this.product_name).replaceAll(" ","-");
   next();
 });
 class ProductModelFactory {
@@ -67,7 +70,7 @@ class ProductModelFactory {
   };
 }
 
-PRODUCT_MODEL.map(async (type) => {
+PRODUCT_TYPE.map(async (type) => {
   await ProductModelFactory.registryProductTypeSchema(
     type,
     model(

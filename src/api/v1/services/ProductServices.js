@@ -15,7 +15,7 @@ const {
   updateProductByIdRepo,
 } = require("../repositories/product.repo");
 const { findUserByIdRepo } = require("../repositories/user.repo");
-const { PRODUCT_MODEL } = require("../utils/constant");
+const { PRODUCT_TYPE } = require("../utils/constant");
 const { convertToObjectId } = require("../utils/getInfo");
 const InventoryServices = require("./InventoryServices");
 const { createReviewRepo } = require("../repositories/review.repo");
@@ -27,41 +27,33 @@ const {
 } = require("../utils/functionHelpers");
 
 class ProductFactory {
-  static productModelStrategy = {
+  static productTypeStrategy = {
     // electronic: class ClassRef extends Product,
   };
-  static registryProductType(model, classRef) {
-    ProductFactory.productModelStrategy[model] = classRef;
+  static registryProductType(type, classRef) {
+    ProductFactory.productTypeStrategy[type] = classRef;
   }
 
-  static createProduct = async (model, payload) => {
-    const productModelClass =
-      ProductFactory.productModelStrategy[
-        model
+  static createProductType = async (type, payload) => {
+    const productTypeClass =
+      ProductFactory.productTypeStrategy[
+        type
       ]; /* = class ClassRef extends Product */
-    if (!productModelClass)
-      throw new ForbiddenRequestError(`Invalid Product model 2 ::: ${model}`);
+    if (!productTypeClass)
+      throw new ForbiddenRequestError(`Invalid Product type createProductType ::: ${type}`);
 
-    // logger.info(
-    //   `payload ::: ${util.inspect(payload, {
-    //     showHidden: false,
-    //     depth: null,
-    //     colors: false,
-    //   })}`
-    // );
-
-    return new productModelClass(payload).createProduct(); // create CON -> CHA
+    return new productTypeClass(payload).createProductType(); // create CON -> CHA
   };
 
-  static updateProductById = async (model, product_id, payload) => {
-    const productModelClass = ProductFactory.productModelStrategy[model];
+  static updateProductById = async (type, product_id, payload) => {
+    const productTypeClass = ProductFactory.productTypeStrategy[type];
 
-    if (!productModelClass)
-      throw new ForbiddenRequestError(`Invalid Product model 1 ::: ${model}`);
+    if (!productTypeClass)
+      throw new ForbiddenRequestError(`Invalid Product type updateProductById ::: ${type}`);
 
-    return new productModelClass(payload).updateProductById(product_id);
+    return new productTypeClass(payload).updateProductById(product_id);
     /**
-     * const productModel = new productModelClass(payload)
+     * const productModel = new productTypeClass(payload)
      * update CON -> CHA
      **/
   };
@@ -143,7 +135,10 @@ class ProductFactory {
     }
 
     if (keyword) {
-      const regexSearch = new RegExp(toNonAccentVietnamese(keyword).replaceAll(" ","-"), "i");
+      const regexSearch = new RegExp(
+        toNonAccentVietnamese(keyword).replaceAll(" ", "-"),
+        "i"
+      );
 
       keyword = {
         product_slug: { $regex: regexSearch },
@@ -209,13 +204,13 @@ class ProductFactory {
 
     const productReviews = product?.reviews ?? [];
 
-    logger.info(
-      `productReviews ::: ${util.inspect(productReviews, {
-        showHidden: false,
-        depth: null,
-        colors: false,
-      })}`
-    );
+    // logger.info(
+    //   `productReviews ::: ${util.inspect(productReviews, {
+    //     showHidden: false,
+    //     depth: null,
+    //     colors: false,
+    //   })}`
+    // );
 
     const alreadyReviewed = productReviews.find(
       (re) => re?.toString() === productId.toString()
@@ -284,27 +279,27 @@ class Product {
   }
 }
 
-const classRefStrategy = (model) => {
+const classRefStrategy = (type) => {
   return class ClassRef extends Product {
     // CON
-    async createProduct() {
+    async createProductType() {
       const user = await findUserByIdRepo(this.product_shop);
 
       if (!user) {
         throw new ForbiddenRequestError("User not Found");
       }
 
-      const newProductType = await createProductModelRepo(model, {
+      const newProductType = await createProductModelRepo(type, {
         ...this.product_attributes,
         product_shop: this.product_shop,
       });
-      // const newProductType = await ProductModel[model].create({
+      // const newProductType = await ProductModel[type].create({
       //   ...this.product_attributes,
       //   product_shop: this.product_shop,
       // });
       // console.log(`newProductType ::: ${newProductType}`);
       if (!newProductType)
-        throw new ForbiddenRequestError(`Wrong create new Product ${model}`);
+        throw new ForbiddenRequestError(`Wrong create new Product ${type}`);
 
       const newProduct = await super.createProduct(newProductType._id);
       if (!newProduct)
@@ -316,13 +311,13 @@ const classRefStrategy = (model) => {
         inven_location: "unknown",
       });
 
-      logger.info(
-        `newProduct ::: ${util.inspect(newProduct, {
-          showHidden: false,
-          depth: null,
-          colors: false,
-        })}`
-      );
+      // logger.info(
+      //   `newProduct ::: ${util.inspect(newProduct, {
+      //     showHidden: false,
+      //     depth: null,
+      //     colors: false,
+      //   })}`
+      // );
 
       return newProduct;
     }
@@ -349,11 +344,11 @@ const classRefStrategy = (model) => {
         foundProduct.product_type.toString() ===
         objectParams.product_type.toString();
       if (!isModel) {
-        throw new ForbiddenRequestError("Wrong product model");
+        throw new ForbiddenRequestError("Wrong product type");
       }
 
       if (objectParams.product_attributes) {
-        await updateProductByIdRepo(model, {
+        await updateProductByIdRepo(type, {
           product_id,
           bodyUpdate: updateNestedObjectParser(objectParams.product_attributes),
         });
@@ -368,11 +363,11 @@ const classRefStrategy = (model) => {
   };
 };
 
-// register product model
-PRODUCT_MODEL.map((model) => {
-  ProductFactory.registryProductType(model, classRefStrategy(model));
+// register product type
+PRODUCT_TYPE.map((type) => {
+  ProductFactory.registryProductType(type, classRefStrategy(type));
 });
 
-// console.log(ProductFactory.productModelStrategy);
+// console.log(ProductFactory.productTypeStrategy);
 
 module.exports = ProductFactory;

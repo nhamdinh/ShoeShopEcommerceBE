@@ -11,7 +11,7 @@ const productRoute = express.Router();
  *
  *  */
 // CREATE PRODUCT
-productRoute.post(
+productRoute.put(
   "/create",
   protect,
   asyncHandler(productController.createProduct)
