@@ -44,7 +44,7 @@ class CartServices {
     //       cart_products: product, // push them
     //     },
     //   },
-    //   options = { upsert: true, new: true };
+    //   options = { upsert: false, new: true };
     // return await findOneAndUpdateRepo(query, updateOrInsert, options);
   };
 
@@ -60,7 +60,7 @@ class CartServices {
           "cart_products.$.quantity": quantity,
         },
       },
-      options = { upsert: true, new: true };
+      options = { upsert: false, new: true };
 
     return await findOneAndUpdateRepo(query, updateSet, options);
   };
@@ -89,7 +89,7 @@ class CartServices {
     for (let i = 0; i < cartsCurrent.length; i++) {
       const cartCurrent = cartsCurrent[i];
 
-      if (cartCurrent?.cart_shopId._id.toString() === cart_shopId)
+      if (cartCurrent?.cart_shopId._id.toString() !== cart_shopId)
         throw new ForbiddenRequestError("Cart not found", 404);
 
       /* add new item */
@@ -166,23 +166,27 @@ class CartServices {
 
   static getCurrentCart = async ({
     cart_userId = convertToObjectId(cart_userId),
-    cart_shopId,
+    cart_shopId = convertToObjectId(cart_shopId),
   }) => {
+    /* 1 shop chỉ 1 cart; 1 user có nhiều cart */
     const foundCarts = await findCartsRepo({
       filter: {
         cart_userId,
+        cart_shopId,
         cart_state: "active",
       },
     });
 
     const foundCart = foundCarts.find(
-      (cart) => cart.cart_userId._id.toString() === cart_userId.toString()
+      (cart) =>
+        cart.cart_userId._id.toString() === cart_userId.toString() &&
+        cart.cart_shopId._id.toString() === cart_shopId.toString()
     );
 
-    if (!foundCart && cart_shopId) {
+    if (!foundCart && cart_shopId.toString()) {
       const newCart = await CartServices.createCart({
         cart_userId,
-        cart_shopId: convertToObjectId(cart_shopId),
+        cart_shopId
       });
 
       return [newCart];
@@ -219,9 +223,14 @@ class CartServices {
     const foundCart = foundCarts[0];
     foundCart.cart_state = "failed";
 
-    const { modifiedCount } = await foundCart.update(foundCart);
+    // const { modifiedCount } = await foundCart.update(foundCart);
 
-    return modifiedCount;
+    // return modifiedCount;
+
+    return await findByIdAndUpdateCartRepo({
+      id: convertToObjectId(foundCart?._id),
+      updateSet: foundCart,
+    });
   };
 }
 module.exports = CartServices;

@@ -15,7 +15,7 @@ const findOneRepo = async ({ filter }) => {
 const findByIdAndUpdateCartRepo = async ({
   id,
   updateSet,
-  options = { upsert: true, new: true },
+  options = { upsert: false, new: true },
 }) => {
   return CartModel.findByIdAndUpdate(id, updateSet, options).exec();
 };

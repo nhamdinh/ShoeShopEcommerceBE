@@ -308,18 +308,30 @@ class OrderServices {
     userId,
     cartsReview,
   }) => {
-    const cartReviewed = [];
-    for (let i = 0; i < cartsReview.length; i++) {
-      const cartReview = cartsReview[i];
-      const { cartId, orderItems } = cartReview;
-      const obj = await OrderServices.checkoutCartUtil({
-        cartId,
-        userId,
-        orderItems,
-      });
 
-      if (obj) cartReviewed.push(obj);
-    }
+
+        logger.info(
+      `cartsReview ::: ${util.inspect(cartsReview, {
+        showHidden: false,
+        depth: null,
+        colors: false,
+      })}`
+    );
+
+    const cartReviewed = [];
+    // for (let i = 0; i < cartsReview.length; i++) {
+    //   const cartReview = cartsReview[i];
+    //   const { cartId, orderItems } = cartReview;
+
+
+    //   const obj = await OrderServices.checkoutCartUtil({
+    //     cartId,
+    //     userId,
+    //     orderItems,
+    //   });
+
+    //   if (obj) cartReviewed.push(obj);
+    // }
 
     // logger.info(
     //   `cartReviewed ::: ${util.inspect(cartReviewed, {
