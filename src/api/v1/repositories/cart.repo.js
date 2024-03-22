@@ -12,11 +12,12 @@ const findOneRepo = async ({ filter }) => {
   return await CartModel.findOne({ filter });
 };
 
-const findByIdAndUpdateCartRepo = async ({ id }) => {
-  return CartModel.findByIdAndUpdate(id, {
-    completedAt: Date.now(),
-    cart_state: "completed",
-  }).exec();
+const findByIdAndUpdateCartRepo = async ({
+  id,
+  updateSet,
+  options = { upsert: true, new: true },
+}) => {
+  return CartModel.findByIdAndUpdate(id, updateSet, options).exec();
 };
 
 const findCartsRepo = async ({ filter }) => {

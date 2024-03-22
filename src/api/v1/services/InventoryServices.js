@@ -18,8 +18,8 @@ class InventoryServices {
     return await getAllInventoriesRepo({ filter: {} });
   };
 
-  static findOneAndUpdateInventory = async ({ filter = {}, update = {} }) => {
-    return await findOneAndUpdateInventoryRepo({ filter, update });
+  static findOneAndUpdateInventory = async ({ filter = {}, updateSet = {} }) => {
+    return await findOneAndUpdateInventoryRepo({ filter, updateSet });
   };
 }
 

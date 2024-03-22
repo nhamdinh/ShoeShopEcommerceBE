@@ -16,8 +16,13 @@ const getAllInventoriesRepo = async ({ filter }) => {
   };
 };
 
-const findOneAndUpdateInventoryRepo = async ({ filter, update }) => {
-  return await InventoryModel.findOneAndUpdate(filter, update);
+const findOneAndUpdateInventoryRepo = async ({
+  filter,
+  updateSet,
+  options = { upsert: true, new: true },
+  /* upsert: them moi; new: du lieu moi */
+}) => {
+  return await InventoryModel.findOneAndUpdate(filter, updateSet, options);
 };
 
 module.exports = {

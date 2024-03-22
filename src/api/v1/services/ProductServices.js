@@ -356,11 +356,20 @@ const classRefStrategy = (type) => {
 
       const updatedInventory = await InventoryServices.findOneAndUpdateInventory({
         filter: { inven_productId: updatedProduct._id},
-        update: {
+        updateSet: {
           inven_product_slug: updatedProduct.product_slug,
           inven_stock: updatedProduct.product_quantity,
         },
       });
+
+      // logger.info(
+      //   `updatedInventory ::: ${util.inspect(updatedInventory, {
+      //     showHidden: false,
+      //     depth: null,
+      //     colors: false,
+      //   })}`
+      // );
+
       if(!updatedInventory) throw new ForbiddenRequestError("update Inventory failed");
 
       return updatedProduct;

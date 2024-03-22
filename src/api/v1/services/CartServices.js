@@ -10,6 +10,7 @@ const {
   getAllCartRepo,
   createCartRepo,
   findCartsRepo,
+  findByIdAndUpdateCartRepo,
 } = require("../repositories/cart.repo");
 
 const {
@@ -29,7 +30,8 @@ const { convertToObjectId } = require("../utils/getInfo");
 
 class CartServices {
   static getAllCart = async () => {
-    return await getAllCartRepo({ filter: { cart_state: "active" } });
+    const filter = { cart_state: "active" };
+    return await getAllCartRepo({ filter });
   };
 
   static createCart = async ({ cart_userId, cart_shopId, product }) => {
@@ -79,83 +81,87 @@ class CartServices {
       throw new ForbiddenRequestError("Product not found", 404);
     }
 
-    const cartCurrents = await CartServices.getCurrentCart({
+    const cartsCurrent = await CartServices.getCurrentCart({
       cart_userId,
       cart_shopId,
     });
 
-    for (let i = 0; i < cartCurrents.length; i++) {
-      const cartCurrent = cartCurrents[i];
+    for (let i = 0; i < cartsCurrent.length; i++) {
+      const cartCurrent = cartsCurrent[i];
 
-      if (cartCurrent?.cart_shopId._id.toString() === cart_shopId) {
-        /* add new item */
-        if (cartCurrent.cart_products.length === 0 && quantity > 0) {
-          cartCurrent.cart_products = [
-            {
-              product_id,
-              image,
-              name,
-              quantity,
-              price: +foundProduct.product_price,
-            },
-          ];
-          return await cartCurrent.update(cartCurrent);
-        }
-        /* add new item */
+      if (cartCurrent?.cart_shopId._id.toString() === cart_shopId)
+        throw new ForbiddenRequestError("Cart not found", 404);
 
-        const productArr = cartCurrent.cart_products.filter(
-          (product) => product.product_id === product_id
-        );
-        /* add new item */
-        if (productArr.length === 0 && quantity > 0) {
-          cartCurrent.cart_products = [
-            ...cartCurrent.cart_products,
-            {
-              product_id,
-              image,
-              name,
-              quantity,
-              price: +foundProduct.product_price,
-            },
-          ];
-          return await cartCurrent.update(cartCurrent);
-        }
-        /* add new item */
+      /* add new item */
+      const newProductOnCart = {
+        product_id,
+        image,
+        name,
+        quantity,
+        price: +foundProduct.product_price,
+      };
+      const { cart_products, cart_products_deleted } = cartCurrent;
 
-        /* update quantity item */
-        if (quantity === 0) {
-          //delete ; tracking
+      if (cart_products.length === 0 && quantity > 0) {
+        cartCurrent.cart_products = [newProductOnCart];
 
-          const productDeletedArr = cartCurrent.cart_products_deleted.filter(
-            (productId) => productId === product_id
-          );
-          if (productDeletedArr.length === 0) {
-            cartCurrent.cart_products_deleted = [
-              ...cartCurrent.cart_products_deleted,
-              product_id,
-            ];
-          }
-
-          const updateProductArr = cartCurrent.cart_products.filter(
-            (product) => product.product_id !== product_id
-          );
-          cartCurrent.cart_products = updateProductArr;
-          return await cartCurrent.update(cartCurrent);
-        }
-
-        cartCurrent.cart_products.map((product) => {
-          if (product.product_id === product_id) {
-            product.quantity = quantity;
-            product.price = +foundProduct.product_price;
-          }
+        return await findByIdAndUpdateCartRepo({
+          id: convertToObjectId(cartCurrent?._id),
+          updateSet: cartCurrent,
         });
-
-        /* update quantity item */
-
-        return await cartCurrent.update(cartCurrent);
       }
+      /* add new item */
+
+      const productObj = cart_products.find(
+        (product) => product.product_id === product_id
+      );
+      /* add new item */
+      if (!productObj && quantity > 0) {
+        cartCurrent.cart_products = [...cart_products, newProductOnCart];
+        return await findByIdAndUpdateCartRepo({
+          id: convertToObjectId(cartCurrent?._id),
+          updateSet: cartCurrent,
+        });
+      }
+      /* add new item */
+
+      /* update quantity item */
+      if (quantity === 0) {
+        //delete ; tracking
+
+        const productDeletedObj = cart_products_deleted.find(
+          (productId) => productId === product_id
+        );
+        if (!productDeletedObj) {
+          cartCurrent.cart_products_deleted = [
+            ...cart_products_deleted,
+            product_id,
+          ];
+        }
+        cartCurrent.cart_products = cart_products.filter(
+          (product) => product.product_id !== product_id
+        );
+
+        return await findByIdAndUpdateCartRepo({
+          id: convertToObjectId(cartCurrent?._id),
+          updateSet: cartCurrent,
+        });
+      }
+
+      cart_products.map((product) => {
+        if (product.product_id === product_id) {
+          product.quantity = quantity;
+          product.price = +foundProduct.product_price;
+        }
+      });
+
+      /* update quantity item */
+
+      return await findByIdAndUpdateCartRepo({
+        id: convertToObjectId(cartCurrent?._id),
+        updateSet: cartCurrent,
+      });
     }
-    throw new ForbiddenRequestError("Cart not found 1", 404);
   };
 
   static getCurrentCart = async ({
@@ -169,28 +175,20 @@ class CartServices {
       },
     });
 
-    const foundCart = foundCarts.filter(
-      (cartt) => cartt.cart_shopId._id.toString() === cart_shopId
+    const foundCart = foundCarts.find(
+      (cart) => cart.cart_userId._id.toString() === cart_userId.toString()
     );
 
-    // logger.info(
-    //   `foundCart 22::: ${util.inspect(foundCart, {
-    //     showHidden: false,
-    //     depth: null,
-    //     colors: false,
-    //   })}`
-    // );
-
-    if (foundCart.length === 0 && cart_shopId) {
+    if (!foundCart && cart_shopId) {
       const newCart = await CartServices.createCart({
         cart_userId,
         cart_shopId: convertToObjectId(cart_shopId),
       });
+
       return [newCart];
     }
-
+    /* return 1 arr ( vì có thể lỗi nên tồn tại > 1 cart) => update toàn bộ arr cart */
     return foundCarts;
-
     // const foundCart = await findOneRepo({
     //   filter: {
     //     cart_userId,
@@ -216,7 +214,7 @@ class CartServices {
       },
     });
     if (foundCarts.length === 0) {
-      throw new ForbiddenRequestError("Cart not found", 404);
+      throw new ForbiddenRequestError("Cart delete not found", 404);
     }
     const foundCart = foundCarts[0];
     foundCart.cart_state = "failed";

@@ -377,9 +377,13 @@ class OrderServices {
           totalAmountPay: cart?.checkCart?.totalAmountPay,
           totalDiscount: cart?.checkCart?.totalDiscount,
         });
-
+        const updateSet = {
+          completedAt: Date.now(),
+          cart_state: "completed",
+        };
         await findByIdAndUpdateCartRepo({
           id: convertToObjectId(cart?.checkCart?.cartId),
+          updateSet,
         });
 
         if (order) return order;
