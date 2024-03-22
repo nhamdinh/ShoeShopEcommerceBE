@@ -314,7 +314,11 @@ const classRefStrategy = (type) => {
 
     async updateProductTypeById(product_id) {
       const objectParams = removeNullObject(this);
-      
+      if (objectParams?.product_name)
+        objectParams.product_slug = toNonAccentVietnamese(
+          objectParams.product_name
+        ).replaceAll(" ", "-");
+
       const foundProduct = await findProductByIdRepo({
         product_id,
       });
@@ -345,12 +349,21 @@ const classRefStrategy = (type) => {
       }
 
       delete objectParams["product_shop"];
-
-      const updateProduct = await super.updateProductById(
+      const updatedProduct = await super.updateProductById(
         product_id,
         updateNestedObjectParser(objectParams)
       );
-      return updateProduct;
+
+      const updatedInventory = await InventoryServices.findOneAndUpdateInventory({
+        filter: { inven_productId: updatedProduct._id},
+        update: {
+          inven_product_slug: updatedProduct.product_slug,
+          inven_stock: updatedProduct.product_quantity,
+        },
+      });
+      if(!updatedInventory) throw new ForbiddenRequestError("update Inventory failed");
+
+      return updatedProduct;
     }
   };
 };
