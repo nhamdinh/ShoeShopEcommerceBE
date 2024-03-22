@@ -2,12 +2,7 @@
 const util = require("util");
 const logger = require("../log");
 const { ForbiddenRequestError } = require("../core/errorResponse");
-const {
-  convertToObjectId,
-  updateNestedObjectParser,
-  removeNullObject,
-  toNonAccentVietnamese,
-} = require("../utils/getInfo");
+const { convertToObjectId } = require("../utils/getInfo");
 
 const {
   getAllThuDungGiosRepo,
@@ -15,6 +10,10 @@ const {
   findByIdRepo,
   findByIdAndUpdateRepo,
 } = require("../repositories/thuDungGio.repo");
+const {
+  removeNullObject,
+  toNonAccentVietnamese,
+} = require("../utils/functionHelpers");
 
 class ThuDungGioServices {
   static findThuDungGioById = async ({ id }) => {

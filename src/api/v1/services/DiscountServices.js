@@ -9,9 +9,10 @@ const {
   getAllDiscountsByShopRepo,
   deleteDiscountByShopRepo,
 } = require("../repositories/discount.repo");
-const { convertToObjectId, removeNullObject } = require("../utils/getInfo");
+const { convertToObjectId } = require("../utils/getInfo");
 const { findAllProductsRepo } = require("../repositories/product.repo");
 const ProductServices = require("./ProductServices");
+const { removeNullObject } = require("../utils/functionHelpers");
 
 /**
  * 1. Generator Discount Code [Shop | Admin]

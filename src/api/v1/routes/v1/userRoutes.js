@@ -54,7 +54,7 @@ userRouter.get(
 );
 
 // GET ALL USER
-userRouter.get("/get-all", asyncHandler(userController.getAllUsers));
+userRouter.get("/get-all", asyncHandler(userController.findAllUsers));
 // /* =======================  CHAT STORIES ======================= */
 // // GET ALL CHAT STORIES
 // userRouter.get("/get-all-chats", getAllChats);

@@ -16,15 +16,15 @@ const {
 } = require("../repositories/product.repo");
 const { findUserByIdRepo } = require("../repositories/user.repo");
 const { PRODUCT_MODEL } = require("../utils/constant");
-const {
-  removeNullObject,
-  updateNestedObjectParser,
-  convertToObjectId,
-  toNonAccentVietnamese,
-} = require("../utils/getInfo");
+const { convertToObjectId } = require("../utils/getInfo");
 const InventoryServices = require("./InventoryServices");
 const { createReviewRepo } = require("../repositories/review.repo");
 const ReviewServices = require("./ReviewServices");
+const {
+  toNonAccentVietnamese,
+  removeNullObject,
+  updateNestedObjectParser,
+} = require("../utils/functionHelpers");
 
 class ProductFactory {
   static productModelStrategy = {
@@ -120,6 +120,7 @@ class ProductFactory {
       sort = "ctime",
       page = +(query?.page ?? 1),
       limit = +(query?.limit ?? 50),
+
       product_shop = query?.product_shop ?? "",
       keyword = query?.keyword ?? "",
       brand = query?.brand ?? "",
@@ -133,49 +134,41 @@ class ProductFactory {
       ],
     } = query;
 
-    if (product_shop === "") {
-      product_shop = {};
-    } else {
+    if (product_shop) {
       product_shop = {
         product_shop: convertToObjectId(product_shop),
       };
+    } else {
+      product_shop = {};
     }
 
-    if (keyword === "") {
-      keyword = {};
-    } else {
-      const regexSearch = new RegExp(toNonAccentVietnamese(keyword), "i");
+    if (keyword) {
+      const regexSearch = new RegExp(toNonAccentVietnamese(keyword).replaceAll(" ","-"), "i");
 
       keyword = {
-        product_name_nonVi: { $regex: regexSearch },
+        product_slug: { $regex: regexSearch },
       };
+    } else {
+      keyword = {};
     }
-    const regexSearchBrand = new RegExp(toNonAccentVietnamese(brand.toUpperCase() !== "ALL" ? brand : ""), "i");
+    const regexSearchBrand = new RegExp(
+      toNonAccentVietnamese(brand.toUpperCase() !== "ALL" ? brand : ""),
+      "i"
+    );
 
     const filter = {
       isPublished: true,
       ...product_shop,
       ...keyword,
       "product_attributes.brand": { $regex: regexSearchBrand },
-
-      
     };
 
     // logger.info(
-    //   `filter ::: ${util.inspect(
-    //     {
-    //       sort,
-    //       limit,
-    //       page,
-    //       filter,
-    //       select,
-    //     },
-    //     {
-    //       showHidden: false,
-    //       depth: null,
-    //       colors: false,
-    //     }
-    //   )}`
+    //   `filter ::: ${util.inspect(filter, {
+    //     showHidden: false,
+    //     depth: null,
+    //     colors: false,
+    //   })}`
     // );
 
     return await findAllProductsRepo({
@@ -271,8 +264,8 @@ class Product {
     product_shop,
     product_attributes,
   }) {
-    this.product_name = toNonAccentVietnamese(product_name);
-    this.product_name_nonVi = product_name;
+    this.product_name = product_name;
+    // this.product_name_nonVi = toNonAccentVietnamese(product_name);
     this.product_thumb = product_thumb;
     this.product_description = product_description;
     this.product_price = product_price;
@@ -362,9 +355,7 @@ const classRefStrategy = (model) => {
       if (objectParams.product_attributes) {
         await updateProductByIdRepo(model, {
           product_id,
-          bodyUpdate: updateNestedObjectParser(
-            removeNullObject(objectParams.product_attributes)
-          ),
+          bodyUpdate: updateNestedObjectParser(objectParams.product_attributes),
         });
       }
 

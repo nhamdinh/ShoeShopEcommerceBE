@@ -1,17 +1,18 @@
 const { Schema, model } = require("mongoose"); // Erase if already required
-const slugify = require("slugify");
+// const slugify = require("slugify");
 
 const { PRODUCT_MODEL } = require("../utils/constant");
+const { toNonAccentVietnamese } = require("../utils/functionHelpers");
 const DOCUMENT_NAME = "Product";
 const COLLECTION_NAME = "Products";
 
 const productSchema = new Schema(
   {
     product_name: { type: String, required: true, trim: true, },
-    product_name_nonVi: { type: String, required: true, trim: true, },
+    // product_name_nonVi: { type: String, required: true, trim: true, },
+    product_slug: String,
     product_thumb: { type: String, required: true },
     product_description: String,
-    product_slug: String,
     product_price: { type: Number, required: true },
     product_quantity: { type: Number, required: true },
     product_type: {
@@ -53,10 +54,7 @@ productSchema.index({
 });
 
 productSchema.pre("save", async function (next) {
-  this.product_slug = slugify(this.product_name, {
-    lower: false,
-    trim: true,
-  });
+  this.product_slug = toNonAccentVietnamese(this.product_name).replaceAll(" ","-")
   next();
 });
 class ProductModelFactory {

@@ -1,6 +1,7 @@
 "use strict";
 
 const UserModel = require("../Models/UserModel");
+const { getSelectData } = require("../utils/getInfo");
 
 const findUserByEmailRepo = async ({
   email,
@@ -39,10 +40,25 @@ const createUserRepo = async (user) => {
   return await UserModel.create({ ...user });
 };
 
-const getAllUsersRepo = async () => {
-  const users = await UserModel.find({ status: "active" }).lean();
+const findAllUsersRepo = async ({ limit, sort, page, filter, select }) => {
+  const skip = (page - 1) * limit;
+  const sortBy = sort === "ctime" ? { _id: -1 } : { _id: 1 };
+  const count = await UserModel.countDocuments({
+    ...filter,
+  });
+
+  const users = await UserModel.find(filter)
+    .sort(sortBy)
+    .skip(skip)
+    .limit(limit)
+    .select(getSelectData(select))
+    .lean();
+
   return {
-    totalCount: users.length ?? 0,
+    totalCount: +count ?? 0,
+    totalPages: Math.ceil(count / limit),
+    page: +page,
+    limit: +limit,
     users,
   };
 };
@@ -57,6 +73,6 @@ module.exports = {
   findUserByIdRepo,
   findAllAdminUsersRepo,
   createUserRepo,
-  getAllUsersRepo,
+  findAllUsersRepo,
   findAllUsersOrdersRepo,
 };

@@ -19,7 +19,7 @@ const {
   findUserByIdRepo,
   findAllAdminUsersRepo,
   createUserRepo,
-  getAllUsersRepo,
+  findAllUsersRepo,
 } = require("../repositories/user.repo");
 const UserModel = require("../Models/UserModel");
 const ChatStory = require("../Models/ChatStoryModel");
@@ -186,8 +186,32 @@ class UserServices {
     };
   };
 
-  static getAllUsers = async () => {
-    return await getAllUsersRepo();
+  static findAllUsers = async ({ query }) => {
+    let {
+      sort = "ctime",
+      page = +(query?.page ?? 1),
+      limit = +(query?.limit ?? 50),
+
+      select = [
+        // "product_name",
+        // "product_shop",
+        // "product_price",
+        // "product_thumb",
+        // "isDraft",
+        // "isPublished",
+      ],
+    } = query;
+
+    const filter = {
+      status: "active",
+    };
+    return await findAllUsersRepo({
+      sort,
+      limit,
+      page,
+      filter,
+      select,
+    });
   };
 
   static login = async (req) => {

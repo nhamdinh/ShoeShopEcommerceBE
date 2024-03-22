@@ -10,6 +10,7 @@ const {
   convertToObjectId,
 } = require("../utils/getInfo");
 const logger = require("../log");
+const { toNonAccentVietnamese } = require("../utils/functionHelpers");
 
 const createProductRepo = async (product) => {
   return await ProductModel.product.create({ ...product });
@@ -96,11 +97,26 @@ const findAllProductsRepo = async ({ limit, sort, page, filter, select }) => {
 
   // for (let i = 0; i < products1.length; i++) {
   //   const item = products1[i];
-  //   item.product_name_nonVi = toNonAccentVietnamese(item.product_name);
+  //   item.product_slug = toNonAccentVietnamese(item.product_name).replaceAll(" ","-=");
   //   await item.update(item);
   // }
 
+  // const startTime = performance.now()
+  // await Promise.all(
+  //   products1.map(async (product) => {
+  //     product.product_slug = toNonAccentVietnamese(product.product_name).replaceAll(" ","-");
+  //     await product.update(product);
+  //   })
+  // );
+  // const endTime = performance.now()
 
+  // logger.info(
+  //   `endTime - startTime ::: ${util.inspect(endTime - startTime, {
+  //     showHidden: false,
+  //     depth: null,
+  //     colors: false,
+  //   })}`
+  // );
 
   const skip = (page - 1) * limit;
   const sortBy = sort === "ctime" ? { _id: -1 } : { _id: 1 };
@@ -118,8 +134,8 @@ const findAllProductsRepo = async ({ limit, sort, page, filter, select }) => {
     .select(getSelectData(select))
     .lean();
 
-    return {
-    totalCount: count ?? 0,
+  return {
+    totalCount: +count ?? 0,
     totalPages: Math.ceil(count / limit),
     page: +page,
     limit: +limit,
@@ -130,8 +146,8 @@ const findAllProductsRepo = async ({ limit, sort, page, filter, select }) => {
 const findProductByIdRepo = async ({ product_id, unSelect = [] }) => {
   return await ProductModel.product
     .findById(product_id)
-    .select(getUnSelectData(unSelect))
-    // .lean();
+    .select(getUnSelectData(unSelect));
+  // .lean();
 };
 
 const findProductById1Repo = async ({ product_id }) => {

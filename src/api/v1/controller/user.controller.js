@@ -113,10 +113,12 @@ class UserController {
     }).send(res);
   };
 
-  getAllUsers = async (req, res) => {
+  findAllUsers = async (req, res) => {
     new OK({
-      message: "getAllUsers OK",
-      metadata: await UserServices.getAllUsers(),
+      message: "findAllUsers OK",
+      metadata: await UserServices.findAllUsers({
+        query: req.query,
+      }),
     }).send(res);
   };
 
