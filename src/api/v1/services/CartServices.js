@@ -177,6 +177,11 @@ class CartServices {
       },
     });
 
+
+
+
+
+
     const foundCart = foundCarts.find(
       (cart) =>
         cart.cart_userId._id.toString() === cart_userId.toString() &&
@@ -205,6 +210,38 @@ class CartServices {
     //   });
     // }
   };
+
+  static getCartsByUser = async ({
+    cart_userId = convertToObjectId(cart_userId),
+  }) => {
+    /* 1 shop chỉ 1 cart; 1 user có nhiều cart */
+    const foundCarts = await findCartsRepo({
+      filter: {
+        cart_userId,
+        cart_state: "active",
+      },
+    });
+
+
+
+
+
+    return foundCarts;
+
+    /* return 1 arr ( vì có thể lỗi nên tồn tại > 1 cart) => update toàn bộ arr cart */
+    // const foundCart = await findOneRepo({
+    //   filter: {
+    //     cart_userId,
+    //     cart_state: "active",
+    //   },
+    // });
+    // if (!foundCart) {
+    //   return await CartServices.createCart({
+    //     cart_userId,
+    //   });
+    // }
+  };
+
 
   static deleteCart = async ({
     cart_userId = convertToObjectId(cart_userId),

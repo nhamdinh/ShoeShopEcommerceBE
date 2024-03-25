@@ -188,7 +188,7 @@ class UserServices {
 
   static findAllUsers = async ({ query }) => {
     let {
-      sort = "ctime",
+      sort = { _id: -1 },
       page = +(query?.page ?? 1),
       limit = +(query?.limit ?? 50),
 

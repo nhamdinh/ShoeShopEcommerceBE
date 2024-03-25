@@ -33,8 +33,8 @@ class DiscountServices {
     discount_shopId = convertToObjectId(discount_shopId),
   }) => {
     const foundDiscount = await findOneDiscountRepo({
-      discount_code: discount_code,
-      discount_shopId: discount_shopId,
+      discount_code,
+      discount_shopId,
       discount_isActive: true,
     });
 
@@ -42,64 +42,89 @@ class DiscountServices {
       throw new ForbiddenRequestError(`Discount is not exist`, 404);
 
     const { discount_applyTo, discount_productIds } = foundDiscount;
-    let products = [];
 
-    if (discount_applyTo === "all") {
-      products = await findAllProductsRepo({
-        filter: {
-          product_shop: discount_shopId,
-          isPublished: true,
-        },
-        limit: 50,
-        sort: "ctime",
-        page: 1,
-        select: [
-          "product_shop",
-          "product_name",
-          "product_price",
-          "product_thumb",
-          "isPublished",
-        ],
-      });
-    }
+    const filter = {
+      product_shop: discount_shopId,
+      isPublished: true,
+    };
 
     if (discount_applyTo === "products_special") {
-      products = await findAllProductsRepo({
-        filter: {
-          _id: { $in: discount_productIds },
-          isPublished: true,
-          product_shop: discount_shopId,
-        },
-        limit: 50,
-        sort: "ctime",
-        page: 1,
-        select: [
-          "product_shop",
-          "product_name",
-          "product_price",
-          "product_thumb",
-          "isDraft",
-          "isPublished",
-        ],
-      });
+      filter._id = { $in: discount_productIds };
     }
-    return products;
+    if (discount_applyTo === "all") {
+    }
+
+    return await findAllProductsRepo({
+      filter,
+      limit: 50,
+      page: 1,
+      sort: { _id: -1 },
+      select: [
+        "product_shop",
+        "product_name",
+        "product_price",
+        "product_thumb",
+        "isDraft",
+        "isPublished",
+      ],
+    });
   };
 
   static getAllDiscountsByShop = async ({
-    limit = 50,
-    sort = "ctime",
-    page = 1,
     discount_shopId = convertToObjectId(discount_shopId),
     filter = {
       discount_isActive: true,
     },
-
     unSelect = ["__v"],
+    body,
   }) => {
+    const {
+      sortKey = "_id",
+      sortVal = -1,
+      page = +(body?.page ?? 1),
+      limit = +(body?.limit ?? 50),
+
+      discount_code = body?.discount_code ?? "",
+      discount_start = body?.discount_start ?? "",
+      discount_end = body?.discount_end ?? "",
+      select = [
+        // "product_name",
+        // "product_shop",
+        // "product_price",
+        // "product_thumb",
+        // "isDraft",
+        // "isPublished",
+      ],
+    } = body;
+
+    const sort = {};
+    sort[sortKey] = sortVal;
+
+    if (discount_start)
+      filter.discount_start = {
+        $gte: new Date(discount_start),
+      };
+    if (discount_end) {
+      filter.discount_end = {
+        $lte: new Date(discount_end),
+      };
+    } /* else {
+      filter.discount_end = {
+        $gte: new Date(),
+      };
+    } */
+
+    if (discount_code) {
+      const regexSearch = new RegExp(discount_code, "i");
+      filter.discount_code = { $regex: regexSearch };
+    }
+
     const metadataProducts = await ProductServices.findAllPublishedByShop({
       product_shop: discount_shopId,
     });
+    const { totalCount, products } = metadataProducts;
+    if (!totalCount)
+      throw new ForbiddenRequestError(`No Products In Shop`, 404);
 
     const foundDiscounts = await getAllDiscountsByShopRepo({
       limit: +limit,
@@ -111,30 +136,29 @@ class DiscountServices {
       },
       unSelect,
     });
+
     if (!foundDiscounts)
       throw new ForbiddenRequestError(`Discount is not exist`, 404);
 
-    let discounts = foundDiscounts?.discounts;
-    discounts.map((item) => {
-      if (item?.discount_productIds.length > 0) {
-        let productsIds = item?.discount_productIds;
+    /* check products in discounts*/
+    const discounts = foundDiscounts?.discounts;
+    discounts.map((ddd) => {
+      const productsIds = ddd?.discount_productIds ?? [];
 
-        let mergedArray = [];
+      if (productsIds.length > 0) {
+        const productsDiscount = [];
 
         for (let i = 0; i < productsIds.length; i++) {
-          let _id = productsIds[i];
+          const _id = productsIds[i];
 
-          let product = metadataProducts.products.find(
-            (item) => item._id.toString() === _id
-          );
+          const product = products.find((item) => item._id.toString() === _id);
 
           if (product) {
-            let mergedProduct = { ...product, _id };
-            mergedArray.push(mergedProduct);
+            productsDiscount.push(product);
           }
         }
 
-        item.discount_productIds = mergedArray;
+        ddd.discount_productIds = productsDiscount;
       }
     });
 
@@ -143,7 +167,7 @@ class DiscountServices {
 
   static getAllDiscountsByShops = async ({
     limit = 50,
-    sort = "ctime",
+    sort = { _id: -1 },
     page = 1,
     discount_shopIds = [],
     filter = {
@@ -180,14 +204,6 @@ class DiscountServices {
       }
     });
 
-    // logger.info(
-    //   `foundDiscounts ::: ${util.inspect(foundDiscounts, {
-    //     showHidden: false,
-    //     depth: null,
-    //     colors: false,
-    //   })}`
-    // );
-
     // const metadataProducts = await ProductServices.findAllPublishedByShop({
     //   product_shop: discount_shopId,
     // });
@@ -197,7 +213,7 @@ class DiscountServices {
     //   if (item?.discount_productIds.length > 0) {
     //     let productsIds = item?.discount_productIds;
 
-    //     let mergedArray = [];
+    //     let productsDiscount = [];
 
     //     for (let i = 0; i < productsIds.length; i++) {
     //       let _id = productsIds[i];
@@ -208,23 +224,24 @@ class DiscountServices {
 
     //       if (product) {
     //         let mergedProduct = { ...product, _id };
-    //         mergedArray.push(mergedProduct);
+    //         productsDiscount.push(mergedProduct);
     //       }
     //     }
 
-    //     item.discount_productIds = mergedArray;
+    //     item.discount_productIds = productsDiscount;
     //   }
     // });
 
     return foundDiscounts;
   };
 
-  static getDiscountsAmount = async ({
-    discount_code,
-    discount_shopId,
-    discount_used_userId,
-    products_order,
-  }) => {
+  static getDiscountsAmount = async ({ discount_used_userId, body }) => {
+    const {
+      discount_code = body.discount_code.toUpperCase(),
+      discount_shopId,
+      products_order,
+    } = body;
+
     const foundDiscount = await findOneDiscountRepo({
       discount_code: discount_code,
       discount_shopId: convertToObjectId(discount_shopId),
@@ -232,6 +249,7 @@ class DiscountServices {
     });
     if (!foundDiscount)
       throw new ForbiddenRequestError(`Discount is not exist`, 404);
+
     const {
       discount_isActive,
       discount_quantity,
@@ -254,8 +272,9 @@ class DiscountServices {
     // )
     //   throw new ForbiddenRequestError(`Discount is out`);
 
-    let orderTotalAmount = 0;
-    if (discount_order_minValue > 0) {
+    if (discount_order_minValue <= 0)
+      throw new ForbiddenRequestError(`discount_order_minValue <= 0`, 404);
+    {
       /* check */
       if (discount_useMax_user > 0) {
         const userUsed = discount_used_users.find(
@@ -264,7 +283,7 @@ class DiscountServices {
         if (userUsed) throw new ForbiddenRequestError(`Your turn is over`);
       }
 
-      orderTotalAmount = products_order.reduce((acc, product) => {
+      const orderTotalAmount = products_order.reduce((acc, product) => {
         return +acc + +product.price * +product.quantity;
       }, 0);
 
@@ -324,9 +343,10 @@ class DiscountServices {
               : orderTotalAmount - discountAmount,
         };
       }
-      throw new ForbiddenRequestError(`Discount is out`);
     }
     return { orderTotalAmount, discountAmount: 0, orderTotalAmountPay: 0 };
+
+    throw new ForbiddenRequestError(`Discount is out`);
   };
 
   static deleteDiscountByShop = async ({ codeId, discount_shopId }) => {

@@ -14,13 +14,17 @@ const findOneDiscountRepo = async (query) => {
 
 const getAllDiscountsByShopRepo = async ({
   limit,
-  sort,
   page,
+  sort,
   filter,
   unSelect,
 }) => {
   const skip = (page - 1) * limit;
-  const sortBy = sort === "ctime" ? { _id: -1 } : { _id: 1 };
+  const sortBy = Object.keys(sort).length ? { ...sort } : { _id: -1 };
+
+  const count = await DiscountModel.countDocuments({
+    ...filter,
+  });
 
   const discounts = await DiscountModel.find(filter)
     .sort(sortBy)
@@ -29,15 +33,13 @@ const getAllDiscountsByShopRepo = async ({
     .select(getUnSelectData(unSelect))
     .lean();
 
-  // logger.info(
-  //   `discounts ::: ${util.inspect(discounts, {
-  //     showHidden: false,
-  //     depth: null,
-  //     colors: false,
-  //   })}`
-  // );
-
-  return { totalCount: discounts?.length ?? 0, discounts };
+  return {
+    totalCount: +count ?? 0,
+    totalPages: Math.ceil(count / limit),
+    page: +page,
+    limit: +limit,
+    discounts,
+  };
 };
 
 const deleteDiscountByShopRepo = async ({ codeId, discount_shopId }) => {

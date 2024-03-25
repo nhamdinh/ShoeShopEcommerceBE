@@ -1,5 +1,6 @@
 "use strict";
 const util = require("util");
+const logger = require("../log");
 
 const { Types } = require("mongoose"); // Erase if already required
 
@@ -9,7 +10,6 @@ const {
   getUnSelectData,
   convertToObjectId,
 } = require("../utils/getInfo");
-const logger = require("../log");
 const { toNonAccentVietnamese } = require("../utils/functionHelpers");
 const InventoryServices = require("../services/InventoryServices");
 
@@ -22,6 +22,10 @@ const createProductModelRepo = async (type, product) => {
 };
 
 const findAllProductsByShopRepo = async ({ query, limit, skip }) => {
+  const count = await ProductModel.product.countDocuments({
+    ...query,
+  });
+
   const products = await ProductModel.product
     .find(query)
     .populate("product_shop", "name email productShopName _id")
@@ -32,7 +36,9 @@ const findAllProductsByShopRepo = async ({ query, limit, skip }) => {
     .exec();
 
   return {
-    totalCount: products.length ?? 0,
+    totalCount: +count ?? 0,
+    totalPages: Math.ceil(count / limit),
+    limit: +limit,
     products: products,
   };
 };
@@ -132,7 +138,8 @@ const findAllProductsRepo = async ({
   // updateAll();
 
   const skip = (page - 1) * limit;
-  const sortBy = sort === "ctime" ? { _id: -1 } : { _id: 1 };
+  // const sortBy = sort === "ctime" ? { _id: -1 } : { _id: 1 };
+  const sortBy = Object.keys(sort).length ? { ...sort } : { _id: -1 };
 
   const count = await ProductModel.product.countDocuments({
     ...filter,

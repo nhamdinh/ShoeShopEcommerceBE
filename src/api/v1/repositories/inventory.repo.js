@@ -20,7 +20,7 @@ const findOneAndUpdateInventoryRepo = async ({
   filter,
   updateSet,
   options = { upsert: false, new: true },
-  /* upsert: them moi(true); new: du lieu moi */
+  /* upsert: them moi(true); new: return du lieu moi */
 }) => {
   return await InventoryModel.findOneAndUpdate(filter, updateSet, options);
 };

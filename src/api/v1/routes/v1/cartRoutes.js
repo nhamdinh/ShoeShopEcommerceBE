@@ -24,7 +24,7 @@ cartRouter.post(
 cartRouter.get(
   "/get-current-cart",
   protect,
-  asyncHandler(cartController.getCurrentCart)
+  asyncHandler(cartController.getCartsByUser)
 );
 
 // GET ALL CART

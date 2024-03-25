@@ -15,10 +15,10 @@ class CartController {
     }).send(res);
   };
 
-  getCurrentCart = async (req, res, next) => {
+  getCartsByUser = async (req, res, next) => {
     new OK({
-      message: "getCurrentCart OK",
-      metadata: await CartServices.getCurrentCart({
+      message: "getCartsByUser OK",
+      metadata: await CartServices.getCartsByUser({
         cart_userId: req.user._id,
       }),
     }).send(res);
