@@ -47,5 +47,10 @@ const discountSchema = new Schema(
   }
 );
 
+discountSchema.index({
+  discount_shopId: "text",
+  _id: "text",
+});
+
 //Export the model
 module.exports = model(DOCUMENT_NAME, discountSchema);

@@ -29,24 +29,33 @@ class DiscountServices {
   };
 
   static getAllProductsByDiscount = async ({
-    discount_code,
+    discount_code = discount_code.toUpperCase(),
     discount_shopId = convertToObjectId(discount_shopId),
+    byShop = false,
   }) => {
-    const foundDiscount = await findOneDiscountRepo({
+    const filterDiscount = {
       discount_code,
-      discount_shopId,
       discount_isActive: true,
-    });
+      discount_start: {
+        $lte: new Date(),
+      },
+      discount_end: {
+        $gte: new Date(),
+      },
+    };
+    if (byShop) filterDiscount.discount_shopId = discount_shopId;
+
+    const foundDiscount = await findOneDiscountRepo(filterDiscount);
 
     if (!foundDiscount || !foundDiscount.discount_isActive)
-      throw new ForbiddenRequestError(`Discount is not exist`, 404);
+      throw new ForbiddenRequestError(`Discount is not exist OR expire`, 404);
 
     const { discount_applyTo, discount_productIds } = foundDiscount;
 
     const filter = {
-      product_shop: discount_shopId,
       isPublished: true,
     };
+    if (byShop) filter.product_shop = discount_shopId;
 
     if (discount_applyTo === "products_special") {
       filter._id = { $in: discount_productIds };
@@ -68,101 +77,6 @@ class DiscountServices {
         "isPublished",
       ],
     });
-  };
-
-  static getAllDiscountsByShop = async ({
-    discount_shopId = convertToObjectId(discount_shopId),
-    filter = {
-      discount_isActive: true,
-    },
-    unSelect = ["__v"],
-    body,
-  }) => {
-    const {
-      sortKey = "_id",
-      sortVal = -1,
-      page = +(body?.page ?? 1),
-      limit = +(body?.limit ?? 50),
-
-      discount_code = body?.discount_code ?? "",
-      discount_start = body?.discount_start ?? "",
-      discount_end = body?.discount_end ?? "",
-      select = [
-        // "product_name",
-        // "product_shop",
-        // "product_price",
-        // "product_thumb",
-        // "isDraft",
-        // "isPublished",
-      ],
-    } = body;
-
-    const sort = {};
-    sort[sortKey] = sortVal;
-
-    if (discount_start)
-      filter.discount_start = {
-        $gte: new Date(discount_start),
-      };
-    if (discount_end) {
-      filter.discount_end = {
-        $lte: new Date(discount_end),
-      };
-    } /* else {
-      filter.discount_end = {
-        $gte: new Date(),
-      };
-    } */
-
-    if (discount_code) {
-      const regexSearch = new RegExp(discount_code, "i");
-      filter.discount_code = { $regex: regexSearch };
-    }
-
-    const metadataProducts = await ProductServices.findAllPublishedByShop({
-      product_shop: discount_shopId,
-    });
-    const { totalCount, products } = metadataProducts;
-    if (!totalCount)
-      throw new ForbiddenRequestError(`No Products In Shop`, 404);
-
-    const foundDiscounts = await getAllDiscountsByShopRepo({
-      limit: +limit,
-      page: +page,
-      sort,
-      filter: {
-        ...filter,
-        discount_shopId,
-      },
-      unSelect,
-    });
-
-    if (!foundDiscounts)
-      throw new ForbiddenRequestError(`Discount is not exist`, 404);
-
-    /* check products in discounts*/
-    const discounts = foundDiscounts?.discounts;
-    discounts.map((ddd) => {
-      const productsIds = ddd?.discount_productIds ?? [];
-
-      if (productsIds.length > 0) {
-        const productsDiscount = [];
-
-        for (let i = 0; i < productsIds.length; i++) {
-          const _id = productsIds[i];
-
-          const product = products.find((item) => item._id.toString() === _id);
-
-          if (product) {
-            productsDiscount.push(product);
-          }
-        }
-
-        ddd.discount_productIds = productsDiscount;
-      }
-    });
-
-    return foundDiscounts;
   };
 
   static getAllDiscountsByShops = async ({
@@ -235,13 +149,12 @@ class DiscountServices {
     return foundDiscounts;
   };
 
-  static getDiscountsAmount = async ({ discount_used_userId, body }) => {
-    const {
-      discount_code = body.discount_code.toUpperCase(),
-      discount_shopId,
-      products_order,
-    } = body;
-
+  static getDiscountsAmount = async ({
+    discount_used_userId,
+    discount_code,
+    discount_shopId,
+    products_order,
+  }) => {
     const foundDiscount = await findOneDiscountRepo({
       discount_code: discount_code,
       discount_shopId: convertToObjectId(discount_shopId),
@@ -275,13 +188,14 @@ class DiscountServices {
     if (discount_order_minValue <= 0)
       throw new ForbiddenRequestError(`discount_order_minValue <= 0`, 404);
     {
-      /* check */
+      /* check Your turn */
       if (discount_useMax_user > 0) {
         const userUsed = discount_used_users.find(
           (user) => user._id === discount_used_userId
         );
         if (userUsed) throw new ForbiddenRequestError(`Your turn is over`);
       }
+      /* check Your turn */
 
       const orderTotalAmount = products_order.reduce((acc, product) => {
         return +acc + +product.price * +product.quantity;
@@ -292,61 +206,73 @@ class DiscountServices {
           `orderTotalAmount require minimum is ${discount_order_minValue}`
         );
 
-      /* => tinh lai discount cho tung mon */
+      /* => tinh lai discount cho tung mon; ap ma nao cho tung pro */
+      const products_order_applied = [];
       if (discount_applyTo === "products_special") {
-        const productsDiscount = products_order.filter((order) => {
-          return discount_productIds.includes(order.product_id);
-        });
+        products_order.map((product) => {
+          const amountE = +product.price * +product.quantity;
+          let discountE = 0;
+          let amountPayE =
+            +amountE - +discountE < 1 ? 1 : +amountE - +discountE;
 
-        if (productsDiscount.length > 0) {
-          let discountAmount = 0;
-          if (discount_type === "fixed_amount") {
-            discountAmount = productsDiscount.reduce((acc, product) => {
-              return +acc + +(+product?.quantity * discount_value).toFixed(0);
-            }, 0);
+          if (discount_productIds.includes(product.product_id)) {
+            const discountEachProduct = +(discount_type === "fixed_amount"
+              ? discount_value
+              : ((+product.price * discount_value) / 100).toFixed(0));
+
+            discountE = discountEachProduct * +product?.quantity;
+
+            amountPayE = +amountE - +discountE < 1 ? 1 : +amountE - +discountE;
           }
-          if (discount_type === "percent") {
-            discountAmount = productsDiscount.reduce((acc, product) => {
-              return (
-                +acc +
-                +(
-                  (+product?.quantity * +product?.price * discount_value) /
-                  100
-                ).toFixed(0)
-              );
-            }, 0);
-          }
-          return {
-            orderTotalAmount,
-            discountAmount: +discountAmount,
-            orderTotalAmountPay:
-              orderTotalAmount - discountAmount < 1
-                ? 1
-                : orderTotalAmount - discountAmount,
-          };
-        }
-        return { orderTotalAmount, discountAmount: 0, orderTotalAmountPay: 0 };
+
+          products_order_applied.push({
+            ...product,
+            summary: {
+              amountE,
+              discountE,
+              amountPayE,
+            },
+          });
+        });
       }
 
       if (discount_applyTo === "all") {
-        const discountAmount =
-          discount_type === "fixed_amount"
+        products_order.map((product) => {
+          const amountE = +product.price * +product.quantity;
+          const discountEachProduct = +(discount_type === "fixed_amount"
             ? discount_value
-            : ((+orderTotalAmount * discount_value) / 100).toFixed(0);
+            : ((+product.price * discount_value) / 100).toFixed(0));
 
-        return {
-          orderTotalAmount,
-          discountAmount: +discountAmount,
-          orderTotalAmountPay:
-            orderTotalAmount - discountAmount < 1
-              ? 1
-              : orderTotalAmount - discountAmount,
-        };
+          const discountE = discountEachProduct * +product?.quantity;
+
+          const amountPayE =
+            +amountE - +discountE < 1 ? 1 : +amountE - +discountE;
+          products_order_applied.push({
+            ...product,
+            summary: {
+              amountE,
+              discountE,
+              amountPayE,
+            },
+          });
+        });
       }
-    }
-    return { orderTotalAmount, discountAmount: 0, orderTotalAmountPay: 0 };
 
-    throw new ForbiddenRequestError(`Discount is out`);
+      const summary = products_order_applied.reduce((acc, product) => {
+        acc.discountAmount =
+          +(acc.discountAmount ?? 0) + +product.summary.discountE;
+        acc.orderTotalAmountPay =
+          +(acc.amountPayE ?? 0) + +product.summary.amountPayE;
+
+        return acc;
+      }, {});
+
+      return {
+        orderTotalAmount,
+        ...summary,
+        products_order_applied,
+      };
+    }
   };
 
   static deleteDiscountByShop = async ({ codeId, discount_shopId }) => {

@@ -8,7 +8,7 @@ const {
   findByIdAndUpdateCartRepo,
 } = require("../repositories/cart.repo");
 const { convertToObjectId } = require("../utils/getInfo");
-const { checkProductsRepo } = require("../repositories/product.repo");
+const { checkPriceProductsRepo } = require("../repositories/product.repo");
 const { getDiscountsAmount } = require("./DiscountServices");
 const {
   createOrderRepo,
@@ -204,99 +204,103 @@ class OrderServices {
     }
  **/
 
-  static checkoutCartUtil = async ({ cartId, userId, orderItems = [] }) => {
+  static checkoutCartUtil = async ({
+    cartId,
+    userId,
+    shopDiscount,
+    shopId,
+  }) => {
     const foundCarts = await findCartsRepo({
       filter: {
         _id: convertToObjectId(cartId),
         cart_userId: convertToObjectId(userId),
+        cart_shopId: convertToObjectId(shopId),
         cart_state: "active",
       },
     });
-    if (foundCarts.length === 0) {
+    if (!foundCarts.length) {
       throw new ForbiddenRequestError("Cart not found", 404);
     }
+
+    const objCart = foundCarts[0];
 
     const checkCart = {
         userId,
         cartId,
+        shopId,
+        shopDiscount,
         totalAmount: 0,
         feeShip: 9,
         totalDiscount: 0,
         totalAmountPay: 0,
       },
-      orderItemsNew = [];
+      orderItemsNew = [];/* luon chi co 1 */
 
-    for (let i = 0; i < orderItems.length; i++) {
-      /* orderItems length = 1 always */
-      const { shopId, shopDiscount = [], itemProducts = [] } = orderItems[i];
-      const checkProducts = await checkProductsRepo(itemProducts);
+    const { cart_products = [] } = objCart;
+    const checkProducts = await checkPriceProductsRepo(cart_products);
 
-      checkProducts.map((checkProduct) => {
-        if (!checkProduct) {
-          throw new ForbiddenRequestError("Order Wrong!");
-        }
-      });
+    if (checkProducts.includes(undefined))
+      throw new ForbiddenRequestError("Order Wrong!");
 
-      const totalAmountProducts = checkProducts.reduce((access, product) => {
-        return +access + +product.price * +product.quantity;
-      }, 0);
-      checkCart.totalAmount = totalAmountProducts;
+    checkCart.totalAmount = checkProducts.reduce((access, product) => {
+      return +access + +product.price * +product.quantity;
+    }, 0);
 
-      if (shopDiscount.length > 0) {
-        const calculateDiscounts = await Promise.all(
-          shopDiscount.map(async (coupon) => {
-            const objDiscount = await getDiscountsAmount({
-              discount_code: coupon.discount_code,
-              discount_shopId: shopId,
-              discount_used_userId: convertToObjectId(userId),
-              products_order: checkProducts,
-            });
+    if (shopDiscount.length) {
+      const calculateDiscounts = await Promise.all(
+        shopDiscount.map(async (coupon) => {
+          const objDiscount = await getDiscountsAmount({
+            discount_code: coupon.discount_code,
+            discount_shopId: shopId,
+            discount_used_userId: convertToObjectId(userId),
+            products_order: checkProducts,
+          });
 
-            if (objDiscount) {
-              return objDiscount;
-            }
-          })
-        );
-
-        calculateDiscounts.map((checkDiscount, index) => {
-          if (!checkDiscount) {
-            throw new ForbiddenRequestError("Order Wrong!");
+          if (objDiscount) {
+            return objDiscount;
           }
-          const { discountAmount } = checkDiscount;
+        })
+      );
 
-          checkCart.totalDiscount += discountAmount;
+      if (calculateDiscounts.includes(undefined))
+        throw new ForbiddenRequestError("Order Wrong!");
 
-          // logger.info(
-          //   `discountAmount ${index}::: ${util.inspect(discountAmount, {
-          //     showHidden: false,
-          //     depth: null,
-          //     colors: false,
-          //   })}`
-          // );
-        });
+    logger.info(
+      `calculateDiscounts ::: ${util.inspect(calculateDiscounts, {
+        showHidden: false,
+        depth: null,
+        colors: false,
+      })}`
+    );
 
-        const orderItemNew = {
-          shopId,
-          shopDiscount,
-          itemProducts: checkProducts,
-          priceRaw: checkCart.totalAmount,
-          discounted: checkCart.totalDiscount,
-          priceAppliedDiscount:
-            checkCart.totalAmount - checkCart.totalDiscount < 1
-              ? 1
-              : checkCart.totalAmount - checkCart.totalDiscount,
-        };
 
-        orderItemsNew.push(orderItemNew);
-      }
+
+
+      checkCart.totalDiscount = calculateDiscounts.reduce(
+        (acc, item) => +acc + +item.discountAmount,
+        [0]
+      );
+
+      const orderItemNew = {
+        shopId,
+        itemProducts: checkProducts,
+        priceRaw: checkCart.totalAmount,
+        discounted: checkCart.totalDiscount,
+        priceAppliedDiscount:
+          checkCart.totalAmount - checkCart.totalDiscount < 1
+            ? 1
+            : checkCart.totalAmount - checkCart.totalDiscount,
+      };
+
+      orderItemsNew.push(orderItemNew);
     }
+
     checkCart.totalAmountPay =
       checkCart.totalAmount - checkCart.totalDiscount - checkCart.feeShip < 1
         ? 1
         : checkCart.totalAmount - checkCart.totalDiscount - checkCart.feeShip;
 
     return {
-      orderItems,
       orderItemsNew,
       checkCart,
     };
@@ -308,38 +312,32 @@ class OrderServices {
     userId,
     cartsReview,
   }) => {
+    const startTime = performance.now();
+    const cartReviewed = await Promise.all(
+      cartsReview.map(async (cartReview) => {
+        const { cartId, orderItems, shopDiscount, shopId } = cartReview;
 
+        const obj = await OrderServices.checkoutCartUtil({
+          cartId,
+          userId,
+          orderItems,
+          shopDiscount,
+          shopId,
+        });
 
-        logger.info(
-      `cartsReview ::: ${util.inspect(cartsReview, {
+        if (obj) return obj;
+      })
+    );
+
+    const endTime = performance.now();
+    logger.info(
+      `endTime - startTime ::: ${util.inspect(endTime - startTime, {
         showHidden: false,
         depth: null,
         colors: false,
       })}`
     );
 
-    const cartReviewed = [];
-    // for (let i = 0; i < cartsReview.length; i++) {
-    //   const cartReview = cartsReview[i];
-    //   const { cartId, orderItems } = cartReview;
-
-
-    //   const obj = await OrderServices.checkoutCartUtil({
-    //     cartId,
-    //     userId,
-    //     orderItems,
-    //   });
-
-    //   if (obj) cartReviewed.push(obj);
-    // }
-
-    // logger.info(
-    //   `cartReviewed ::: ${util.inspect(cartReviewed, {
-    //     showHidden: false,
-    //     depth: null,
-    //     colors: false,
-    //   })}`
-    // );
     return cartReviewed;
   };
 
@@ -349,18 +347,19 @@ class OrderServices {
     userId,
     cartsReview,
   }) => {
-    const cartReviewed = [];
-    for (let i = 0; i < cartsReview.length; i++) {
-      const cartReview = cartsReview[i];
-      const { cartId, orderItems } = cartReview;
-      const obj = await OrderServices.checkoutCartUtil({
-        cartId,
-        userId,
-        orderItems,
-      });
+    const cartReviewed = await Promise.all(
+      cartsReview.map(async (cartReview) => {
+        const { cartId, orderItems } = cartReview;
 
-      if (obj) cartReviewed.push(obj);
-    }
+        const obj = await OrderServices.checkoutCartUtil({
+          cartId,
+          userId,
+          orderItems,
+        });
+
+        if (obj) return obj;
+      })
+    );
 
     const addressArr = await findAddressByUserRepo({
       userId: convertToObjectId(userId),

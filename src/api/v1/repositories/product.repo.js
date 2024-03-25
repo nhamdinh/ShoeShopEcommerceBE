@@ -201,7 +201,7 @@ const updateProductByIdRepo = async (
   });
 };
 
-const checkProductsRepo = async (products) => {
+const checkPriceProductsRepo = async (products) => {
   return await Promise.all(
     products.map(async (product) => {
       const foundProduct = await ProductModel.product.findById(
@@ -230,5 +230,5 @@ module.exports = {
   updateProductByIdRepo,
   findOneProductRepo,
   findProductById1Repo,
-  checkProductsRepo,
+  checkPriceProductsRepo,
 };

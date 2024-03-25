@@ -54,16 +54,19 @@ class DiscountController {
       metadata: await DiscountServices.getAllProductsByDiscount({
         discount_shopId: req.user._id,
         discount_code: req.body.discount_code.toUpperCase(),
+        byShop: req.body.byShop ?? false,
       }),
     }).send(res);
   };
 
   getDiscountsAmount = async (req, res, next) => {
     new OK({
-      message: "getDiscountsAmount OK",/* BO; dung de checkout cart */
+      message: "getDiscountsAmount OK", /* BO; dung de checkout cart */
       metadata: await DiscountServices.getDiscountsAmount({
         discount_used_userId: req.user._id,
-        body: req.body,
+        discount_code: req.body.discount_code.toUpperCase(),
+        discount_shopId: req.body.discount_shopId,
+        products_order: req.body.products_order,
       }),
     }).send(res);
   };
