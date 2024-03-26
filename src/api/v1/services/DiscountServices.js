@@ -12,7 +12,11 @@ const {
 const { convertToObjectId } = require("../utils/getInfo");
 const { findAllProductsRepo } = require("../repositories/product.repo");
 const ProductServices = require("./ProductServices");
-const { removeNullObject, checkNumber } = require("../utils/functionHelpers");
+const {
+  removeNullObject,
+  checkNumber,
+  toFixedNumber,
+} = require("../utils/functionHelpers");
 
 /**
  * 1. Generator Discount Code [Shop | Admin]
@@ -164,32 +168,34 @@ class DiscountServices {
     discount_type,
     discount_value,
     discount_productIds,
-    discount_description,
   }) => {
     const products_order_applied = [];
 
     products_order.map((product) => {
-      const amountE = +product.price * +product.quantity;
-      let discountE = 0;
-      let amountPayE = checkNumber(+amountE - +discountE);
+      const priceRawOne = +product.price * +product.quantity;
+      let discountedOne = 0;
+      let amountPayOne = checkNumber(+priceRawOne - +discountedOne);
 
       if (discount_productIds.includes(product.product_id)) {
-        const discountEachProduct = +(discount_type === "fixed_amount"
-          ? discount_value
-          : ((+product.price * discount_value) / 100).toFixed(0));
+        const discountEachProduct =
+          discount_type === "fixed_amount"
+            ? +discount_value
+            : toFixedNumber((+product.price * discount_value) / 100, 1);
 
-        discountE = discountEachProduct * +product?.quantity;
+        discountedOne = toFixedNumber(
+          discountEachProduct * +product?.quantity,
+          1
+        );
 
-        amountPayE = checkNumber(+amountE - +discountE);
+        amountPayOne = checkNumber(+priceRawOne - +discountedOne);
       }
 
       products_order_applied.push({
         ...product,
         summary: {
-          amountE,
-          discountE,
-          amountPayE,
-          discount_description,
+          priceRawOne,
+          discountedOne,
+          amountPayOne,
         },
       });
     });
@@ -201,26 +207,28 @@ class DiscountServices {
     discount_type,
     discount_value,
     discount_productIds,
-    discount_description,
   }) => {
     const products_order_applied = [];
 
     products_order.map((product) => {
-      const amountE = +product.price * +product.quantity;
-      const discountEachProduct = +(discount_type === "fixed_amount"
-        ? discount_value
-        : ((+product.price * discount_value) / 100).toFixed(0));
+      const priceRawOne = +product.price * +product.quantity;
+      const discountEachProduct =
+        discount_type === "fixed_amount"
+          ? +discount_value
+          : toFixedNumber((+product.price * discount_value) / 100, 1);
 
-      const discountE = discountEachProduct * +product?.quantity;
+      const discountedOne = toFixedNumber(
+        discountEachProduct * +product?.quantity,
+        1
+      );
 
-      const amountPayE = checkNumber(+amountE - +discountE);
+      const amountPayOne = checkNumber(+priceRawOne - +discountedOne);
       products_order_applied.push({
         ...product,
         summary: {
-          amountE,
-          discountE,
-          amountPayE,
-          discount_description,
+          priceRawOne,
+          discountedOne,
+          amountPayOne,
         },
       });
     });
@@ -294,22 +302,24 @@ class DiscountServices {
           discount_type,
           discount_value,
           discount_productIds,
-          discount_description,
         }
       );
 
       const summary = products_order_applied.reduce((acc, product) => {
-        acc.discountAmount =
-          +(acc.discountAmount ?? 0) + +product.summary.discountE;
-        acc.orderTotalAmountPay =
-          +(acc.amountPayE ?? 0) + +product.summary.amountPayE;
+        acc.totalAmountForCoupon =
+          +(acc.totalAmountForCoupon ?? 0) + +product.summary.priceRawOne;
+        acc.totalDiscountedForCoupon =
+          +(acc.totalDiscountedForCoupon ?? 0) + +product.summary.discountedOne;
+        acc.totalPayForCoupon =
+          +(acc.totalPayForCoupon ?? 0) + +product.summary.amountPayOne;
 
         return acc;
       }, {});
 
       return {
-        orderTotalAmount,
         ...summary,
+        discount_code,
+        discount_description,
         products_order_applied,
       };
     }

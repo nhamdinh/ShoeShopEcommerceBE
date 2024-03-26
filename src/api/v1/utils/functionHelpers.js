@@ -101,9 +101,15 @@ const checkNumber = (valNum) => {
   return valNum < 1 ? 1 : valNum;
 };
 
+const toFixedNumber = (valNum, toFixed) => {
+  const num = +valNum;
+  return +num.toFixed(toFixed);
+};
+
 module.exports = {
   removeNullObject,
   updateNestedObjectParser,
   toNonAccentVietnamese,
   checkNumber,
+  toFixedNumber,
 };

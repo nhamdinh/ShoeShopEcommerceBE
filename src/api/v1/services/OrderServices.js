@@ -225,7 +225,8 @@ class OrderServices {
 
     const objCart = foundCarts[0];
 
-    const checkCart = {
+    const result = {
+      checkCart: {
         userId,
         cartId,
         shopId,
@@ -235,8 +236,9 @@ class OrderServices {
         totalDiscount: 0,
         totalAmountPay: 0,
       },
-      orderItemsNew = []; /* luon chi co 1 */
-
+      orderItemsNew: {},
+    };
+    const { checkCart } = result;
     const { cart_products = [] } = objCart;
     const checkProducts = await checkPriceProductsRepo(cart_products);
 
@@ -267,29 +269,24 @@ class OrderServices {
         throw new ForbiddenRequestError("Order Wrong!");
 
       checkCart.totalDiscount = calculateDiscounts.reduce(
-        (acc, item) => +acc + +item.discountAmount,
+        (acc, item) => +acc + +item.totalDiscountedForCoupon,
         [0]
       );
       const { totalAmount, totalDiscount } = checkCart;
-      const orderItemNew = {
+      result.orderItemsNew = {
         shopId,
         itemProducts: calculateDiscounts,
         priceRaw: totalAmount,
         discounted: totalDiscount,
         priceAppliedDiscount: checkNumber(totalAmount - totalDiscount),
       };
-
-      orderItemsNew.push(orderItemNew);
     }
     const { totalAmount, totalDiscount, feeShip } = checkCart;
 
     checkCart.totalAmountPay = checkNumber(
       totalAmount - totalDiscount - feeShip
     );
-    return {
-      orderItemsNew,
-      checkCart,
-    };
+    return result;
   };
 
   static checkoutReviewCart = async ({
