@@ -177,11 +177,6 @@ class CartServices {
       },
     });
 
-
-
-
-
-
     const foundCart = foundCarts.find(
       (cart) =>
         cart.cart_userId._id.toString() === cart_userId.toString() &&
@@ -191,7 +186,7 @@ class CartServices {
     if (!foundCart && cart_shopId.toString()) {
       const newCart = await CartServices.createCart({
         cart_userId,
-        cart_shopId
+        cart_shopId,
       });
 
       return [newCart];
@@ -222,10 +217,6 @@ class CartServices {
       },
     });
 
-
-
-
-
     return foundCarts;
 
     /* return 1 arr ( vì có thể lỗi nên tồn tại > 1 cart) => update toàn bộ arr cart */
@@ -241,7 +232,6 @@ class CartServices {
     //   });
     // }
   };
-
 
   static deleteCart = async ({
     cart_userId = convertToObjectId(cart_userId),

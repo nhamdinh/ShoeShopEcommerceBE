@@ -22,6 +22,7 @@ const {
   findUserByIdRepo,
 } = require("../repositories/user.repo");
 const { checkNumber } = require("../utils/functionHelpers");
+const { acquireLock, releaseLock } = require("./redis.service");
 /**
  * 1. Create New Order [User]
  * 2. Query Orders [User]
@@ -240,12 +241,12 @@ class OrderServices {
     };
     const { checkCart } = result;
     const { cart_products = [] } = objCart;
-    const checkProducts = await checkPriceProductsRepo(cart_products);
+    const checkedProducts = await checkPriceProductsRepo(cart_products);
 
-    if (checkProducts.includes(undefined))
+    if (checkedProducts.includes(undefined))
       throw new ForbiddenRequestError("Order Wrong!");
 
-    checkCart.totalAmount = checkProducts.reduce((access, product) => {
+    checkCart.totalAmount = checkedProducts.reduce((access, product) => {
       return +access + +product.price * +product.quantity;
     }, 0);
 
@@ -256,7 +257,7 @@ class OrderServices {
             discount_code: coupon.discount_code,
             discount_shopId: shopId,
             discount_used_userId: convertToObjectId(userId),
-            products_order: checkProducts,
+            products_order: checkedProducts,
           });
 
           if (objDiscount) {
@@ -286,6 +287,7 @@ class OrderServices {
     checkCart.totalAmountPay = checkNumber(
       totalAmount - totalDiscount - feeShip
     );
+    result.checkedProducts = checkedProducts;
     return result;
   };
 
@@ -295,7 +297,7 @@ class OrderServices {
     userId,
     cartsReview,
   }) => {
-    const cartReviewed = await Promise.all(
+    const cartsReviewed = await Promise.all(
       cartsReview.map(async (cartReview) => {
         const { cartId, orderItems, shopDiscount, shopId } = cartReview;
 
@@ -311,7 +313,7 @@ class OrderServices {
       })
     );
 
-    return cartReviewed;
+    return cartsReviewed;
   };
 
   static checkoutOrder = async ({
@@ -320,82 +322,91 @@ class OrderServices {
     userId,
     cartsReview,
   }) => {
-    const cartReviewed = await Promise.all(
-      cartsReview.map(async (cartReview) => {
-        const { cartId, orderItems, shopDiscount, shopId } = cartReview;
-
-        const obj = await OrderServices.checkoutCartUtil({
-          cartId,
-          userId,
-          orderItems,
-          shopDiscount,
-          shopId,
-        });
-
-        if (obj) return obj;
-      })
-    );
-
-    const addressArr = await findAddressByUserRepo({
-      userId: convertToObjectId(userId),
+    const cartsReviewed = await OrderServices.checkoutReviewCart({
+      userId,
+      cartsReview,
     });
 
-    let createAddress = {};
-    if (addressArr.length > 0) {
-      createAddress = addressArr[0];
-    } else {
-      throw new ForbiddenRequestError("User have Address YET", 400);
+    /* check product again */
+    // const checkedProducts = orderItemsNew.flatMap((order) => order.itemProducts);
+
+    for (let i = 0; i < cartsReviewed.length; i++) {
+      const cartReviewed = cartsReviewed[i];
+      const { checkedProducts, checkCart } = cartReviewed;
+
+      const acquireProducts = [];
+      for (let i = 0; i < checkedProducts.length; i++) {
+        const { quantity, price, product_id } = checkedProducts[i];
+
+        const keyLock = await acquireLock(
+          product_id,
+          quantity,
+          checkCart.cartId
+        );
+
+        logger.info(
+          `result :::keyLock ${util.inspect(keyLock, {
+            showHidden: false,
+            depth: null,
+            colors: false,
+          })}`
+        );
+
+
+        acquireProducts.push(keyLock ? true : false);
+        // if (keyLock) await releaseLock(keyLock);/* done update Inventory */
+      }
+      if (acquireProducts.includes(false)) {
+        throw new ForbiddenRequestError("Have been update product, please turn back cart", 401);
+      }
     }
 
-    const orders = await Promise.all(
-      cartReviewed.map(async (cart) => {
-        const order = await createOrderRepo({
-          userId: convertToObjectId(cart?.checkCart?.userId),
-          shippingAddress: createAddress?._id,
-          cartId: convertToObjectId(cart?.checkCart?.cartId),
-          shopId: convertToObjectId(cart?.orderItems[0]?.shopId),
-
-          orderItems: cart?.orderItems,
-          paymentMethod: "Paypal",
-          taxPrice: 0,
-          feeShip: cart?.checkCart?.feeShip,
-          totalAmount: cart?.checkCart?.totalAmount,
-          totalAmountPay: cart?.checkCart?.totalAmountPay,
-          totalDiscount: cart?.checkCart?.totalDiscount,
-        });
-        const updateSet = {
-          completedAt: Date.now(),
-          cart_state: "completed",
-        };
-        await findByIdAndUpdateCartRepo({
-          id: convertToObjectId(cart?.checkCart?.cartId),
-          updateSet,
-        });
-
-        if (order) return order;
-      })
-    );
-
-    return orders;
-
-    // const { orderItemsNew } = await OrderServices.checkoutReviewCart({
-    //   cartId,
-    //   userId,
-    //   orderItems,
+    // const addressArr = await findAddressByUserRepo({
+    //   userId: convertToObjectId(userId),
     // });
-    /* check product again */
-    // const products = orderItemsNew.flatMap((order) => order.itemProducts);
 
-    // for (let i = 0; i < products.length; i++) {
-    //   const { quantity, price, productId } = products[i];
-    //   //   logger.info(
-    //   //     `products ${[i]}::: ${util.inspect(products[i], {
-    //   //       showHidden: false,
-    //   //       depth: null,
-    //   //       colors: false,
-    //   //     })}`
-    //   //   );
+    // let createAddress = {};
+    // if (addressArr.length > 0) {
+    //   createAddress = addressArr[0];
+    // } else {
+    //   throw new ForbiddenRequestError("User have Address YET", 400);
     // }
+
+    // const orders = await Promise.all(
+    //   cartsReviewed.map(async (cart) => {
+    //     const orderNew = await createOrderRepo({
+    //       userId: convertToObjectId(cart?.checkCart?.userId),
+    //       shippingAddress: createAddress?._id,
+    //       cartId: convertToObjectId(cart?.checkCart?.cartId),
+    //       shopId: convertToObjectId(cart?.orderItems[0]?.shopId),
+
+    //       orderItems: cart?.orderItems,
+    //       paymentMethod: "Paypal",
+    //       taxPrice: 0,
+    //       feeShip: cart?.checkCart?.feeShip,
+    //       totalAmount: cart?.checkCart?.totalAmount,
+    //       totalAmountPay: cart?.checkCart?.totalAmountPay,
+    //       totalDiscount: cart?.checkCart?.totalDiscount,
+    //     });
+
+    //     if (orderNew) {
+    //       const updateSet = {
+    //         completedAt: Date.now(),
+    //         cart_state: "completed",
+    //       };
+    //       await findByIdAndUpdateCartRepo({
+    //         id: convertToObjectId(cart?.checkCart?.cartId),
+    //         updateSet,
+    //       });
+
+    //       return orderNew;
+    //     }
+    //   })
+    // );
+
+    // return orders;
+
+    return cartsReviewed;
   };
 }
 
