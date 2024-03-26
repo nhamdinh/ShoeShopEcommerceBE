@@ -76,7 +76,7 @@ const updateNestedObjectParser = (obj) => {
   return final;
 };
 
-const  toNonAccentVietnamese = (str) => {
+const toNonAccentVietnamese = (str) => {
   str = str.replace(/A|Á|À|Ã|Ạ|Ả|Â|Ấ|Ầ|Ẫ|Ậ|Ẩ|Ă|Ắ|Ằ|Ẵ|Ặ|Ẳ/g, "A");
   str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, "a");
   str = str.replace(/E|É|È|Ẽ|Ẹ|Ẻ|Ê|Ế|Ề|Ễ|Ệ|Ể/, "E");
@@ -95,10 +95,15 @@ const  toNonAccentVietnamese = (str) => {
   // str = str.replace(/\u0300|\u0301|\u0303|\u0309|\u0323/g, ""); // Huyền sắc hỏi ngã nặng
   // str = str.replace(/\u02C6|\u0306|\u031B/g, ""); // Â, Ê, Ă, Ơ, Ư
   return str;
-}
+};
+
+const checkNumber = (valNum) => {
+  return valNum < 1 ? 1 : valNum;
+};
 
 module.exports = {
   removeNullObject,
   updateNestedObjectParser,
   toNonAccentVietnamese,
+  checkNumber,
 };

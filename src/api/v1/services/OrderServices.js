@@ -21,6 +21,7 @@ const {
   findAllUsersOrdersRepo,
   findUserByIdRepo,
 } = require("../repositories/user.repo");
+const { checkNumber } = require("../utils/functionHelpers");
 /**
  * 1. Create New Order [User]
  * 2. Query Orders [User]
@@ -234,7 +235,7 @@ class OrderServices {
         totalDiscount: 0,
         totalAmountPay: 0,
       },
-      orderItemsNew = [];/* luon chi co 1 */
+      orderItemsNew = []; /* luon chi co 1 */
 
     const { cart_products = [] } = objCart;
     const checkProducts = await checkPriceProductsRepo(cart_products);
@@ -265,41 +266,26 @@ class OrderServices {
       if (calculateDiscounts.includes(undefined))
         throw new ForbiddenRequestError("Order Wrong!");
 
-    logger.info(
-      `calculateDiscounts ::: ${util.inspect(calculateDiscounts, {
-        showHidden: false,
-        depth: null,
-        colors: false,
-      })}`
-    );
-
-
-
-
       checkCart.totalDiscount = calculateDiscounts.reduce(
         (acc, item) => +acc + +item.discountAmount,
         [0]
       );
-
+      const { totalAmount, totalDiscount } = checkCart;
       const orderItemNew = {
         shopId,
-        itemProducts: checkProducts,
-        priceRaw: checkCart.totalAmount,
-        discounted: checkCart.totalDiscount,
-        priceAppliedDiscount:
-          checkCart.totalAmount - checkCart.totalDiscount < 1
-            ? 1
-            : checkCart.totalAmount - checkCart.totalDiscount,
+        itemProducts: calculateDiscounts,
+        priceRaw: totalAmount,
+        discounted: totalDiscount,
+        priceAppliedDiscount: checkNumber(totalAmount - totalDiscount),
       };
 
       orderItemsNew.push(orderItemNew);
     }
+    const { totalAmount, totalDiscount, feeShip } = checkCart;
 
-    checkCart.totalAmountPay =
-      checkCart.totalAmount - checkCart.totalDiscount - checkCart.feeShip < 1
-        ? 1
-        : checkCart.totalAmount - checkCart.totalDiscount - checkCart.feeShip;
-
+    checkCart.totalAmountPay = checkNumber(
+      totalAmount - totalDiscount - feeShip
+    );
     return {
       orderItemsNew,
       checkCart,
@@ -312,7 +298,6 @@ class OrderServices {
     userId,
     cartsReview,
   }) => {
-    const startTime = performance.now();
     const cartReviewed = await Promise.all(
       cartsReview.map(async (cartReview) => {
         const { cartId, orderItems, shopDiscount, shopId } = cartReview;
@@ -329,15 +314,6 @@ class OrderServices {
       })
     );
 
-    const endTime = performance.now();
-    logger.info(
-      `endTime - startTime ::: ${util.inspect(endTime - startTime, {
-        showHidden: false,
-        depth: null,
-        colors: false,
-      })}`
-    );
-
     return cartReviewed;
   };
 
@@ -349,12 +325,14 @@ class OrderServices {
   }) => {
     const cartReviewed = await Promise.all(
       cartsReview.map(async (cartReview) => {
-        const { cartId, orderItems } = cartReview;
+        const { cartId, orderItems, shopDiscount, shopId } = cartReview;
 
         const obj = await OrderServices.checkoutCartUtil({
           cartId,
           userId,
           orderItems,
+          shopDiscount,
+          shopId,
         });
 
         if (obj) return obj;

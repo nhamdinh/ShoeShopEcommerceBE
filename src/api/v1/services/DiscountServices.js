@@ -12,7 +12,7 @@ const {
 const { convertToObjectId } = require("../utils/getInfo");
 const { findAllProductsRepo } = require("../repositories/product.repo");
 const ProductServices = require("./ProductServices");
-const { removeNullObject } = require("../utils/functionHelpers");
+const { removeNullObject, checkNumber } = require("../utils/functionHelpers");
 
 /**
  * 1. Generator Discount Code [Shop | Admin]
@@ -149,6 +149,84 @@ class DiscountServices {
     return foundDiscounts;
   };
 
+  static DiscountStrategy = {
+    products_special: (props) =>
+      DiscountServices.discountStrategySpecial(props),
+    all: (props) => DiscountServices.discountStrategyAll(props),
+  };
+
+  static getDiscountStrategy = (type, props) => {
+    return DiscountServices.DiscountStrategy[type](props);
+  };
+
+  static discountStrategySpecial = ({
+    products_order,
+    discount_type,
+    discount_value,
+    discount_productIds,
+    discount_description,
+  }) => {
+    const products_order_applied = [];
+
+    products_order.map((product) => {
+      const amountE = +product.price * +product.quantity;
+      let discountE = 0;
+      let amountPayE = checkNumber(+amountE - +discountE);
+
+      if (discount_productIds.includes(product.product_id)) {
+        const discountEachProduct = +(discount_type === "fixed_amount"
+          ? discount_value
+          : ((+product.price * discount_value) / 100).toFixed(0));
+
+        discountE = discountEachProduct * +product?.quantity;
+
+        amountPayE = checkNumber(+amountE - +discountE);
+      }
+
+      products_order_applied.push({
+        ...product,
+        summary: {
+          amountE,
+          discountE,
+          amountPayE,
+          discount_description,
+        },
+      });
+    });
+    return products_order_applied;
+  };
+
+  static discountStrategyAll = ({
+    products_order,
+    discount_type,
+    discount_value,
+    discount_productIds,
+    discount_description,
+  }) => {
+    const products_order_applied = [];
+
+    products_order.map((product) => {
+      const amountE = +product.price * +product.quantity;
+      const discountEachProduct = +(discount_type === "fixed_amount"
+        ? discount_value
+        : ((+product.price * discount_value) / 100).toFixed(0));
+
+      const discountE = discountEachProduct * +product?.quantity;
+
+      const amountPayE = checkNumber(+amountE - +discountE);
+      products_order_applied.push({
+        ...product,
+        summary: {
+          amountE,
+          discountE,
+          amountPayE,
+          discount_description,
+        },
+      });
+    });
+    return products_order_applied;
+  };
+
   static getDiscountsAmount = async ({
     discount_used_userId,
     discount_code,
@@ -168,6 +246,7 @@ class DiscountServices {
       discount_quantity,
       discount_start,
       discount_end,
+      discount_description,
       discount_order_minValue,
       discount_useMax_user,
       discount_used_users,
@@ -207,56 +286,17 @@ class DiscountServices {
         );
 
       /* => tinh lai discount cho tung mon; ap ma nao cho tung pro */
-      const products_order_applied = [];
-      if (discount_applyTo === "products_special") {
-        products_order.map((product) => {
-          const amountE = +product.price * +product.quantity;
-          let discountE = 0;
-          let amountPayE =
-            +amountE - +discountE < 1 ? 1 : +amountE - +discountE;
 
-          if (discount_productIds.includes(product.product_id)) {
-            const discountEachProduct = +(discount_type === "fixed_amount"
-              ? discount_value
-              : ((+product.price * discount_value) / 100).toFixed(0));
-
-            discountE = discountEachProduct * +product?.quantity;
-
-            amountPayE = +amountE - +discountE < 1 ? 1 : +amountE - +discountE;
-          }
-
-          products_order_applied.push({
-            ...product,
-            summary: {
-              amountE,
-              discountE,
-              amountPayE,
-            },
-          });
-        });
-      }
-
-      if (discount_applyTo === "all") {
-        products_order.map((product) => {
-          const amountE = +product.price * +product.quantity;
-          const discountEachProduct = +(discount_type === "fixed_amount"
-            ? discount_value
-            : ((+product.price * discount_value) / 100).toFixed(0));
-
-          const discountE = discountEachProduct * +product?.quantity;
-
-          const amountPayE =
-            +amountE - +discountE < 1 ? 1 : +amountE - +discountE;
-          products_order_applied.push({
-            ...product,
-            summary: {
-              amountE,
-              discountE,
-              amountPayE,
-            },
-          });
-        });
-      }
+      const products_order_applied = DiscountServices.getDiscountStrategy(
+        discount_applyTo,
+        {
+          products_order,
+          discount_type,
+          discount_value,
+          discount_productIds,
+          discount_description,
+        }
+      );
 
       const summary = products_order_applied.reduce((acc, product) => {
         acc.discountAmount =
