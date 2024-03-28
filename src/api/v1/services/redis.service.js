@@ -8,25 +8,18 @@ const { reservationInventory } = require("./InventoryServices");
 
 const redisClient = redis.createClient();
 
-const pexpire = promisify(redisClient.pexpire).bind(redisClient);
-const setnxAsync = promisify(redisClient.setnx).bind(redisClient);
+const pexpire = promisify(redisClient.PEXPIRE).bind(redisClient);
+const setnxAsync = promisify(redisClient.SETNX).bind(redisClient);
 
 const acquireLock = async (productId, quantity, cartId) => {
   const key = `lock_v2024_${productId}`;
   const retryTimes = 10;
-  const expireTime = 3000; // 3 seconds lock
+  const expireTimer = 3000; // 3 seconds lock
+  const waitTimer = 100;
 
   for (let i = 0; i < retryTimes; i++) {
     // tao 1 key, thang nao giu dc vao thanh toan
-    const result = await setnxAsync(key, expireTime);
-
-    logger.info(
-      `result :::${productId} ${util.inspect(result, {
-        showHidden: false,
-        depth: null,
-        colors: false,
-      })}`
-    );
+    const result = await setnxAsync(key, expireTimer);
 
     if (result === 1) {
       //thao tac voi inventory
@@ -35,22 +28,15 @@ const acquireLock = async (productId, quantity, cartId) => {
         quantity: +quantity,
         cartId,
       });
-      logger.info(
-        `reversation ::: ${util.inspect(reversation, {
-          showHidden: false,
-          depth: null,
-          colors: false,
-        })}`
-      );
 
-      await releaseLock(key);/* ko update dc Inventory */
+      await releaseLock(key); /* ko update dc Inventory */
       if (reversation) {
-        await pexpire(key, expireTime);
+        // await pexpire(key, expireTimer);
         return key;
       }
       return null;
     } else {
-      await new Promise((resolve) => setTimeout(resolve, 50));
+      await new Promise((resolve) => setTimeout(resolve, waitTimer));
     }
   }
 
@@ -58,7 +44,7 @@ const acquireLock = async (productId, quantity, cartId) => {
 };
 
 const releaseLock = async (keyLock) => {
-  const delAsyncKey = promisify(redisClient.del).bind(redisClient);
+  const delAsyncKey = promisify(redisClient.DEL).bind(redisClient);
   return delAsyncKey(keyLock);
 };
 

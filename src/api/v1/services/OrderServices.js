@@ -276,7 +276,7 @@ class OrderServices {
       const { totalAmount, totalDiscount } = checkCart;
       result.orderItemsNew = {
         shopId,
-        itemProducts: calculateDiscounts,
+        itemProductsForCoupons: calculateDiscounts,
         priceRaw: totalAmount,
         discounted: totalDiscount,
         priceAppliedDiscount: checkNumber(totalAmount - totalDiscount),
@@ -329,37 +329,110 @@ class OrderServices {
 
     /* check product again */
     // const checkedProducts = orderItemsNew.flatMap((order) => order.itemProducts);
+    const acquireProducts = [];
+    const orders = await Promise.all(
+      cartsReviewed.map(async (cart) => {
+        const cartReviewed = { ...cart };
+        const { checkedProducts, checkCart } = cartReviewed;
 
-    for (let i = 0; i < cartsReviewed.length; i++) {
-      const cartReviewed = cartsReviewed[i];
-      const { checkedProducts, checkCart } = cartReviewed;
+        for (let i = 0; i < checkedProducts.length; i++) {
+          const { quantity, price, product_id } = checkedProducts[i];
 
-      const acquireProducts = [];
-      for (let i = 0; i < checkedProducts.length; i++) {
-        const { quantity, price, product_id } = checkedProducts[i];
+          const keyLock = await acquireLock(
+            product_id,
+            quantity,
+            checkCart.cartId
+          );
+          acquireProducts.push(keyLock ? true : false);
+          // if (keyLock) await releaseLock(keyLock);/* done update Inventory */
+          if (keyLock) {
+            /* create order */
 
-        const keyLock = await acquireLock(
-          product_id,
-          quantity,
-          checkCart.cartId
-        );
+            const addressArr = await findAddressByUserRepo({
+              userId: convertToObjectId(userId),
+            });
 
-        logger.info(
-          `result :::keyLock ${util.inspect(keyLock, {
-            showHidden: false,
-            depth: null,
-            colors: false,
-          })}`
-        );
+            let createAddress = {};
+            if (addressArr.length > 0) {
+              createAddress = addressArr[0];
+            } else {
+              throw new ForbiddenRequestError("User have Address YET", 400);
+            }
 
+            const zzz = {
+              userId: convertToObjectId(cartReviewed?.checkCart?.userId),
+              shippingAddress: convertToObjectId(createAddress?._id),
+              cartId: convertToObjectId(cartReviewed?.checkCart?.cartId),
+              shopId: convertToObjectId(cartReviewed?.checkCart?.shopId),
 
-        acquireProducts.push(keyLock ? true : false);
-        // if (keyLock) await releaseLock(keyLock);/* done update Inventory */
-      }
-      if (acquireProducts.includes(false)) {
-        throw new ForbiddenRequestError("Have been update product, please turn back cart", 401);
-      }
+              orderItems: cartReviewed?.checkedProducts,
+              paymentMethod: "Paypal",
+              taxPrice: 0,
+              feeShip: cartReviewed?.checkCart?.feeShip,
+              totalAmount: cartReviewed?.checkCart?.totalAmount,
+              totalAmountPay: cartReviewed?.checkCart?.totalAmountPay,
+              totalDiscount: cartReviewed?.checkCart?.totalDiscount,
+            };
+
+            // const orderNew = await createOrderRepo(zzz);
+
+            // if (orderNew) {
+            //   const updateSet = {
+            //     completedAt: Date.now(),
+            //     cart_state: "completed",
+            //   };
+            //   await findByIdAndUpdateCartRepo({
+            //     id: convertToObjectId(cartReviewed?.checkCart?.cartId),
+            //     updateSet,
+            //   });
+
+            //   return orderNew;
+            // }
+
+            // const orders = await Promise.all(
+            //   cartsReviewed.map(async (cart) => {
+            //     const orderNew = await createOrderRepo({
+            //       userId: convertToObjectId(cart?.checkCart?.userId),
+            //       shippingAddress: createAddress?._id,
+            //       cartId: convertToObjectId(cart?.checkCart?.cartId),
+            //       shopId: convertToObjectId(cart?.orderItems[0]?.shopId),
+
+            //       orderItems: cart?.orderItems,
+            //       paymentMethod: "Paypal",
+            //       taxPrice: 0,
+            //       feeShip: cart?.checkCart?.feeShip,
+            //       totalAmount: cart?.checkCart?.totalAmount,
+            //       totalAmountPay: cart?.checkCart?.totalAmountPay,
+            //       totalDiscount: cart?.checkCart?.totalDiscount,
+            //     });
+
+            //     if (orderNew) {
+            //       const updateSet = {
+            //         completedAt: Date.now(),
+            //         cart_state: "completed",
+            //       };
+            //       await findByIdAndUpdateCartRepo({
+            //         id: convertToObjectId(cart?.checkCart?.cartId),
+            //         updateSet,
+            //       });
+
+            //       return orderNew;
+            //     }
+            //   })
+            // );
+
+            // return orders;
+          }
+        }
+      })
+    );
+    if (acquireProducts.includes(false)) {
+      throw new ForbiddenRequestError(
+        "Have been update product, please turn back cart",
+        401
+      );
     }
+    return orders;
 
     // const addressArr = await findAddressByUserRepo({
     //   userId: convertToObjectId(userId),
