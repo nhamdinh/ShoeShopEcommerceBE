@@ -13,6 +13,9 @@ const redisClient = redis.createClient();
 const pexpire = promisify(redisClient.PEXPIRE).bind(redisClient);
 const setnxAsync = promisify(redisClient.SETNX).bind(redisClient);
 
+const getAsync = promisify(redisClient.GET).bind(redisClient);
+const setAsync = promisify(redisClient.SET).bind(redisClient);
+
 const acquireLock = async (productId, quantity, cartId) => {
   const key = `lock_v2024_${productId}`;
   const retryTimes = 10;
@@ -64,4 +67,6 @@ const releaseLock = async (keyLock) => {
 module.exports = {
   acquireLock,
   releaseLock,
+  setAsync,
+  getAsync,
 };

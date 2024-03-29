@@ -15,7 +15,11 @@ const {
   updateProductByIdRepo,
 } = require("../repositories/product.repo");
 const { findUserByIdRepo } = require("../repositories/user.repo");
-const { PRODUCT_TYPE } = require("../utils/constant");
+const {
+  PRODUCT_TYPE,
+  RD_ALL_PRODUCTS,
+  RD_EXPIRE,
+} = require("../utils/constant");
 const { convertToObjectId } = require("../utils/getInfo");
 const InventoryServices = require("./InventoryServices");
 const { createReviewRepo } = require("../repositories/review.repo");
@@ -25,6 +29,7 @@ const {
   removeNullObject,
   updateNestedObjectParser,
 } = require("../utils/functionHelpers");
+const { setAsync, getAsync } = require("./redis.service");
 
 class ProductFactory {
   static productTypeStrategy = {
@@ -154,21 +159,19 @@ class ProductFactory {
       "product_attributes.brand": { $regex: regexSearchBrand },
     };
 
-    // logger.info(
-    //   `filter ::: ${util.inspect(filter, {
-    //     showHidden: false,
-    //     depth: null,
-    //     colors: false,
-    //   })}`
-    // );
+    const cachedData = await getAsync(RD_ALL_PRODUCTS);
 
-    return await findAllProductsRepo({
+    if (cachedData) return JSON.parse(cachedData);
+
+    const metadata = await findAllProductsRepo({
       sort,
       limit,
       page,
       filter,
       select,
     });
+    await setAsync(RD_ALL_PRODUCTS, JSON.stringify(metadata), "EX", RD_EXPIRE);
+    return metadata;
   };
 
   static checkUserIsBuy = async (req) => {
@@ -354,13 +357,14 @@ const classRefStrategy = (type) => {
         updateNestedObjectParser(objectParams)
       );
 
-      const updatedInventory = await InventoryServices.findOneAndUpdateInventory({
-        filter: { inven_productId: updatedProduct._id},
-        updateSet: {
-          inven_product_slug: updatedProduct.product_slug,
-          inven_stock: updatedProduct.product_quantity,
-        },
-      });
+      const updatedInventory =
+        await InventoryServices.findOneAndUpdateInventory({
+          filter: { inven_productId: updatedProduct._id },
+          updateSet: {
+            inven_product_slug: updatedProduct.product_slug,
+            inven_stock: updatedProduct.product_quantity,
+          },
+        });
 
       // logger.info(
       //   `updatedInventory ::: ${util.inspect(updatedInventory, {
@@ -370,7 +374,8 @@ const classRefStrategy = (type) => {
       //   })}`
       // );
 
-      if(!updatedInventory) throw new ForbiddenRequestError("update Inventory failed");
+      if (!updatedInventory)
+        throw new ForbiddenRequestError("update Inventory failed");
 
       return updatedProduct;
     }
