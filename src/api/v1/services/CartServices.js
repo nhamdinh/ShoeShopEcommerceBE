@@ -95,8 +95,8 @@ class CartServices {
       /* add new item */
       const newProductOnCart = {
         product_id,
-        image,
-        name,
+        image:foundProduct.product_thumb,
+        name:foundProduct.product_name,
         quantity,
         price: +foundProduct.product_price,
       };

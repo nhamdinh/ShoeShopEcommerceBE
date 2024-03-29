@@ -195,7 +195,7 @@ class OrderServices {
               price: 22,
             },
           ],
-          shopDiscount: [
+          shopDiscounts: [
             {
               discount_shopId: "6566d9bb48178823d8d43919",
               discount_code: "TANG40",
@@ -209,7 +209,7 @@ class OrderServices {
   static checkoutCartUtil = async ({
     cartId,
     userId,
-    shopDiscount,
+    shopDiscounts,
     shopId,
   }) => {
     const foundCarts = await findCartsRepo({
@@ -231,7 +231,7 @@ class OrderServices {
         userId,
         cartId,
         shopId,
-        shopDiscount,
+        shopDiscounts,
         totalAmount: 0,
         feeShip: 9,
         totalDiscount: 0,
@@ -250,9 +250,15 @@ class OrderServices {
       return +access + +product.price * +product.quantity;
     }, 0);
 
-    if (shopDiscount.length) {
+    const uniqueCodes = [
+      ...new Set(shopDiscounts.map((sss) => sss.discount_code)),
+    ];
+    if (uniqueCodes.length !== shopDiscounts.length)
+      throw new ForbiddenRequestError("The same CODES cannot be applied");
+
+    if (shopDiscounts.length) {
       const calculateDiscounts = await Promise.all(
-        shopDiscount.map(async (coupon) => {
+        shopDiscounts.map(async (coupon) => {
           const objDiscount = await getDiscountsAmount({
             discount_code: coupon.discount_code,
             discount_shopId: shopId,
@@ -299,13 +305,13 @@ class OrderServices {
   }) => {
     const cartsReviewed = await Promise.all(
       cartsReview.map(async (cartReview) => {
-        const { cartId, orderItems, shopDiscount, shopId } = cartReview;
+        const { cartId, orderItems, shopDiscounts, shopId } = cartReview;
 
         const obj = await OrderServices.checkoutCartUtil({
           cartId,
           userId,
           orderItems,
-          shopDiscount,
+          shopDiscounts,
           shopId,
         });
 
@@ -330,11 +336,12 @@ class OrderServices {
     /* check product again */
     // const checkedProducts = orderItemsNew.flatMap((order) => order.itemProducts);
     const acquireProducts = [];
-    const orders = await Promise.all(
+    const ordersNew = await Promise.all(
       cartsReviewed.map(async (cart) => {
         const cartReviewed = { ...cart };
         const { checkedProducts, checkCart } = cartReviewed;
 
+        const acquireProductsItem = [];
         for (let i = 0; i < checkedProducts.length; i++) {
           const { quantity, price, product_id } = checkedProducts[i];
 
@@ -344,85 +351,87 @@ class OrderServices {
             checkCart.cartId
           );
           acquireProducts.push(keyLock ? true : false);
+          acquireProductsItem.push(keyLock ? true : false);
           // if (keyLock) await releaseLock(keyLock);/* done update Inventory */
-          if (keyLock) {
-            /* create order */
+        }
 
-            const addressArr = await findAddressByUserRepo({
-              userId: convertToObjectId(userId),
+        if (!acquireProductsItem.includes(false)) {
+          /* create order */
+          const addressArr = await findAddressByUserRepo({
+            userId: convertToObjectId(userId),
+          });
+
+          let createAddress = {};
+          if (addressArr.length > 0) {
+            createAddress = addressArr[0];
+          } else {
+            throw new ForbiddenRequestError("User have Address YET", 400);
+          }
+
+          const zzz = {
+            userId: convertToObjectId(cartReviewed?.checkCart?.userId),
+            shippingAddress: convertToObjectId(createAddress?._id),
+            cartId: convertToObjectId(cartReviewed?.checkCart?.cartId),
+            shopId: convertToObjectId(cartReviewed?.checkCart?.shopId),
+
+            orderItems: cartReviewed?.checkedProducts,
+            shopDiscounts: cartReviewed?.checkCart?.shopDiscounts,
+            paymentMethod: "Paypal",
+            taxPrice: 0,
+            feeShip: cartReviewed?.checkCart?.feeShip,
+            totalAmount: cartReviewed?.checkCart?.totalAmount,
+            totalAmountPay: cartReviewed?.checkCart?.totalAmountPay,
+            totalDiscount: cartReviewed?.checkCart?.totalDiscount,
+          };
+
+          const orderNew = await createOrderRepo(zzz);
+
+          if (orderNew) {
+            const updateSet = {
+              completedAt: Date.now(),
+              cart_state: "completed",
+            };
+            await findByIdAndUpdateCartRepo({
+              id: convertToObjectId(cartReviewed?.checkCart?.cartId),
+              updateSet,
             });
 
-            let createAddress = {};
-            if (addressArr.length > 0) {
-              createAddress = addressArr[0];
-            } else {
-              throw new ForbiddenRequestError("User have Address YET", 400);
-            }
-
-            const zzz = {
-              userId: convertToObjectId(cartReviewed?.checkCart?.userId),
-              shippingAddress: convertToObjectId(createAddress?._id),
-              cartId: convertToObjectId(cartReviewed?.checkCart?.cartId),
-              shopId: convertToObjectId(cartReviewed?.checkCart?.shopId),
-
-              orderItems: cartReviewed?.checkedProducts,
-              paymentMethod: "Paypal",
-              taxPrice: 0,
-              feeShip: cartReviewed?.checkCart?.feeShip,
-              totalAmount: cartReviewed?.checkCart?.totalAmount,
-              totalAmountPay: cartReviewed?.checkCart?.totalAmountPay,
-              totalDiscount: cartReviewed?.checkCart?.totalDiscount,
-            };
-
-            // const orderNew = await createOrderRepo(zzz);
-
-            // if (orderNew) {
-            //   const updateSet = {
-            //     completedAt: Date.now(),
-            //     cart_state: "completed",
-            //   };
-            //   await findByIdAndUpdateCartRepo({
-            //     id: convertToObjectId(cartReviewed?.checkCart?.cartId),
-            //     updateSet,
-            //   });
-
-            //   return orderNew;
-            // }
-
-            // const orders = await Promise.all(
-            //   cartsReviewed.map(async (cart) => {
-            //     const orderNew = await createOrderRepo({
-            //       userId: convertToObjectId(cart?.checkCart?.userId),
-            //       shippingAddress: createAddress?._id,
-            //       cartId: convertToObjectId(cart?.checkCart?.cartId),
-            //       shopId: convertToObjectId(cart?.orderItems[0]?.shopId),
-
-            //       orderItems: cart?.orderItems,
-            //       paymentMethod: "Paypal",
-            //       taxPrice: 0,
-            //       feeShip: cart?.checkCart?.feeShip,
-            //       totalAmount: cart?.checkCart?.totalAmount,
-            //       totalAmountPay: cart?.checkCart?.totalAmountPay,
-            //       totalDiscount: cart?.checkCart?.totalDiscount,
-            //     });
-
-            //     if (orderNew) {
-            //       const updateSet = {
-            //         completedAt: Date.now(),
-            //         cart_state: "completed",
-            //       };
-            //       await findByIdAndUpdateCartRepo({
-            //         id: convertToObjectId(cart?.checkCart?.cartId),
-            //         updateSet,
-            //       });
-
-            //       return orderNew;
-            //     }
-            //   })
-            // );
-
-            // return orders;
+            return orderNew;
           }
+
+          // const orders = await Promise.all(
+          //   cartsReviewed.map(async (cart) => {
+          //     const orderNew = await createOrderRepo({
+          //       userId: convertToObjectId(cart?.checkCart?.userId),
+          //       shippingAddress: createAddress?._id,
+          //       cartId: convertToObjectId(cart?.checkCart?.cartId),
+          //       shopId: convertToObjectId(cart?.orderItems[0]?.shopId),
+
+          //       orderItems: cart?.orderItems,
+          //       paymentMethod: "Paypal",
+          //       taxPrice: 0,
+          //       feeShip: cart?.checkCart?.feeShip,
+          //       totalAmount: cart?.checkCart?.totalAmount,
+          //       totalAmountPay: cart?.checkCart?.totalAmountPay,
+          //       totalDiscount: cart?.checkCart?.totalDiscount,
+          //     });
+
+          //     if (orderNew) {
+          //       const updateSet = {
+          //         completedAt: Date.now(),
+          //         cart_state: "completed",
+          //       };
+          //       await findByIdAndUpdateCartRepo({
+          //         id: convertToObjectId(cart?.checkCart?.cartId),
+          //         updateSet,
+          //       });
+
+          //       return orderNew;
+          //     }
+          //   })
+          // );
+
+          // return orders;
         }
       })
     );
@@ -432,7 +441,7 @@ class OrderServices {
         401
       );
     }
-    return orders;
+    return ordersNew;
 
     // const addressArr = await findAddressByUserRepo({
     //   userId: convertToObjectId(userId),

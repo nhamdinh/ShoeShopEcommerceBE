@@ -5,6 +5,8 @@ const logger = require("../log");
 const redis = require("redis");
 const { promisify } = require("util");
 const { reservationInventory } = require("./InventoryServices");
+const { updateProductByIdRepo } = require("../repositories/product.repo");
+const { convertToObjectId } = require("../utils/getInfo");
 
 const redisClient = redis.createClient();
 
@@ -27,6 +29,17 @@ const acquireLock = async (productId, quantity, cartId) => {
         productId,
         quantity: +quantity,
         cartId,
+      });
+
+      const bodyUpdate = {
+        $inc: {
+          product_quantity: -quantity,
+        },
+      };
+
+      await updateProductByIdRepo("product", {
+        product_id: convertToObjectId(productId),
+        bodyUpdate,
       });
 
       await releaseLock(key); /* ko update dc Inventory */

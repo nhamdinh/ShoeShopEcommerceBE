@@ -45,6 +45,10 @@ const orderSchema = Schema(
       type: Array,
       default: [],
     },
+    shopDiscounts: {
+      type: Array,
+      default: [],
+    },
     paymentMethod: {
       type: String,
       required: true,

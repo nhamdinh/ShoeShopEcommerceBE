@@ -187,7 +187,7 @@ const findOneProductRepo = async ({ filter }) => {
 
 const updateProductByIdRepo = async (
   type,
-  { product_id, bodyUpdate, isNew = true }
+  { product_id, bodyUpdate, options = { upsert: false, new: true } }
 ) => {
   // logger.info(
   //   `bodyUpdate Repo ::: ${util.inspect(bodyUpdate, {
@@ -196,9 +196,11 @@ const updateProductByIdRepo = async (
   //     colors: false,
   //   })}`
   // );
-  return await ProductModel[type].findByIdAndUpdate(product_id, bodyUpdate, {
-    new: isNew,
-  });
+  return await ProductModel[type].findByIdAndUpdate(
+    product_id,
+    bodyUpdate,
+    options
+  );
 };
 
 const checkPriceProductsRepo = async (products) => {
@@ -212,9 +214,24 @@ const checkPriceProductsRepo = async (products) => {
         return {
           ...product,
           price: foundProduct?.product_price,
+          image: foundProduct?.product_thumb,
+          name: foundProduct?.product_name,
         };
       }
     })
+  );
+};
+
+const findOneAndUpdateProductRepo = async ({
+  filter,
+  updateSet,
+  options = { upsert: false, new: true },
+  /* upsert: them moi(true); new: return du lieu moi */
+}) => {
+  return await ProductModel.product.findOneAndUpdate(
+    filter,
+    updateSet,
+    options
   );
 };
 
@@ -231,4 +248,5 @@ module.exports = {
   findOneProductRepo,
   findProductById1Repo,
   checkPriceProductsRepo,
+  findOneAndUpdateProductRepo,
 };
