@@ -64,7 +64,7 @@ productRoute.get(
 // GET PRODUCT BY ID
 productRoute.get(
   "/detail/:product_id",
-  protect,
+  // protect,
   asyncHandler(productController.findProductById)
 );
 // UPDATE PRODUCT BY ID

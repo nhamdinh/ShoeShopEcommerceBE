@@ -159,9 +159,9 @@ class ProductFactory {
       "product_attributes.brand": { $regex: regexSearchBrand },
     };
 
-    const cachedData = await getAsync(RD_ALL_PRODUCTS);
+    // const cachedData = await getAsync(RD_ALL_PRODUCTS);
 
-    if (cachedData) return JSON.parse(cachedData);
+    // if (cachedData) return JSON.parse(cachedData);
 
     const metadata = await findAllProductsRepo({
       sort,

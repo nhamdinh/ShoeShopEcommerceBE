@@ -19,6 +19,7 @@ routes.use("/api/categorys", require("./v1/categoryRoutes"));
 routes.use("/api/discounts", require("./v1/discountRoutes"));
 routes.use("/api/inventories", require("./v1/inventoryRoutes"));
 routes.use("/api/reviews", require("./v1/reviewRoutes"));
+routes.use("/api/comments", require("./v1/comment.routes"));
 routes.use("/api/thudung", require("./v1/thuDungGio.routes"));
 routes.use("/api/codes", require("./v1/mainCodeRoutes"));
 routes.use("/api", require("./v1/sendEmailRoutes"));
