@@ -37,32 +37,12 @@ const findCommentsRepo = async ({ limit, sort, page, filter, select = [] }) => {
   };
 };
 
-const updateManyCommentRepo = async ({ cmt_productId, rightVal }) => {
-  await CommentModel.updateMany(
-    {
-      cmt_productId,
+const updateManyCommentRepo = async ({ filter, update }) => {
+  await CommentModel.updateMany(filter, update);
+};
 
-      cmt_right: { $gte: rightVal },
-    },
-    {
-      $inc: {
-        cmt_right: 2,
-      },
-    }
-  );
-
-  await CommentModel.updateMany(
-    {
-      cmt_productId,
-
-      cmt_left: { $gt: rightVal },
-    },
-    {
-      $inc: {
-        cmt_left: 2,
-      },
-    }
-  );
+const deleteManyCommentRepo = async ({ filter }) => {
+  await CommentModel.deleteMany(filter);
 };
 
 const getAllInventoriesRepo = async ({ filter }) => {
@@ -98,6 +78,9 @@ const findOneRightRepo = async ({ cmt_productId }) => {
   );
 };
 
+const findOneCommentRepo = async ({ filter }) => {
+  return await CommentModel.findOne(filter).lean();
+};
 module.exports = {
   createCommentRepo,
   getAllInventoriesRepo,
@@ -106,4 +89,6 @@ module.exports = {
   findCommentByIdRepo,
   updateManyCommentRepo,
   findCommentsRepo,
+  findOneCommentRepo,
+  deleteManyCommentRepo,
 };

@@ -23,6 +23,16 @@ class CommentController {
       }),
     }).send(res);
   };
+
+  deleteComments = async (req, res, next) => {
+    new OK({
+      message: "deleteComments OK",
+      metadata: await CommentServices.deleteComments({
+        // params: req.params,
+        body: req.body,
+      }),
+    }).send(res);
+  };
 }
 
 module.exports = new CommentController();
