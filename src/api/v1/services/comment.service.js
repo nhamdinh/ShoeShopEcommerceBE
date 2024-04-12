@@ -41,7 +41,7 @@ class CommentServices {
         convertToObjectId(cmt_parentId)
       );
 
-      if (!parentComment) throw new Error("Comment not Found", 404);
+      if (!parentComment) throw new ForbiddenRequestError("Comment not Found", 404);
 
       rightVal = parentComment.cmt_right;
 
@@ -95,7 +95,7 @@ class CommentServices {
         convertToObjectId(cmt_parentId)
       );
 
-      if (!parentComment) throw new Error("Comment not Found", 404);
+      if (!parentComment) throw new ForbiddenRequestError("Comment not Found", 404);
 
       const metadata = await findCommentsRepo({
         limit,
@@ -146,7 +146,7 @@ class CommentServices {
       },
     });
 
-    if (!foundComment) throw new Error("Comment not Found", 404);
+    if (!foundComment) throw new ForbiddenRequestError("Comment not Found", 404);
     logger.info(
       `foundComment ::: ${util.inspect(foundComment, {
         showHidden: false,
