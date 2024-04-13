@@ -1,7 +1,7 @@
 "use strict";
 const util = require("util");
 const logger = require("../log");
-const { URL_SERVER } = require("../utils/constant");
+const { URL_SERVER, PATH_IMG_PRODUCTS, PATH_IMG_CATEGORYS, PATH_IMG_COMMONS } = require("../utils/constant");
 
 const getUrlFromLocal = (req, res) => {
   const folder = req?.query?.folder;
@@ -36,11 +36,11 @@ const getUrlFromLocal = (req, res) => {
   let url = "";
   try {
     if (folder === "products") {
-      url = URL_SERVER + STORAGE_IMG_PRODUCTS+ "/" + filename;
+      url = URL_SERVER + PATH_IMG_PRODUCTS+ "/" + filename;
     } else if (folder === "categorys") {
-      url = URL_SERVER + STORAGE_IMG_CATEGORYS+ "/" + filename;
+      url = URL_SERVER + PATH_IMG_CATEGORYS+ "/" + filename;
     } else {
-      url = URL_SERVER + STORAGE_IMG_COMMONS+ "/" + filename;
+      url = URL_SERVER + PATH_IMG_COMMONS+ "/" + filename;
     }
     return res.status(200).json({ url });
   } catch (error) {

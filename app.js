@@ -22,7 +22,14 @@ require("./src/config/MongoDb");
 const app = express();
 
 const cookieParser = require("cookie-parser");
-const { STORAGE_IMG_COMMONS, STORAGE_IMG_PRODUCTS, STORAGE_IMG_CATEGORYS } = require("./src/api/v1/utils/constant");
+const {
+  PATH_IMG_COMMONS,
+  PATH_IMG_PRODUCTS,
+  PATH_IMG_CATEGORYS,
+  DIRNAME_IMG_COMMONS,
+  DIRNAME_IMG_PRODUCTS,
+  DIRNAME_IMG_CATEGORYS,
+} = require("./src/api/v1/utils/constant");
 // app.use(cookieParser("randomsecretstring"));
 app.use(cookieParser());
 // app.use(cors());
@@ -40,16 +47,16 @@ app.use(
 app.set("view engine", require("ejs"));
 
 app.use(
-  `/+${STORAGE_IMG_COMMONS}`,
-  express.static(path.join(__dirname, "public/images/commons"))
+  `/${PATH_IMG_COMMONS}`,
+  express.static(path.join(__dirname, DIRNAME_IMG_COMMONS))
 ); // server images
 app.use(
-  `/+${STORAGE_IMG_PRODUCTS}`,
-  express.static(path.join(__dirname, "public/images/products"))
+  `/${PATH_IMG_PRODUCTS}`,
+  express.static(path.join(__dirname, DIRNAME_IMG_PRODUCTS))
 ); // server images
 app.use(
-  `/+${STORAGE_IMG_CATEGORYS}`,
-  express.static(path.join(__dirname, "public/images/categorys"))
+  `/${PATH_IMG_CATEGORYS}`,
+  express.static(path.join(__dirname, DIRNAME_IMG_CATEGORYS))
 ); // server images
 
 /* middleware */

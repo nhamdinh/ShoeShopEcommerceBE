@@ -1,16 +1,21 @@
 const multer = require("multer");
 const sharp = require("sharp");
 const fs = require("fs");
+const {
+  DIRNAME_IMG_PRODUCTS,
+  DIRNAME_IMG_CATEGORYS,
+  DIRNAME_IMG_COMMONS,
+} = require("../api/v1/utils/constant");
 
 const diskStorage = multer.diskStorage({
   destination: (req, file, cb) => {
     let folder = req?.query?.folder;
     if (folder === "products") {
-      cb(null, "public/images/products");
+      cb(null, DIRNAME_IMG_PRODUCTS);
     } else if (folder === "categorys") {
-      cb(null, "public/images/categorys");
+      cb(null, DIRNAME_IMG_CATEGORYS);
     } else {
-      cb(null, "public/images/commons");
+      cb(null, DIRNAME_IMG_COMMONS);
     }
   },
   filename: (req, file, cb) => {

@@ -6,7 +6,11 @@ module.exports = {
   PRODUCT_TYPE: ["electronic", "clothing", "furniture","household"],
   RD_ALL_PRODUCTS: 'RD_ALL_PRODUCTS',
   RD_EXPIRE: 6000,
-  STORAGE_IMG_COMMONS: 'commons',
-  STORAGE_IMG_PRODUCTS: 'products-img',
-  STORAGE_IMG_CATEGORYS: 'categorys-img',
+  PATH_IMG_COMMONS: 'commons',
+  PATH_IMG_PRODUCTS: 'products-img',
+  PATH_IMG_CATEGORYS: 'categorys-img',
+
+  DIRNAME_IMG_COMMONS: 'public/images/commons',
+  DIRNAME_IMG_PRODUCTS: 'public/images/products',
+  DIRNAME_IMG_CATEGORYS: 'public/images/categorys',
 };
