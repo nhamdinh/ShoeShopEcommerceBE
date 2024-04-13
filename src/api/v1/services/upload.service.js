@@ -4,8 +4,24 @@ const logger = require("../log");
 const cloudinary = require("../../../config/cloudinary.config");
 
 const { ForbiddenRequestError } = require("../core/errorResponse");
+const { PATH_IMG_PRODUCTS, PATH_IMG_CATEGORYS, PATH_IMG_COMMONS, URL_SERVER } = require("../utils/constant");
 
 class UploadServices {
+  static getUrlFromLocal = ({ file, query }) => {
+    const folder = query?.folder;
+    const filename = file?.filename ?? "";
+
+    const toFolder = {
+      products: PATH_IMG_PRODUCTS,
+      categorys: PATH_IMG_CATEGORYS,
+    };
+
+    const url =
+      URL_SERVER + (toFolder[folder] ?? PATH_IMG_COMMONS) + "/" + filename;
+
+    return { url };
+  };
+
   static uploadFromUrl = async () => {
     const urlImage =
       "https://genk.mediacdn.vn/139269124445442048/2024/4/12/220915df66e0e99bc5d39317f5a64b11823ab76d-1712821336971764153781-1712882558761-17128825589311749566008.png";

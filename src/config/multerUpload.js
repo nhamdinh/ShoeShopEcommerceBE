@@ -9,14 +9,12 @@ const {
 
 const diskStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    let folder = req?.query?.folder;
-    if (folder === "products") {
-      cb(null, DIRNAME_IMG_PRODUCTS);
-    } else if (folder === "categorys") {
-      cb(null, DIRNAME_IMG_CATEGORYS);
-    } else {
-      cb(null, DIRNAME_IMG_COMMONS);
-    }
+    const folder = req.query?.folder ?? "commons";
+    const toFolder = {
+      products: DIRNAME_IMG_PRODUCTS,
+      categorys: DIRNAME_IMG_CATEGORYS,
+    };
+    cb(null, toFolder[folder] ?? DIRNAME_IMG_COMMONS);
   },
   filename: (req, file, cb) => {
     cb(null, req.body.name);

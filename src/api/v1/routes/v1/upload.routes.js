@@ -5,15 +5,20 @@ const uploadController = require("../../controller/upload.controller");
 const { validate } = require("../../validations");
 const { protect } = require("../../Middleware/AuthMiddleware");
 const { diskUpload } = require("../../../../config/multerUpload");
-const { getUrlFromLocal } = require("../../Middleware/uploadImage");
 const uploadRoute = express.Router();
 
-uploadRoute.post("/create", asyncHandler(uploadController.uploadFromUrl));
+uploadRoute.post("/url", asyncHandler(uploadController.uploadFromUrl));
 
 uploadRoute.post(
   "/file",
   diskUpload.single("file"),
   asyncHandler(uploadController.uploadFromLocal)
+);
+
+uploadRoute.post(
+  "/to-local",
+  diskUpload.single("file"),
+  asyncHandler(uploadController.getUrlFromLocal)
 );
 
 module.exports = uploadRoute;
