@@ -16,6 +16,7 @@ class UploadController {
       message: "uploadFromLocal OK",
       metadata: await UploadServices.uploadFromLocal({
         file: req.file,
+        query: req.query
       }),
     }).send(res);
   };
