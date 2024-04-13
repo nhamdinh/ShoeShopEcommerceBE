@@ -2,7 +2,7 @@ const multer = require("multer");
 const sharp = require("sharp");
 const fs = require("fs");
 
-const storage = multer.diskStorage({
+const diskStorage = multer.diskStorage({
   destination: (req, file, cb) => {
     let folder = req?.query?.folder;
     if (folder === "products") {
@@ -49,10 +49,14 @@ const productImgResize = async (req, res, next) => {
   }
 };
 
-const storageUpload = multer({
-  storage: storage,
+const diskUpload = multer({
+  storage: diskStorage,
   fileFilter: multerFilter,
   limits: { fileSize: 10 * 1024 * 1024 },
 });
 
-module.exports = { storageUpload, productImgResize };
+const memoryUpload = multer({
+  storage: multer.memoryStorage(),
+});
+
+module.exports = { diskUpload, memoryUpload, productImgResize };

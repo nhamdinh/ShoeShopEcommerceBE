@@ -11,6 +11,14 @@ class UploadController {
       metadata: await UploadServices.uploadFromUrl(),
     }).send(res);
   };
+  uploadFromLocal = async (req, res, next) => {
+    new CREATED({
+      message: "uploadFromLocal OK",
+      metadata: await UploadServices.uploadFromLocal({
+        file: req.file,
+      }),
+    }).send(res);
+  };
 }
 
 module.exports = new UploadController();

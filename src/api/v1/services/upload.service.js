@@ -31,6 +31,32 @@ class UploadServices {
 
     return result;
   };
+
+  static uploadFromLocal = async ({file}) => {
+    // const urlImage =
+    //   "https://genk.mediacdn.vn/139269124445442048/2024/4/12/220915df66e0e99bc5d39317f5a64b11823ab76d-1712821336971764153781-1712882558761-17128825589311749566008.png";
+    // const folderName = "shop/1202";
+    // const newFileName = "testdev" + Date.now();
+    // const options = {
+    //   use_filename: true,
+    //   unique_filename: false,
+    //   overwrite: true,
+    //   public_id: newFileName,
+    //   folder: folderName,
+    // };
+
+    // const result = await cloudinary.uploader.upload(urlImage, options);
+
+    logger.info(
+      `file ::: ${util.inspect(file, {
+        showHidden: false,
+        depth: null,
+        colors: false,
+      })}`
+    );
+
+    return 'result';
+  };
   /////////////////////////
   // Uploads an image file
   /////////////////////////
