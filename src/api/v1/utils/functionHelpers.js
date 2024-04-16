@@ -1,6 +1,8 @@
 "use strict";
 const util = require("util");
 const _ = require("lodash");
+const crypto = require("crypto");
+
 const logger = require("../log");
 const { Types } = require("mongoose"); // Erase if already required
 
@@ -106,10 +108,14 @@ const toFixedNumber = (valNum, toFixed) => {
   return +num.toFixed(toFixed);
 };
 
+const randomName = () => crypto.randomBytes(16).toString("hex");
+
+
 module.exports = {
   removeNullObject,
   updateNestedObjectParser,
   toNonAccentVietnamese,
   checkNumber,
   toFixedNumber,
+  randomName
 };

@@ -31,6 +31,19 @@ class UploadController {
       }),
     }).send(res);
   };
+
+  
+  uploadFromLocalS3 = async (req, res, next) => {
+    new CREATED({
+      message: "uploadFromLocalS3 OK",
+      metadata: await UploadServices.uploadFromLocalS3({
+        file: req.file,
+        query: req.query
+      }),
+    }).send(res);
+  };
+
+
 }
 
 module.exports = new UploadController();

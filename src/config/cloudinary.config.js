@@ -1,4 +1,6 @@
 "use strict";
+const util = require("util");
+const logger = require("../api/v1/log");
 // Require the cloudinary library
 const cloudinary = require("cloudinary").v2;
 
@@ -11,6 +13,12 @@ cloudinary.config({
 });
 
 // Log the configuration
-console.log(cloudinary.config());
+// logger.info(
+//   `cloudinary.config() ::: ${util.inspect(cloudinary.config(), {
+//     showHidden: false,
+//     depth: null,
+//     colors: false,
+//   })}`
+// );
 
 module.exports = cloudinary;

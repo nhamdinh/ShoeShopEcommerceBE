@@ -1,12 +1,55 @@
 "use strict";
+const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
+
 const util = require("util");
 const logger = require("../log");
 const cloudinary = require("../../../config/cloudinary.config");
+const {
+  clientS3,
+  PutObjectCommand,
+  GetObjectCommand,
+} = require("../../../config/s3.config");
 
 const { ForbiddenRequestError } = require("../core/errorResponse");
-const { PATH_IMG_PRODUCTS, PATH_IMG_CATEGORYS, PATH_IMG_COMMONS, URL_SERVER } = require("../utils/constant");
+const {
+  PATH_IMG_PRODUCTS,
+  PATH_IMG_CATEGORYS,
+  PATH_IMG_COMMONS,
+  URL_SERVER,
+} = require("../utils/constant");
+const { randomName } = require("../utils/functionHelpers");
 
 class UploadServices {
+  /* s3 */
+  static uploadFromLocalS3 = async ({ file, query }) => {
+    // const filename = file?.filename ?? "";
+    // const folder = query?.folder ?? "commons";
+    const keyName = (file.originalname ?? "unknown") + randomName();
+    const objectCommand = {
+      Bucket: process.env.AWS_CLOUD_NAME,
+      Key: keyName,
+    };
+
+    const command = new PutObjectCommand({
+      ...objectCommand,
+      Body: file.buffer,
+      ContentType: "image/jpeg",
+    });
+
+    const result = await clientS3.send(command);
+
+    const signedUrl = new GetObjectCommand(objectCommand);
+
+    const url = await getSignedUrl(clientS3, signedUrl, { expiresIn: 3600 });
+
+    return {
+      url,
+    };
+  };
+  /* s3 */
+
+  /* cloudinary */
+
   static getUrlFromLocal = ({ file, query }) => {
     const folder = query?.folder;
     const filename = file?.filename ?? "";
@@ -72,6 +115,9 @@ class UploadServices {
       }),
     };
   };
+
+  /* cloudinary */
+
   /////////////////////////
   // Uploads an image file
   /////////////////////////
