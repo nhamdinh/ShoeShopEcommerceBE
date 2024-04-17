@@ -94,7 +94,7 @@ app.use((req, res, next) => {
 /* API */
 
 app.get("/", (req, res, next) => {
-  const strCompression = "hello world";
+  const strCompression = "hello world 1";
   res.status(200).json({
     mess: `API is running`,
     metadata: strCompression.repeat(10000),
