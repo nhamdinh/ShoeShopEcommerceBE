@@ -25,4 +25,5 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
     - run: npm ci
+    - run: cp .env ./_work/ShoeShopEcommerceBE/ShoeShopEcommerceBE/
     - run: pm2 restart shopnode-be
