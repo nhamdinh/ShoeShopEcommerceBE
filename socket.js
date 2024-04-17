@@ -5,8 +5,8 @@ const ChatStory = require("./src/api/v1/Models/ChatStoryModel");
 const logger = require("./src/api/v1/log");
 const UserModel = require("./src/api/v1/Models/UserModel");
 
-const server = http.createServer(app);
-const socketIo = require("socket.io")(server, {
+const socketServer = http.createServer(app);
+const socketIo = require("socket.io")(socketServer, {
   cors: {
     origin: "*",
   },
@@ -72,4 +72,4 @@ socketIo.on("connection", (socket) => {
   });
 });
 
-module.exports = server;
+module.exports = socketServer;

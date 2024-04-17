@@ -1,7 +1,7 @@
 const os = require("os");
 require("dotenv").config();
 const app = require("./app");
-const server = require("./socket");
+const socketServer = require("./socket");
 const logger = require("./src/api/v1/log");
 
 /* chay voi bao nhieu core */
@@ -11,8 +11,8 @@ process.env.UV_THREADPOOL_SIZE = Math.floor(Number(os.cpus().length) * 0.8);
 //     Math.floor(Number(os.cpus().length) * 0.8)
 // );
 
-const { SOCKET_PORT } =  6000;
-server.listen(SOCKET_PORT, () => {
+const { SOCKET_PORT } = 6000;
+socketServer.listen(SOCKET_PORT, () => {
   console.log(`Server socketIo run in port ${SOCKET_PORT}`);
 });
 
@@ -22,7 +22,7 @@ app.listen(PORT, () => {
 });
 
 process.on("SIGINT", () => {
-  server.close(() => {
-    console.log(`Server shutdown`);
+  socketServer.close(() => {
+    console.log(`socketServer shutdown`);
   });
 });

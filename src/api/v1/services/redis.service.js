@@ -10,6 +10,14 @@ const { convertToObjectId } = require("../utils/getInfo");
 
 const redisClient = redis.createClient();
 
+redisClient.ping((err, result) => {
+  if (err) {
+    console.error("Error connecting redisClient", err);
+  } else {
+    console.log(" connecting to redisClient");
+  }
+});
+
 const pexpire = promisify(redisClient.PEXPIRE).bind(redisClient);
 const setnxAsync = promisify(redisClient.SETNX).bind(redisClient);
 
