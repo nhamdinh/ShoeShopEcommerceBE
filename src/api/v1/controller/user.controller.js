@@ -1,17 +1,6 @@
 "use strict";
-
-const asyncHandler = require("express-async-handler");
-const generateToken = require("../utils/generateToken");
-const generateRefreshToken = require("../utils/generateRefreshToken");
-const crypto = require("node:crypto");
-
 const { validationResult } = require("express-validator");
-
-const User = require("../Models/UserModel");
-const ChatStory = require("../Models/ChatStoryModel");
-const logger = require("../log");
 const { COOKIE_REFRESH_TOKEN } = require("../utils/constant");
-const KeyTokenServices = require("../services/KeyTokenServices");
 const { createToken } = require("../utils/authUtils");
 const { getInfoData } = require("../utils/getInfo");
 const { ForbiddenRequestError } = require("../core/errorResponse");
@@ -81,7 +70,7 @@ const { CREATED, OK } = require("../core/successResponse");
 // };
 
 class UserController {
-  register = async (req, res, next) => {
+  register = async (req, res) => {
     new CREATED({
       message: "register CREATED",
       metadata: await UserServices.register(req),
@@ -122,7 +111,7 @@ class UserController {
     }).send(res);
   };
 
-  updateProfile = async (req, res, next) => {
+  updateProfile = async (req, res) => {
     new CREATED({
       message: "updateProfile CREATED",
       metadata: await UserServices.updateProfile({
@@ -134,7 +123,7 @@ class UserController {
     }).send(res);
   };
 
-  updateIsShop = async (req, res, next) => {
+  updateIsShop = async (req, res) => {
     new CREATED({
       message: "updateIsShop CREATED",
       metadata: await UserServices.updateIsShop({
@@ -144,7 +133,7 @@ class UserController {
     }).send(res);
   };
 
-  clearCountChat = async (req, res, next) => {
+  clearCountChat = async (req, res) => {
     new CREATED({
       message: "clearCountChat CREATED",
       metadata: await UserServices.clearCountChat({
@@ -153,7 +142,7 @@ class UserController {
     }).send(res);
   };
 
-  findAllUserByAdmin = async (req, res, next) => {
+  findAllUserByAdmin = async (req, res) => {
     new OK({
       message: "findAllUserByAdmin OK",
       metadata: await UserServices.findAllUserByAdmin({
@@ -162,7 +151,7 @@ class UserController {
     }).send(res);
   };
 
-  getStory = async (req, res, next) => {
+  getStory = async (req, res) => {
     new OK({
       message: "getStory OK",
       metadata: await UserServices.getStory({

@@ -1,8 +1,17 @@
 "use strict";
 const util = require("util");
 const logger = require("../log");
-
+const { convertToObjectId } = require("../utils/getInfo");
 const { ForbiddenRequestError } = require("../core/errorResponse");
+const {
+  findChatsRepo,
+  findByIdAndUpdateChatRepo,
+  createChatStoryRepo,
+} = require("../repositories/chat.repo");
+const {
+  findUserByEmailRepo,
+  findByIdAndUpdateUserRepo,
+} = require("../repositories/user.repo");
 
 class SocketServices {
   static connection(socket) {
@@ -11,53 +20,8 @@ class SocketServices {
 
     // event on here
     socket.on("clientSendData", function (data) {
-      //   const updateStory = async () => {
-      //     let chatStories = await ChatStory.find({
-      //       fromTo: [data?.sendFrom, data?.to],
-      //     });
-
-      //     if (chatStories?.length === 0) {
-      //       chatStories = await ChatStory.find({
-      //         fromTo: [data?.to, data?.sendFrom],
-      //       });
-      //     }
-
-      //     if (chatStories?.length === 0) {
-      //       await ChatStory.create({
-      //         fromTo: [data?.sendFrom, data?.to],
-      //         story: [{ ...data }],
-      //       });
-      //     } else {
-      //       chatStories[0].story = [...chatStories[0]?.story, data];
-      //       await chatStories[0].save();
-      //     }
-      //   };
-
-      //   const updateUser = async () => {
-      //     let users = await UserModel.find({
-      //       email: data?.sendFrom,
-      //     });
-      //     if (users?.length > 0) {
-      //       users[0].countChat = +users[0].countChat + 1;
-      //     }
-      //     // logger.info(
-      //     //   `users ::: ${util.inspect(users, {
-      //     //     showHidden: false,
-      //     //     depth: null,
-      //     //     colors: false,
-      //     //   })}`
-      //     // );
-
-      //     UserModel.findByIdAndUpdate(users[0]._id, {
-      //       countChat: users[0].countChat,
-      //     }).exec();
-
-      //     // await users[0].save();
-      //     // await users[0].update(users[0]);
-      //   };
-
-      // updateStory();
-      // updateUser();
+      SocketServices.updateStory(data);
+      SocketServices.updateCountChatUser(data);
 
       logger.info(
         `data ::: ${util.inspect(data, {
@@ -76,14 +40,70 @@ class SocketServices {
   }
 
   static sendMessage = async ({ chatBody }) => {
-    // console.log(`msg ::::::::::::: `,msg)
-    // gb__socketIo.emit("serverSendData", data);
-
+    SocketServices.updateStory(chatBody);
+    SocketServices.updateCountChatUser(chatBody);
     gb__socketIo.emit("serverSendData", chatBody);
-
-    // const io = res.io;
-    // _io.emit('chat message', msg)
     return { ...chatBody };
+  };
+
+  static updateStory = async (data) => {
+    let chatStories = await findChatsRepo({
+      filter: {
+        fromTo: [data?.sendFrom, data?.to],
+      },
+      // unSelect: ["story"],
+    });
+
+    if (chatStories?.length === 0) {
+      chatStories = await findChatsRepo({
+        filter: {
+          fromTo: [data?.to, data?.sendFrom],
+        },
+        // unSelect: ["story"],
+      });
+    }
+
+    // logger.info(
+    //   `chatStories ::: ${util.inspect(chatStories, {
+    //     showHidden: false,
+    //     depth: null,
+    //     colors: false,
+    //   })}`
+    // );
+
+    if (chatStories?.length === 0) {
+      await createChatStoryRepo({
+        fromTo: [data?.sendFrom, data?.to],
+        story: [{ ...data }],
+      });
+    } else {
+      const chatStory = chatStories[0];
+      const story = [...chatStory.story, data];
+
+      await findByIdAndUpdateChatRepo({
+        id: convertToObjectId(chatStory._id),
+        updateSet: {
+          story,
+        },
+      });
+    }
+  };
+
+  static updateCountChatUser = async (data) => {
+    const user = await findUserByEmailRepo({
+      email: data?.sendFrom,
+    });
+
+    if (!user) throw new ForbiddenRequestError("User already NOT exists");
+
+    const countChat = +user.countChat + 1;
+
+    await findByIdAndUpdateUserRepo({
+      id: convertToObjectId(user._id),
+      updateSet: {
+        countChat,
+      },
+    });
   };
 }
 

@@ -1,9 +1,8 @@
 const http = require("http");
 const app = require("./app");
 const util = require("util");
-const ChatStory = require("./src/api/v1/Models/ChatStoryModel");
 const logger = require("./src/api/v1/log");
-const UserModel = require("./src/api/v1/Models/UserModel");
+
 const SocketServices = require("./src/api/v1/services/chat.service");
 
 const socketServer = http.createServer(app);

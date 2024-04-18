@@ -24,7 +24,7 @@ const {
 const UserModel = require("../Models/UserModel");
 const ChatStory = require("../Models/ChatStoryModel");
 
-const { SENDER } = process.env || "nhamnd.hmu@gmail.com";
+const { SENDER = "nhamnd.hmu@gmail.com" } = process.env;
 
 class UserServices {
   static sendEmail = async ({ request }) => {
@@ -350,7 +350,7 @@ class UserServices {
     const { name, email, password, phone, isAdmin } = req.body;
     const userExists = await findUserByEmailRepo({ email }); //giam size OBJECT, tra ve 1 obj js original, neu k trar ve nhieu thong tin hon
     if (userExists) {
-      throw new ForbiddenRequestError("User already exists");
+      throw new ForbiddenRequestError("User already NOT exists");
     }
 
     const newUser = await createUserRepo({

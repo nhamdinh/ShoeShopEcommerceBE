@@ -1,25 +1,11 @@
 "use strict";
-
-const asyncHandler = require("express-async-handler");
-const generateToken = require("../utils/generateToken");
-const generateRefreshToken = require("../utils/generateRefreshToken");
-const crypto = require("node:crypto");
-
-const { validationResult } = require("express-validator");
-
-const ChatStory = require("../Models/ChatStoryModel");
 const util = require("util");
 const logger = require("../log");
-const { COOKIE_REFRESH_TOKEN } = require("../utils/constant");
-const KeyTokenServices = require("../services/KeyTokenServices");
-const { createToken } = require("../utils/authUtils");
-const { getInfoData } = require("../utils/getInfo");
-const { ForbiddenRequestError } = require("../core/errorResponse");
 const { CREATED, OK } = require("../core/successResponse");
 const DiscountServices = require("../services/DiscountServices");
 
 class DiscountController {
-  createDiscount = async (req, res, next) => {
+  createDiscount = async (req, res) => {
     new CREATED({
       message: "createDiscount CREATED",
       metadata: await DiscountServices.createDiscount({
@@ -29,7 +15,7 @@ class DiscountController {
     }).send(res);
   };
 
-  getAllDiscountsByShop = async (req, res, next) => {
+  getAllDiscountsByShop = async (req, res) => {
     new OK({
       message: "getAllDiscountsByShop OK",
       metadata: await DiscountServices.getAllDiscountsByShop({
@@ -39,7 +25,7 @@ class DiscountController {
     }).send(res);
   };
 
-  getAllDiscountsByShops = async (req, res, next) => {
+  getAllDiscountsByShops = async (req, res) => {
     new OK({
       message: "getAllDiscountsByShops OK",
       metadata: await DiscountServices.getAllDiscountsByShops({
@@ -48,7 +34,7 @@ class DiscountController {
     }).send(res);
   };
 
-  getAllProductsByDiscount = async (req, res, next) => {
+  getAllProductsByDiscount = async (req, res) => {
     new OK({
       message: "getAllProductsByDiscount OK",
       metadata: await DiscountServices.getAllProductsByDiscount({
@@ -59,7 +45,7 @@ class DiscountController {
     }).send(res);
   };
 
-  getDiscountsAmount = async (req, res, next) => {
+  getDiscountsAmount = async (req, res) => {
     new OK({
       message: "getDiscountsAmount OK", /* BO; dung de checkout cart */
       metadata: await DiscountServices.getDiscountsAmount({

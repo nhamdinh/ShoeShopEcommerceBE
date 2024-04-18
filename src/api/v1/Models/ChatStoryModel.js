@@ -1,6 +1,9 @@
-const mongoose = require("mongoose");
-
-const chatStorySchema = mongoose.Schema(
+"use strict";
+const { Schema, model } = require("mongoose"); // Erase if already required
+//!dmbg
+const DOCUMENT_NAME = "ChatStory";
+// Declare the Schema of the Mongo model
+const chatStorySchema = new Schema(
   {
     fromTo: { type: Array, required: false },
     story: { type: Array, required: false },
@@ -11,6 +14,5 @@ const chatStorySchema = mongoose.Schema(
   }
 );
 
-const ChatStory = mongoose.model("ChatStory", chatStorySchema);
-
-module.exports = ChatStory;
+//Export the model
+module.exports = model(DOCUMENT_NAME, chatStorySchema);

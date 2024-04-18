@@ -23,6 +23,14 @@ const findByIdAndUpdateTokenRepo = async (id, refreshToken) => {
   }).exec();
 };
 
+const findByIdAndUpdateUserRepo = async ({
+  id,
+  updateSet,
+  options = { upsert: false, new: true },
+}) => {
+  return UserModel.findByIdAndUpdate(id, updateSet, options).exec();
+};
+
 const findUserByIdRepo = async (id) => {
   return await UserModel.findById(id);
   /* 
@@ -75,4 +83,5 @@ module.exports = {
   createUserRepo,
   findAllUsersRepo,
   findAllUsersOrdersRepo,
+  findByIdAndUpdateUserRepo,
 };
