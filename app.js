@@ -29,6 +29,7 @@ const {
   DIRNAME_IMG_COMMONS,
   DIRNAME_IMG_PRODUCTS,
   DIRNAME_IMG_CATEGORYS,
+  strCompression,
 } = require("./src/api/v1/utils/constant");
 // app.use(cookieParser("randomsecretstring"));
 app.use(cookieParser());
@@ -94,7 +95,7 @@ app.use((req, res, next) => {
 /* API */
 
 app.get("/", (req, res, next) => {
-  const strCompression = "hello world 33";
+  // const strCompression = "hello world 33";
   res.status(200).json({
     mess: `API is running`,
     metadata: strCompression.repeat(10000),

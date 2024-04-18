@@ -62,13 +62,22 @@ socketIo.on("connection", (socket) => {
       // await users[0].update(users[0]);
     };
 
-    updateStory();
-    updateUser();
+    // updateStory();
+    // updateUser();
+
+    logger.info(
+      `data ::: ${util.inspect(data, {
+        showHidden: false,
+        depth: null,
+        colors: false,
+      })}`
+    );
+
     socketIo.emit("serverSendData", data);
   });
 
   socket.on("disconnect", () => {
-    logger.info("Client disconnected");
+    logger.info("Client socket disconnected");
   });
 });
 
