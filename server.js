@@ -6,7 +6,7 @@ const app = require("./app");
 const socketServer = require("./socket");
 
 /* chay voi bao nhieu core */
-process.env.UV_THREADPOOL_SIZE = Math.floor(Number(os.cpus().length) * 0.8);
+process.env.UV_THREADPOOL_SIZE = Math.floor(Number(os.cpus().length) * 1);
 // logger.info(
 //   "Number of UV_THREADPOOL_SIZE ::: " +
 //     Math.floor(Number(os.cpus().length) * 0.8)
