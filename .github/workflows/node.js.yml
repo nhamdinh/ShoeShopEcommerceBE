@@ -26,4 +26,4 @@ jobs:
         cache: 'npm'
     - run: npm ci
     - run: cp ./../../../.env .env
-    - run: pm2 restart shopnode-be
+    
