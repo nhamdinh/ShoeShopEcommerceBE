@@ -9,7 +9,6 @@ const { ForbiddenRequestError } = require("../core/errorResponse");
 module.exports = {
   admin: (req, res, next) => {
     // console.log("admin xxx =====================================");
-
     if (req.user && req.user.isAdmin) {
       next();
     } else {
@@ -25,26 +24,23 @@ module.exports = {
       req.headers.authorization &&
       req.headers.authorization.startsWith("Bearer")
     ) {
-      try {
-        token = req.headers.authorization.split(" ")[1];
-        if (!token) {
-          throw new ForbiddenRequestError("Not authorized, no token", 401);
-        }
-        
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = await User.findById(decoded.id).select("-password");
-        // logger.info(
-        //   `req.user::: ${util.inspect(req.user, {
-        //     showHidden: false,
-        //     depth: null,
-        //     colors: false,
-        //   })}`
-        // );
-        next();
-      } catch (error) {
-        console.error(error);
-        throw new ForbiddenRequestError("Not authorized, token failed", 401);
-      }
+      token = req.headers.authorization.split(" ")[1];
+      if (!token)
+        throw new ForbiddenRequestError("Not authorized, no token", 401);
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      req.user = await User.findById(decoded.id).select("-password");
+
+      // logger.info(
+      //   `req.user::: ${util.inspect(req.user, {
+      //     showHidden: false,
+      //     depth: null,
+      //     colors: false,
+      //   })}`
+      // );
+
+      next();
+    } else {
+      throw new ForbiddenRequestError("Not authorized, token failed", 401);
     }
   }),
 };

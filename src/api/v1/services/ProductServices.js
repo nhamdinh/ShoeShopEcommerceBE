@@ -177,6 +177,7 @@ class ProductFactory {
           page,
           filter,
           keywords: toNonAccentVietnamese(keywords),
+          brand,
         })
       ) {
         logger.info(
@@ -214,6 +215,7 @@ class ProductFactory {
           page,
           filter,
           keywords: toNonAccentVietnamese(keywords),
+          brand,
         }),
         "EX",
         RD_EXPIRE
@@ -242,6 +244,7 @@ class ProductFactory {
         page,
         filter,
         keywords: toNonAccentVietnamese(keywords),
+        brand,
       }),
       "EX",
       RD_EXPIRE
@@ -277,17 +280,16 @@ class ProductFactory {
       isPublished: true,
     };
 
+    const cachedFilter = {
+      limit,
+      page,
+      filter,
+    };
+
     const cachedDataFilter = await getAsync(RD_FILTER_PRODUCTS_MAX);
 
     if (cachedDataFilter) {
-      if (
-        cachedDataFilter ===
-        JSON.stringify({
-          limit,
-          page,
-          filter,
-        })
-      ) {
+      if (cachedDataFilter === JSON.stringify(cachedFilter)) {
         logger.info(
           `findAllProductsMax GIONG ::: ${util.inspect(cachedDataFilter, {
             showHidden: false,
@@ -318,11 +320,7 @@ class ProductFactory {
 
       await setAsync(
         RD_FILTER_PRODUCTS_MAX,
-        JSON.stringify({
-          limit,
-          page,
-          filter,
-        }),
+        JSON.stringify(cachedFilter),
         "EX",
         RD_EXPIRE
       );
@@ -345,11 +343,7 @@ class ProductFactory {
 
     await setAsync(
       RD_FILTER_PRODUCTS_MAX,
-      JSON.stringify({
-        limit,
-        page,
-        filter,
-      }),
+      JSON.stringify(cachedFilter),
       "EX",
       RD_EXPIRE
     );

@@ -107,24 +107,24 @@ app.get("/api/config/paypal", (req, res) => {
   res.send(process.env.PAYPAL_CLIENT_ID);
 });
 app.post("/api/upload", diskUpload.single("file"), getUrlFromLocal);
-app.post(
-  "/api/cookie",
-  asyncHandler(async (req, res) => {
-    // res.cookie("name", "express").send("cookie set"); //Sets name = express
-    res.header("Access-Control-Allow-Origin", process.env.URL_CLIENT); // update to match the domain you will make the request from
-    res.header(
-      "Access-Control-Allow-Headers",
-      "Origin, X-Requested-With, Content-Type, Accept"
-    );
-    res.header("Access-Control-Allow-Credentials", "true");
-    res
-      .cookie("access_token", "token", {
-        httpOnly: true,
-      })
-      .status(200)
-      .json({ message: "Logged in successfully 😊 👌" });
-  })
-);
+// app.post(
+//   "/api/cookie",
+//   asyncHandler(async (req, res) => {
+//     // res.cookie("name", "express").send("cookie set"); //Sets name = express
+//     res.header("Access-Control-Allow-Origin", process.env.URL_CLIENT); // update to match the domain you will make the request from
+//     res.header(
+//       "Access-Control-Allow-Headers",
+//       "Origin, X-Requested-With, Content-Type, Accept"
+//     );
+//     res.header("Access-Control-Allow-Credentials", "true");
+//     res
+//       .cookie("access_token", "token", {
+//         httpOnly: true,
+//       })
+//       .status(200)
+//       .json({ message: "Logged in successfully 😊 👌" });
+//   })
+// );
 
 app.get(
   "/api/cookie",
