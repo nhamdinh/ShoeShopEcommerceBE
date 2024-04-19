@@ -53,6 +53,9 @@ productRoute.get(
 // GET ALL PRODUCTS
 productRoute.get("/all", asyncHandler(productController.findAllProducts));
 
+// GET ALL PRODUCTS MAX
+productRoute.get("/all-max", asyncHandler(productController.findAllProductsMax));
+
 // ADMIN GET ALL PRODUCT
 productRoute.get(
   "/all-admin",

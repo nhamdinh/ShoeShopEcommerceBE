@@ -5,7 +5,13 @@ module.exports = {
   URL_SERVER: process.env.URL_SERVER,
   COOKIE_REFRESH_TOKEN: "refreshToken",
   PRODUCT_TYPE: ["electronic", "clothing", "furniture","household"],
+  
   RD_ALL_PRODUCTS: 'RD_ALL_PRODUCTS',
+  RD_FILTER_PRODUCTS: 'RD_FILTER_PRODUCTS',
+
+  RD_ALL_PRODUCTS_MAX: 'RD_ALL_PRODUCTS_MAX',
+  RD_FILTER_PRODUCTS_MAX: 'RD_FILTER_PRODUCTS_MAX',
+
   RD_EXPIRE: 6000,
   PATH_IMG_COMMONS: 'commons',
   PATH_IMG_PRODUCTS: 'products-img',

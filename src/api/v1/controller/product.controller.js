@@ -271,6 +271,15 @@ class ProductController {
     }).send(res);
   };
 
+  findAllProductsMax = async (req, res, next) => {
+    new OK({
+      message: "findAllProductsMax OK",
+      metadata: await ProductServices.findAllProductsMax({
+        query: req.query,
+      }),
+    }).send(res);
+  };
+
   findProductById = async (req, res, next) => {
     new OK({
       message: "findProductById OK",

@@ -17,8 +17,11 @@ const {
 const { findUserByIdRepo } = require("../repositories/user.repo");
 const {
   PRODUCT_TYPE,
-  RD_ALL_PRODUCTS,
   RD_EXPIRE,
+  RD_ALL_PRODUCTS,
+  RD_FILTER_PRODUCTS,
+  RD_FILTER_PRODUCTS_MAX,
+  RD_ALL_PRODUCTS_MAX,
 } = require("../utils/constant");
 const { convertToObjectId } = require("../utils/getInfo");
 const InventoryServices = require("./InventoryServices");
@@ -126,7 +129,7 @@ class ProductFactory {
         // "isPublished",
       ],
     } = query;
-
+    const keywords = keyword;
     if (product_shop) {
       product_shop = {
         product_shop: convertToObjectId(product_shop),
@@ -147,6 +150,7 @@ class ProductFactory {
     } else {
       keyword = {};
     }
+
     const regexSearchBrand = new RegExp(
       toNonAccentVietnamese(brand.toUpperCase() !== "ALL" ? brand : ""),
       "i"
@@ -163,6 +167,86 @@ class ProductFactory {
 
     // if (cachedData) return JSON.parse(cachedData);
 
+    const cachedDataFilter = await getAsync(RD_FILTER_PRODUCTS);
+
+    if (cachedDataFilter) {
+      if (
+        cachedDataFilter ===
+        JSON.stringify({
+          limit,
+          page,
+          filter,
+          keywords: toNonAccentVietnamese(keywords),
+        })
+      ) {
+        logger.info(
+          `findAllProducts GIONG ::: ${util.inspect(cachedDataFilter, {
+            showHidden: false,
+            depth: null,
+            colors: false,
+          })}`
+        );
+
+        const cachedData = await getAsync(RD_ALL_PRODUCTS);
+
+        if (cachedData) return JSON.parse(cachedData);
+
+        const metadata = await findAllProductsRepo({
+          sort,
+          limit,
+          page,
+          filter,
+          select,
+        });
+        await setAsync(
+          RD_ALL_PRODUCTS,
+          JSON.stringify(metadata),
+          "EX",
+          RD_EXPIRE
+        );
+        return metadata;
+      }
+
+      await setAsync(
+        RD_FILTER_PRODUCTS,
+        JSON.stringify({
+          limit,
+          page,
+          filter,
+          keywords: toNonAccentVietnamese(keywords),
+        }),
+        "EX",
+        RD_EXPIRE
+      );
+
+      const metadata = await findAllProductsRepo({
+        sort,
+        limit,
+        page,
+        filter,
+        select,
+      });
+      await setAsync(
+        RD_ALL_PRODUCTS,
+        JSON.stringify(metadata),
+        "EX",
+        RD_EXPIRE
+      );
+      return metadata;
+    }
+
+    await setAsync(
+      RD_FILTER_PRODUCTS,
+      JSON.stringify({
+        limit,
+        page,
+        filter,
+        keywords: toNonAccentVietnamese(keywords),
+      }),
+      "EX",
+      RD_EXPIRE
+    );
+
     const metadata = await findAllProductsRepo({
       sort,
       limit,
@@ -171,6 +255,118 @@ class ProductFactory {
       select,
     });
     await setAsync(RD_ALL_PRODUCTS, JSON.stringify(metadata), "EX", RD_EXPIRE);
+    return metadata;
+  };
+
+  static findAllProductsMax = async ({ query }) => {
+    const {
+      sort = { _id: -1 },
+      page = +(query?.page ?? 1),
+      limit = +(query?.limit ?? 50),
+      select = [
+        // "product_name",
+        // "product_shop",
+        // "product_price",
+        // "product_thumb",
+        // "isDraft",
+        // "isPublished",
+      ],
+    } = query;
+
+    const filter = {
+      isPublished: true,
+    };
+
+    const cachedDataFilter = await getAsync(RD_FILTER_PRODUCTS_MAX);
+
+    if (cachedDataFilter) {
+      if (
+        cachedDataFilter ===
+        JSON.stringify({
+          limit,
+          page,
+          filter,
+        })
+      ) {
+        logger.info(
+          `findAllProductsMax GIONG ::: ${util.inspect(cachedDataFilter, {
+            showHidden: false,
+            depth: null,
+            colors: false,
+          })}`
+        );
+
+        const cachedData = await getAsync(RD_ALL_PRODUCTS_MAX);
+
+        if (cachedData) return JSON.parse(cachedData);
+
+        const metadata = await findAllProductsRepo({
+          sort,
+          limit,
+          page,
+          filter,
+          select,
+        });
+        await setAsync(
+          RD_ALL_PRODUCTS_MAX,
+          JSON.stringify(metadata),
+          "EX",
+          RD_EXPIRE
+        );
+        return metadata;
+      }
+
+      await setAsync(
+        RD_FILTER_PRODUCTS_MAX,
+        JSON.stringify({
+          limit,
+          page,
+          filter,
+        }),
+        "EX",
+        RD_EXPIRE
+      );
+
+      const metadata = await findAllProductsRepo({
+        sort,
+        limit,
+        page,
+        filter,
+        select,
+      });
+      await setAsync(
+        RD_ALL_PRODUCTS_MAX,
+        JSON.stringify(metadata),
+        "EX",
+        RD_EXPIRE
+      );
+      return metadata;
+    }
+
+    await setAsync(
+      RD_FILTER_PRODUCTS_MAX,
+      JSON.stringify({
+        limit,
+        page,
+        filter,
+      }),
+      "EX",
+      RD_EXPIRE
+    );
+
+    const metadata = await findAllProductsRepo({
+      sort,
+      limit,
+      page,
+      filter,
+      select,
+    });
+    await setAsync(
+      RD_ALL_PRODUCTS_MAX,
+      JSON.stringify(metadata),
+      "EX",
+      RD_EXPIRE
+    );
     return metadata;
   };
 
