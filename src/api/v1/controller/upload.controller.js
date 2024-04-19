@@ -8,7 +8,9 @@ class UploadController {
   uploadFromUrl = async (req, res, next) => {
     new CREATED({
       message: "uploadFromUrl OK",
-      metadata: await UploadServices.uploadFromUrl(),
+      metadata: await UploadServices.uploadFromUrl({
+        body: req.body
+      }),
     }).send(res);
   };
   

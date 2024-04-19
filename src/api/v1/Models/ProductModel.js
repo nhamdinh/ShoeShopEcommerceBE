@@ -12,6 +12,7 @@ const productSchema = new Schema(
     // product_name_nonVi: { type: String, required: true, trim: true, },
     product_slug: String,
     product_thumb: { type: String, required: true },
+    product_thumb_small: { type: String, required: false, trim: true},
     product_description: String,
     product_price: { type: Number, required: true },
     product_quantity: { type: Number, required: true },

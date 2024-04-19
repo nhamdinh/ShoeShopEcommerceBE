@@ -29,7 +29,7 @@ const findAllProductsByShopRepo = async ({ query, limit, skip }) => {
   const products = await ProductModel.product
     .find(query)
     .populate("product_shop", "name email productShopName _id")
-    .sort({ updatedAt: -1 })
+    .sort({ _id: -1 })
     .skip(skip)
     .limit(limit)
     .lean()

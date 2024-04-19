@@ -1,6 +1,6 @@
 "use strict";
+const { uid } = require("uid");
 const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
-
 const util = require("util");
 const logger = require("../log");
 const cloudinary = require("../../../config/cloudinary.config");
@@ -18,7 +18,10 @@ const {
   URL_SERVER,
 } = require("../utils/constant");
 const { randomName } = require("../utils/functionHelpers");
-
+const miniSize = {
+  width: 370,
+  height: 250,
+};
 class UploadServices {
   /* s3 */
   static uploadFromLocalS3 = async ({ file, query }) => {
@@ -65,30 +68,30 @@ class UploadServices {
     return { url };
   };
 
-  static uploadFromUrl = async () => {
-    const urlImage =
-      "https://genk.mediacdn.vn/139269124445442048/2024/4/12/220915df66e0e99bc5d39317f5a64b11823ab76d-1712821336971764153781-1712882558761-17128825589311749566008.png";
-    const folderName = "shop/1202";
-    const newFileName = "testdev" + Date.now();
+  static uploadFromUrl = async ({ body }) => {
+    const {
+      urlImage = "https://genk.mediacdn.vn/139269124445442048/2024/4/12/220915df66e0e99bc5d39317f5a64b11823ab76d-1712821336971764153781-1712882558761-17128825589311749566008.png",
+    } = body;
+
+    const newFileName = "url" + Date.now() + uid();
+    const folder = body?.folder ?? "commons";
     const options = {
       use_filename: true,
       unique_filename: false,
       overwrite: true,
       public_id: newFileName,
-      folder: folderName,
+      folder,
     };
 
     const result = await cloudinary.uploader.upload(urlImage, options);
 
-    // logger.info(
-    //   `result ::: ${util.inspect(result, {
-    //     showHidden: false,
-    //     depth: null,
-    //     colors: false,
-    //   })}`
-    // );
-
-    return result;
+    return {
+      ...result,
+      thumb_url: await cloudinary.url(result.public_id, {
+        ...miniSize,
+        format: "jpg",
+      }),
+    };
   };
 
   static uploadFromLocal = async ({ file, query }) => {
@@ -109,8 +112,7 @@ class UploadServices {
     return {
       ...result,
       thumb_url: await cloudinary.url(result.public_id, {
-        width: 100,
-        height: 100,
+        ...miniSize,
         format: "jpg",
       }),
     };

@@ -251,6 +251,7 @@ class Product {
   constructor({
     /* = payload */ product_name,
     product_thumb,
+    product_thumb_small,
     product_description,
     product_price,
     product_quantity,
@@ -261,6 +262,7 @@ class Product {
     this.product_name = product_name;
     // this.product_name_nonVi = toNonAccentVietnamese(product_name);
     this.product_thumb = product_thumb;
+    this.product_thumb_small = product_thumb_small;
     this.product_description = product_description;
     this.product_price = product_price;
     this.product_quantity = product_quantity;
