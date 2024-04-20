@@ -45,6 +45,7 @@ const acquireLock = async (productId, quantity, cartId) => {
       const bodyUpdate = {
         $inc: {
           product_quantity: -quantity,
+          product_sold: +quantity,
         },
       };
 
