@@ -124,6 +124,7 @@ class ProductFactory {
         // "product_name",
         // "product_shop",
         // "product_price",
+        // "product_original_price",
         // "product_thumb",
         // "isDraft",
         // "isPublished",
@@ -270,6 +271,7 @@ class ProductFactory {
         // "product_name",
         // "product_shop",
         // "product_price",
+        // "product_original_price",
         // "product_thumb",
         // "isDraft",
         // "isPublished",
@@ -444,6 +446,7 @@ class Product {
     product_thumb_small,
     product_description,
     product_price,
+    product_original_price,
     product_quantity,
     product_type,
     product_shop,
@@ -455,6 +458,7 @@ class Product {
     this.product_thumb_small = product_thumb_small;
     this.product_description = product_description;
     this.product_price = product_price;
+    this.product_original_price = product_original_price;
     this.product_quantity = product_quantity;
     this.product_type = product_type;
     this.product_shop = product_shop;

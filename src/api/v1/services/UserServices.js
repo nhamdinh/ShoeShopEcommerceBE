@@ -196,6 +196,7 @@ class UserServices {
         // "product_name",
         // "product_shop",
         // "product_price",
+        // "product_original_price",
         // "product_thumb",
         // "isDraft",
         // "isPublished",

@@ -76,6 +76,7 @@ class DiscountServices {
         "product_shop",
         "product_name",
         "product_price",
+        "product_original_price",
         "product_thumb",
         "isDraft",
         "isPublished",

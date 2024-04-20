@@ -209,9 +209,12 @@ class ProductController {
   createProduct = async (req, res, next) => {
     new CREATED({
       message: "createProduct CREATED",
-      metadata: await ProductServices.createProductType(req.body?.product_type, {
-        ...req.body,
-      }),
+      metadata: await ProductServices.createProductType(
+        req.body?.product_type,
+        {
+          ...req.body,
+        }
+      ),
     }).send(res);
   };
 
@@ -230,6 +233,9 @@ class ProductController {
       metadata: await ProductServices.findAllPublishedByShop({
         product_shop: req.query.product_shop,
       }),
+      options: {
+        product_shop: req.query.product_shop,
+      },
     }).send(res);
   };
 

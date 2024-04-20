@@ -14,6 +14,17 @@ const { toNonAccentVietnamese } = require("../utils/functionHelpers");
 const InventoryServices = require("../services/InventoryServices");
 
 const createProductRepo = async (product) => {
+
+  logger.info(
+    `product ::: ${util.inspect(product, {
+      showHidden: false,
+      depth: null,
+      colors: false,
+    })}`
+  );
+
+
+
   return await ProductModel.product.create({ ...product });
 };
 
@@ -114,6 +125,7 @@ const updateAll = async () => {
   // await Promise.all(
   //   products1.map(async (product) => {
   //     product.product_slug = toNonAccentVietnamese(product.product_name).replaceAll(" ","-");
+  // const zz  =  +product.product_price * ( (Math.random() * (50 - 10) + 10) +100    )/100
   //     await product.update(product);
   //   })
   // );
