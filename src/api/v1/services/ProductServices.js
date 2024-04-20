@@ -466,11 +466,18 @@ class Product {
   }
 
   async createProduct(product_id) {
+    await Product.resetFilter();
     return await createProductRepo({ ...this, _id: product_id });
   }
 
   async updateProductById(product_id, bodyUpdate) {
+    await Product.resetFilter();
     return await updateProductByIdRepo("product", { product_id, bodyUpdate });
+  }
+
+  static async resetFilter() {
+    await setAsync(RD_FILTER_PRODUCTS_MAX, "", "EX", RD_EXPIRE);
+    await setAsync(RD_FILTER_PRODUCTS, "", "EX", RD_EXPIRE);
   }
 }
 

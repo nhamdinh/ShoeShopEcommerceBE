@@ -14,17 +14,6 @@ const { toNonAccentVietnamese } = require("../utils/functionHelpers");
 const InventoryServices = require("../services/InventoryServices");
 
 const createProductRepo = async (product) => {
-
-  logger.info(
-    `product ::: ${util.inspect(product, {
-      showHidden: false,
-      depth: null,
-      colors: false,
-    })}`
-  );
-
-
-
   return await ProductModel.product.create({ ...product });
 };
 
