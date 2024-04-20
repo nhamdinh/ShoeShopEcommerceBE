@@ -12,11 +12,12 @@ const productSchema = new Schema(
     // product_name_nonVi: { type: String, required: true, trim: true, },
     product_slug: String,
     product_thumb: { type: String, required: true },
-    product_thumb_small: { type: String, required: false, trim: true},
+    product_thumb_small: { type: String, required: false, trim: true },
     product_description: String,
     product_original_price: { type: Number, required: true },
     product_price: { type: Number, required: true },
     product_quantity: { type: Number, required: true },
+    product_sold: { type: Number, required: false, default: 0 },
     product_type: {
       type: String,
       required: true,
@@ -59,7 +60,10 @@ productSchema.index({
 });
 
 productSchema.pre("save", async function (next) {
-  this.product_slug = toNonAccentVietnamese(this.product_name).replaceAll(" ","-");
+  this.product_slug = toNonAccentVietnamese(this.product_name).replaceAll(
+    " ",
+    "-"
+  );
   next();
 });
 class ProductModelFactory {
