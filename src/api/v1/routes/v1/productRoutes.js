@@ -51,6 +51,13 @@ productRoute.put(
   asyncHandler(productController.findAllProductsByShop)
 );
 
+// UPDATE-STATUS-PRODUCTS-BY-SHOP
+productRoute.put(
+  "/update-status-products-by-shop",
+  // protect,
+  asyncHandler(productController.updateStatusProductsByShop)
+);
+
 // GET SEARCH PRODUCTS
 productRoute.get(
   "/search/:keySearch",

@@ -196,30 +196,31 @@ const findProductsByShopRepo = async ({
   const skip = (page < 1 ? 1 : page - 1) * limit;
   // const sortBy = sort === "ctime" ? { _id: -1 } : { _id: 1 };
   const sortBy = Object.keys(sort).length ? { ...sort } : { _id: -1 };
-
-  const countAll = await ProductModel.product.countDocuments({
-    product_shop:filter?.product_shop,
-  });
+  const { product_shop } = filter;
 
   const count = await ProductModel.product.countDocuments({
     ...filter,
   });
 
-  const isDelete = await ProductModel.product.countDocuments({
-    ...filter,
-    isDelete: true,
+  const countAll = await ProductModel.product.countDocuments({
+    product_shop,
   });
 
   const isPublished = await ProductModel.product.countDocuments({
-    ...filter,
+    product_shop,
     isDelete: false,
     isPublished: true,
   });
 
   const isDraft = await ProductModel.product.countDocuments({
-    ...filter,
+    product_shop,
     isDelete: false,
     isPublished: false,
+  });
+
+  const isDelete = await ProductModel.product.countDocuments({
+    product_shop,
+    isDelete: true,
   });
 
   const products = await ProductModel.product
@@ -330,5 +331,5 @@ module.exports = {
   findProductById1Repo,
   checkPriceProductsRepo,
   findOneAndUpdateProductRepo,
-  findProductsByShopRepo
+  findProductsByShopRepo,
 };

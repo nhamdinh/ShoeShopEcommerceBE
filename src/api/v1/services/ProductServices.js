@@ -106,6 +106,27 @@ class ProductFactory {
     return await findAllProductsByShopRepo({ query, limit, skip });
   };
 
+  static updateStatusProductsByShop = async ({ user, body }) => {
+    const { product_shop, bodyUpdate, ids } = body;
+    // updateAllRepo()
+
+    // if (user._id?.toString() !== product_shop?.toString())
+    //   throw new ForbiddenRequestError("You are not Owner!!");
+
+    if (!ids.length) return false;
+    
+    await Promise.all(
+      ids.map(async (id) => {
+        return await updateProductByIdRepo("product", {
+          product_id: convertToObjectId(id),
+          bodyUpdate,
+        });
+      })
+    );
+
+    return true;
+  };
+
   static findAllProductsByShop = async ({ user, body }) => {
     const {
       product_shop,
@@ -126,13 +147,13 @@ class ProductFactory {
     } = body;
 
     // updateAllRepo()
-    
+
     // if (user._id?.toString() !== product_shop?.toString())
     //   throw new ForbiddenRequestError("You are not Owner!!");
 
     const filter = { product_shop };
-    if(typeof isDelete === 'boolean') filter.isDelete = isDelete
-    if(typeof isPublished === 'boolean') filter.isPublished = isPublished
+    if (typeof isDelete === "boolean") filter.isDelete = isDelete;
+    if (typeof isPublished === "boolean") filter.isPublished = isPublished;
 
     return await findProductsByShopRepo({
       sort,
