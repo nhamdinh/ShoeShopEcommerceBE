@@ -232,9 +232,23 @@ class ProductController {
       message: "findAllPublishedByShop OK",
       metadata: await ProductServices.findAllPublishedByShop({
         product_shop: req.query.product_shop,
+        user: req.user
       }),
       options: {
         product_shop: req.query.product_shop,
+      },
+    }).send(res);
+  };
+
+  findAllProductsByShop = async (req, res, next) => {
+    new OK({
+      message: "findAllProductsByShop OK",
+      metadata: await ProductServices.findAllProductsByShop({
+        user: req.user,
+        body: req.body
+      }),
+      options: {
+        product_shop: req.body.product_shop,
       },
     }).send(res);
   };

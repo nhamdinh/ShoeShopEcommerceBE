@@ -9,6 +9,7 @@ const COLLECTION_NAME = "Products";
 const productSchema = new Schema(
   {
     product_name: { type: String, required: true, trim: true },
+    product_sku: { type: String, required: false, trim: true },
     // product_name_nonVi: { type: String, required: true, trim: true, },
     product_slug: String,
     product_thumb: { type: String, required: true },
@@ -39,6 +40,7 @@ const productSchema = new Schema(
       default: [],
     },
     isDraft: { type: Boolean, default: false, index: true },
+    isDelete: { type: Boolean, default: false },
     isPublished: { type: Boolean, default: true, index: true }, //, select: T/F: always selected/not
     numReviews: {
       type: Number,

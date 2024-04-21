@@ -13,6 +13,7 @@ const {
   findAllProductsRepo,
   findProductByIdRepo,
   updateProductByIdRepo,
+  findProductsByShopRepo,
 } = require("../repositories/product.repo");
 const { findUserByIdRepo } = require("../repositories/user.repo");
 const {
@@ -33,6 +34,7 @@ const {
   updateNestedObjectParser,
 } = require("../utils/functionHelpers");
 const { setAsync, getAsync } = require("./redis.service");
+const { updateAllRepo } = require("../repositories/updateDB.repo");
 
 class ProductFactory {
   static productTypeStrategy = {
@@ -94,9 +96,51 @@ class ProductFactory {
     product_shop,
     limit = 50,
     skip = 0,
+    user,
   }) => {
+    // updateAllRepo()
+    // if (user._id?.toString() !== product_shop?.toString())
+    //   throw new ForbiddenRequestError("You are not Owner!!");
+
     const query = { product_shop, isPublished: true };
     return await findAllProductsByShopRepo({ query, limit, skip });
+  };
+
+  static findAllProductsByShop = async ({ user, body }) => {
+    const {
+      product_shop,
+      limit = 50,
+      page = 1,
+      sort = { _id: -1 },
+      select = [
+        // "product_name",
+        // "product_shop",
+        // "product_price",
+        // "product_original_price",
+        // "product_thumb",
+        // "isDraft",
+        // "isPublished",
+      ],
+      isDelete,
+      isPublished,
+    } = body;
+
+    // updateAllRepo()
+    
+    // if (user._id?.toString() !== product_shop?.toString())
+    //   throw new ForbiddenRequestError("You are not Owner!!");
+
+    const filter = { product_shop };
+    if(typeof isDelete === 'boolean') filter.isDelete = isDelete
+    if(typeof isPublished === 'boolean') filter.isPublished = isPublished
+
+    return await findProductsByShopRepo({
+      sort,
+      limit,
+      page,
+      filter,
+      select,
+    });
   };
 
   static publishedProductByShop = async ({ product_shop, product_id }) => {

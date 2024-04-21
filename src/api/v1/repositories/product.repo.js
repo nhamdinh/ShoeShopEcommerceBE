@@ -138,12 +138,29 @@ const findAllProductsRepo = async ({
 }) => {
   // updateAll();
 
-  const skip = (page - 1) * limit;
+  const skip = (page < 1 ? 1 : page - 1) * limit;
   // const sortBy = sort === "ctime" ? { _id: -1 } : { _id: 1 };
   const sortBy = Object.keys(sort).length ? { ...sort } : { _id: -1 };
 
   const count = await ProductModel.product.countDocuments({
     ...filter,
+  });
+
+  const isDelete = await ProductModel.product.countDocuments({
+    ...filter,
+    isDelete: true,
+  });
+
+  const isPublished = await ProductModel.product.countDocuments({
+    ...filter,
+    isDelete: false,
+    isPublished: true,
+  });
+
+  const isDraft = await ProductModel.product.countDocuments({
+    ...filter,
+    isDelete: false,
+    isPublished: false,
   });
 
   const products = await ProductModel.product
@@ -157,6 +174,69 @@ const findAllProductsRepo = async ({
 
   return {
     totalCount: +count ?? 0,
+    isDelete: +isDelete ?? 0,
+    isPublished: +isPublished ?? 0,
+    isDraft: +isDraft ?? 0,
+    totalPages: Math.ceil(count / limit),
+    page: +page,
+    limit: +limit,
+    products: products,
+  };
+};
+
+const findProductsByShopRepo = async ({
+  limit,
+  sort,
+  page,
+  filter,
+  select = [],
+}) => {
+  // updateAll();
+
+  const skip = (page < 1 ? 1 : page - 1) * limit;
+  // const sortBy = sort === "ctime" ? { _id: -1 } : { _id: 1 };
+  const sortBy = Object.keys(sort).length ? { ...sort } : { _id: -1 };
+
+  const countAll = await ProductModel.product.countDocuments({
+    product_shop:filter?.product_shop,
+  });
+
+  const count = await ProductModel.product.countDocuments({
+    ...filter,
+  });
+
+  const isDelete = await ProductModel.product.countDocuments({
+    ...filter,
+    isDelete: true,
+  });
+
+  const isPublished = await ProductModel.product.countDocuments({
+    ...filter,
+    isDelete: false,
+    isPublished: true,
+  });
+
+  const isDraft = await ProductModel.product.countDocuments({
+    ...filter,
+    isDelete: false,
+    isPublished: false,
+  });
+
+  const products = await ProductModel.product
+    .find(filter)
+    .sort(sortBy)
+    .skip(skip)
+    .limit(limit)
+    .populate({ path: "product_shop" })
+    .select(getSelectData(select))
+    .lean();
+
+  return {
+    countAll: +countAll ?? 0,
+    totalCount: +count ?? 0,
+    isDelete: +isDelete ?? 0,
+    isPublished: +isPublished ?? 0,
+    isDraft: +isDraft ?? 0,
     totalPages: Math.ceil(count / limit),
     page: +page,
     limit: +limit,
@@ -250,4 +330,5 @@ module.exports = {
   findProductById1Repo,
   checkPriceProductsRepo,
   findOneAndUpdateProductRepo,
+  findProductsByShopRepo
 };

@@ -40,7 +40,15 @@ productRoute.get(
 // GET PUBLISHED PRODUCT
 productRoute.get(
   "/published/all",
+  // protect,
   asyncHandler(productController.findAllPublishedByShop)
+);
+
+// GET PRODUCTS BY SHOP
+productRoute.put(
+  "/all-by-shop",
+  // protect,
+  asyncHandler(productController.findAllProductsByShop)
 );
 
 // GET SEARCH PRODUCTS
