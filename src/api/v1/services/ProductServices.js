@@ -114,7 +114,7 @@ class ProductFactory {
     //   throw new ForbiddenRequestError("You are not Owner!!");
 
     if (!ids.length) return false;
-    
+
     await Promise.all(
       ids.map(async (id) => {
         return await updateProductByIdRepo("product", {
@@ -144,6 +144,8 @@ class ProductFactory {
       ],
       isDelete,
       isPublished,
+      product_type,
+      keyword,
     } = body;
 
     // updateAllRepo()
@@ -154,6 +156,33 @@ class ProductFactory {
     const filter = { product_shop };
     if (typeof isDelete === "boolean") filter.isDelete = isDelete;
     if (typeof isPublished === "boolean") filter.isPublished = isPublished;
+    if (product_type) filter.product_type = product_type;
+
+    if (keyword) {
+      const regexSearch = new RegExp(
+        toNonAccentVietnamese(keyword).replaceAll(" ", "-"),
+        "i"
+      );
+      filter.product_slug = { $regex: regexSearch };
+    }
+
+
+
+    logger.info(
+      `filter ::: ${util.inspect(filter, {
+        showHidden: false,
+        depth: null,
+        colors: false,
+      })}`
+    );
+
+
+
+
+
+
+
+
 
     return await findProductsByShopRepo({
       sort,

@@ -266,19 +266,6 @@ class ProductController {
     }).send(res);
   };
 
-  findAllProductsByShop = async (req, res, next) => {
-    new OK({
-      message: "findAllProductsByShop OK",
-      metadata: await ProductServices.findAllProductsByShop({
-        user: req.user,
-        body: req.body,
-      }),
-      options: {
-        product_shop: req.body.product_shop,
-      },
-    }).send(res);
-  };
-
   publishedProductByShop = async (req, res, next) => {
     new OK({
       message: "publishedProductByShop OK",
