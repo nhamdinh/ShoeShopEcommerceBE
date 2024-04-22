@@ -7,15 +7,15 @@ const logger = require("../log");
 const { convertToObjectId } = require("../utils/getInfo");
 
 const updateAllRepo = async () => {
-  const Model = model("Product");
+  const Model = model("Order");
   const Inventory = model("Inventory");
 
-  const products1 = await Model.find({}).sort({
+  const models = await Model.find({}).sort({
     _id: -1,
   });
 
-  // for (let i = 0; i < products1.length; i++) {
-  //   const item = products1[i];
+  // for (let i = 0; i < models.length; i++) {
+  //   const item = models[i];
   //   item.product_slug = toNonAccentVietnamese(item.product_name).replaceAll(" ","-=");
   //   await item.update(item);
   // }
@@ -23,17 +23,18 @@ const updateAllRepo = async () => {
   const startTime = performance.now();
 
   await Promise.all(
-    products1.map(async (product) => {
-      //       product.product_slug = toNonAccentVietnamese(product.product_name).replaceAll(" ","-");
-      //   const zz  =  +product.product_price * ( (Math.random() * (50 - 10) + 10) +100    )/100
+    models.map(async (mmm) => {
+      //       mmm.product_slug = toNonAccentVietnamese(mmm.product_name).replaceAll(" ","-");
+      //   const zz  =  +mmm.product_price * ( (Math.random() * (50 - 10) + 10) +100    )/100
         // const quantity  =  Math.floor( (Math.random() * (505 - 10) + 11)    )
 
-        //     product.product_quantity = quantity
-        //     await product.update(product);
+            // mmm.isCanceled = false
+            // mmm.isRefunded = false
+            // await mmm.update(mmm);
 
 
         //       const filter = {
-        //     inven_productId: convertToObjectId(product._id),
+        //     inven_productId: convertToObjectId(mmm._id),
         //   },
         //   updateSet = {
         //     inven_stock: quantity,

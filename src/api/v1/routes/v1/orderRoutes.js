@@ -56,6 +56,14 @@ orderRoute.get(
   asyncHandler(orderController.getAllOrderByAdmin)
 );
 
+// GET ORDERS BY SHOP
+orderRoute.put(
+  "/all-by-shop",
+  // protect,
+  asyncHandler(orderController.findAllOrdersByShop)
+);
+
+
 module.exports = orderRoute;
 
 // const express = require("express");

@@ -90,6 +90,16 @@ const orderSchema = Schema(
       required: true,
       default: false,
     },
+    isCanceled: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    isRefunded: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
     paidAt: { type: Date, required: false, default: null },
     isDelivered: {
       type: Boolean,

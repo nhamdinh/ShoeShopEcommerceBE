@@ -136,7 +136,6 @@ const findAllProductsRepo = async ({
   filter,
   select = [],
 }) => {
-  // updateAll();
 
   const skip = (page < 1 ? 1 : page - 1) * limit;
   // const sortBy = sort === "ctime" ? { _id: -1 } : { _id: 1 };
@@ -191,7 +190,6 @@ const findProductsByShopRepo = async ({
   filter,
   select = [],
 }) => {
-  // updateAll();
 
   const skip = (page < 1 ? 1 : page - 1) * limit;
   // const sortBy = sort === "ctime" ? { _id: -1 } : { _id: 1 };

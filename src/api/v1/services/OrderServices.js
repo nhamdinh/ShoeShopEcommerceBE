@@ -1,19 +1,22 @@
 "use strict";
 const util = require("util");
 const logger = require("../log");
-
 const { ForbiddenRequestError } = require("../core/errorResponse");
 const {
   findCartsRepo,
   findByIdAndUpdateCartRepo,
 } = require("../repositories/cart.repo");
 const { convertToObjectId } = require("../utils/getInfo");
-const { checkPriceProductsRepo } = require("../repositories/product.repo");
+const {
+  checkPriceProductsRepo,
+  findProductById1Repo,
+} = require("../repositories/product.repo");
 const { getDiscountsAmount } = require("./DiscountServices");
 const {
   createOrderRepo,
   findOrdersRepo,
   getOrderByIdRepo,
+  findOrdersByShopRepo,
 } = require("../repositories/order.repo");
 const { findAddressByUserRepo } = require("../repositories/address.repo");
 const OrderModel = require("../Models/OrderModel");
@@ -80,9 +83,86 @@ class OrderServices {
     //     colors: false,
     //   })}`
     // );
-
-    if (orders.length === 0) return [];
     return orders;
+  };
+
+  static findAllOrdersByShop = async ({ user, body }) => {
+    const {
+      shopId = convertToObjectId(shopId),
+      limit = 50,
+      page = 1,
+      sort = { _id: -1 },
+      select = [],
+      isPaid,
+      isDelivered,
+      keyword,
+      createdAt,
+    } = body;
+
+    // if (user._id?.toString() !== shopId?.toString())
+    //   throw new ForbiddenRequestError("You are not Owner!!");
+
+    const filter = {
+      shopId,
+    };
+    if (typeof isPaid === "boolean") filter.isPaid = isPaid;
+    if (typeof isDelivered === "boolean") filter.isDelivered = isDelivered;
+
+    if (keyword) {
+      const regexSearch = new RegExp(
+        toNonAccentVietnamese(keyword).replaceAll(" ", "-"),
+        "i"
+      );
+      filter.product_slug = { $regex: regexSearch };
+    }
+
+    if (createdAt)
+      filter.createdAt = {
+        $gte: new Date(createdAt.gte),
+        $lt: new Date(createdAt.lt),
+        // $gte: new Date("2023-02-20T00:00:00+07:00"),
+        // $lt: new Date("2024-04-20T00:00:00+07:00"),
+      };
+
+    // logger.info(
+    //   `filter ::: ${util.inspect(filter, {
+    //     showHidden: false,
+    //     depth: null,
+    //     colors: false,
+    //   })}`
+    // );
+
+    const metadata = await findOrdersByShopRepo({
+      sort,
+      limit,
+      page,
+      filter,
+      select,
+    });
+
+    const orders = metadata.orders.map((od) => {
+      const itemProducts = od?.orderItems[0]?.itemProducts;
+      return { ...od, itemProducts };
+    });
+    return {
+      ...metadata,
+      orders: await Promise.all(
+        orders.map(async (od) => {
+          const { itemProducts } = od;
+          const _itemProducts = await Promise.all(
+            itemProducts.map(async (prd) => {
+              return {
+                ...(await findProductById1Repo({
+                  product_id: convertToObjectId(prd.product_id),
+                })),
+                order_id: od._id,
+              };
+            })
+          );
+          return { ...od, itemProducts: _itemProducts };
+        })
+      ),
+    };
   };
 
   static orderIsDelivered = async ({ id }) => {

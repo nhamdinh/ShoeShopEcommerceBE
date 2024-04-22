@@ -68,6 +68,19 @@ class OrderController {
       }),
     }).send(res);
   };
+
+  findAllOrdersByShop = async (req, res, next) => {
+    new OK({
+      message: "findAllOrdersByShop OK",
+      metadata: await OrderServices.findAllOrdersByShop({
+        user: req.user,
+        body: req.body,
+      }),
+      options: {
+        product_shop: req.body.product_shop,
+      },
+    }).send(res);
+  };
 }
 
 module.exports = new OrderController();

@@ -166,24 +166,6 @@ class ProductFactory {
       filter.product_slug = { $regex: regexSearch };
     }
 
-
-
-    logger.info(
-      `filter ::: ${util.inspect(filter, {
-        showHidden: false,
-        depth: null,
-        colors: false,
-      })}`
-    );
-
-
-
-
-
-
-
-
-
     return await findProductsByShopRepo({
       sort,
       limit,
