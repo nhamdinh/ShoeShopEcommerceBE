@@ -1,7 +1,7 @@
 "use strict";
 
 const UserModel = require("../Models/UserModel");
-const { getSelectData } = require("../utils/getInfo");
+const { getSelectData, getUnSelectData } = require("../utils/getInfo");
 
 const findUserByEmailRepo = async ({
   email,
@@ -40,8 +40,21 @@ const findUserByIdRepo = async (id) => {
   exec(): async await trong db
   */
 };
-const findAllAdminUsersRepo = async (select = { _id: 0 }) => {
-  return await UserModel.find({ isAdmin: true }).select(select).lean();
+
+const findUserByIdRepo2 = async ({ id, unSelect = [] }) => {
+  return await UserModel.findById(id).select(getUnSelectData(unSelect)).lean();
+  /* 
+  lean(): giam size OBJECT, 
+   tra ve 1 obj js original,
+    neu k trar ve nhieu thong tin hon
+  exec(): async await trong db
+  */
+};
+
+const findAllAdminUsersRepo = async ({ unSelect = [] }) => {
+  return await UserModel.find({ isAdmin: true })
+    .select(getUnSelectData(unSelect))
+    .lean();
 };
 
 const createUserRepo = async (user) => {
@@ -84,4 +97,5 @@ module.exports = {
   findAllUsersRepo,
   findAllUsersOrdersRepo,
   findByIdAndUpdateUserRepo,
+  findUserByIdRepo2,
 };

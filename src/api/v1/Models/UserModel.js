@@ -41,6 +41,10 @@ const userSchema = Schema(
       type: String,
       required: true,
     },
+    user_salt: {
+      type: String,
+      required: false,
+    },
     countChat: {
       type: Number,
       required: false,
@@ -100,6 +104,7 @@ userSchema.pre("save", async function (next) {
   }
   const salt = await bcrypt.genSalt(8);
   this.password = await bcrypt.hash(this.password, salt);
+  this.user_salt = salt;
 });
 
 module.exports = model(DOCUMENT_NAME, userSchema);

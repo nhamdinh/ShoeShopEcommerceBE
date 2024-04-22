@@ -2,12 +2,13 @@
 const { model } = require("mongoose");
 const util = require("util");
 const { uid } = require("uid");
+const bcrypt = require("bcrypt");
 
 const logger = require("../log");
 const { convertToObjectId } = require("../utils/getInfo");
 
 const updateAllRepo = async () => {
-  const Model = model("Order");
+  const Model = model("User");
   const Inventory = model("Inventory");
 
   const models = await Model.find({}).sort({
@@ -27,9 +28,10 @@ const updateAllRepo = async () => {
       //       mmm.product_slug = toNonAccentVietnamese(mmm.product_name).replaceAll(" ","-");
       //   const zz  =  +mmm.product_price * ( (Math.random() * (50 - 10) + 10) +100    )/100
         // const quantity  =  Math.floor( (Math.random() * (505 - 10) + 11)    )
+        const salt = await bcrypt.genSalt(8);
 
-            // mmm.isCanceled = false
-            // mmm.isRefunded = false
+            // mmm.user_salt = salt
+            // mmm.password = await bcrypt.hash('123456', salt);
             // await mmm.update(mmm);
 
 

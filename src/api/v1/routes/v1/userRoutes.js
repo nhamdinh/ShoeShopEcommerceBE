@@ -37,6 +37,12 @@ userRouter.put(
   protect,
   asyncHandler(userController.updateProfile)
 );
+// UPDATE PROFILE
+userRouter.put(
+  "/change-password",
+  protect,
+  asyncHandler(userController.changePassword)
+);
 
 // UPDATE ISSHOP??
 userRouter.put(

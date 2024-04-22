@@ -111,13 +111,21 @@ class UserController {
     }).send(res);
   };
 
+  changePassword = async (req, res) => {
+    new OK({
+      message: "changePassword OK",
+      metadata: await UserServices.changePassword({
+        body: req.body,
+        id: req.user._id,
+      }),
+    }).send(res);
+  };
+
   updateProfile = async (req, res) => {
-    new CREATED({
-      message: "updateProfile CREATED",
+    new OK({
+      message: "updateProfile OK",
       metadata: await UserServices.updateProfile({
-        name: req.body.name,
-        email: req.body.email,
-        password: req.body.password,
+        body: req.body,
         id: req.user._id,
       }),
     }).send(res);

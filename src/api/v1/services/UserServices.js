@@ -9,7 +9,7 @@ const bcrypt = require("bcrypt");
 
 const { ForbiddenRequestError } = require("../core/errorResponse");
 const KeyTokenServices = require("./KeyTokenServices");
-const { getInfoData } = require("../utils/getInfo");
+const { getInfoData, convertToObjectId } = require("../utils/getInfo");
 const { createToken } = require("../utils/authUtils");
 const generateRefreshToken = require("../utils/generateRefreshToken");
 const generateToken = require("../utils/generateToken");
@@ -20,6 +20,7 @@ const {
   findAllAdminUsersRepo,
   createUserRepo,
   findAllUsersRepo,
+  findUserByIdRepo2,
 } = require("../repositories/user.repo");
 const UserModel = require("../Models/UserModel");
 const ChatStory = require("../Models/ChatStoryModel");
@@ -171,16 +172,36 @@ class UserServices {
     };
   };
 
-  static updateProfile = async ({ name, email, password, id }) => {
-    const user = await findUserByIdRepo(id);
+  static updateProfile = async ({ body, id }) => {
+    const user = await findUserByIdRepo(convertToObjectId(id));
 
     if (!user) throw new ForbiddenRequestError("User not Found", 404);
 
+    const { name, phone, avatar } = body;
     user.name = name ?? user.name;
-    user.email = email ?? user.email;
-    if (password) {
-      user.password = password;
-    }
+    user.phone = phone ?? user.phone;
+    user.avatar = avatar ?? user.avatar;
+
+    const updatedUser = await user.save();
+
+    return {
+      ...getInfoData({
+        object: updatedUser,
+        fields: ["_id", "name", "email", "phone", "isAdmin", "createdAt"],
+      }),
+    };
+  };
+
+  static changePassword = async ({ body, id }) => {
+    const { password, passwordOld } = body;
+    const user = await findUserByIdRepo(convertToObjectId(id));
+
+    if (!user) throw new ForbiddenRequestError("User not Found", 404);
+
+    const match = await bcrypt.compare(passwordOld, user.password);
+    if (!match) throw new ForbiddenRequestError("Wrong Old password ");
+
+    if (password) user.password = password;
 
     const updatedUser = await user.save();
 
@@ -249,9 +270,7 @@ class UserServices {
     }
 
     const match = await bcrypt.compare(password, user.password);
-    if (!match) {
-      throw new ForbiddenRequestError("Wrong Email or Password");
-    }
+    if (!match) throw new ForbiddenRequestError("Wrong Email or Password");
 
     const refreshToken = await generateRefreshToken(user?._id);
 
@@ -320,29 +339,40 @@ class UserServices {
     };
   };
 
-  static getProfile = async ({ id }) => {
-    const user = await findUserByIdRepo(id);
+  static getProfile = async ({
+    id,
+    unSelect = ["buyer", "password", "__v", "refreshToken"],
+  }) => {
+    const user = await findUserByIdRepo2({ id, unSelect });
     if (!user) {
       throw new ForbiddenRequestError("User not Found");
     }
-    const admins = await findAllAdminUsersRepo();
+    const admins = await findAllAdminUsersRepo({
+      unSelect: [...unSelect, "_id", "countChat", "roles"],
+    });
     // logger.info(`admins ::: ${admins}`);
     return {
-      ...getInfoData({
-        object: user,
-        fields: [
-          "_id",
-          "name",
-          "email",
-          "phone",
-          "isAdmin",
-          "createdAt",
-          "isShop",
-          "productShopName",
-        ],
-      }),
+      ...user,
       admins,
     };
+
+    // return {
+    //   ...getInfoData({
+    //     object: user,
+    //     fields: [
+    //       "_id",
+    //       "name",
+    //       "email",
+    //       "phone",
+    //       "isAdmin",
+    //       "createdAt",
+    //       "isShop",
+    //       "productShopName",
+    //       "avatar"
+    //     ],
+    //   }),
+    //   admins,
+    // };
   };
 
   static register = async (req) => {

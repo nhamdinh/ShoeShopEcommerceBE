@@ -22,5 +22,6 @@ module.exports = {
   DIRNAME_IMG_CATEGORYS: 'public/images/categorys',
 
   AVATAR: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTPYWi23AJDPw9hwCYw9TbBTS_VXSI_bVHoIj8S4XN19A&s',
+  PATH_IMG_AVATAR: 'avatar',
 
 };

@@ -16,11 +16,16 @@ const {
   PATH_IMG_CATEGORYS,
   PATH_IMG_COMMONS,
   URL_SERVER,
+  PATH_IMG_AVATAR,
 } = require("../utils/constant");
 const { randomName } = require("../utils/functionHelpers");
 const miniSize = {
   width: 370,
   height: 250,
+};
+const miniSizeAvatar = {
+  width: 400,
+  height: 400,
 };
 class UploadServices {
   /* s3 */
@@ -109,10 +114,11 @@ class UploadServices {
 
     const result = await cloudinary.uploader.upload(path, options);
 
+    const mini = folder === PATH_IMG_AVATAR ? miniSizeAvatar : miniSize;
     return {
       ...result,
       thumb_url: await cloudinary.url(result.public_id, {
-        ...miniSize,
+        ...mini,
         format: "jpg",
       }),
     };
