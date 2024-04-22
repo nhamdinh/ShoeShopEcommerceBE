@@ -13,7 +13,7 @@ const otpSchema = new Schema(
       default: "pending",
       enum: ["pending", "active", "block"],
     },
-    otp_expireAt: { type: Date, default: Date.now, expires: 60 * 10 }, // if 'expireAt' is set, then document expires at expireAt + 11 seconds
+    otp_expireAt: { type: Date, default: Date.now, expires: 60 * 5 }, // if 'expireAt' is set, then document expires at expireAt + 11 seconds
   },
   {
     collection: COLLECTION_NAME,

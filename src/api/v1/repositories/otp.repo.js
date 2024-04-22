@@ -20,7 +20,19 @@ const findOneOtpRepo = async ({
   return await OtpModel.findOne(filter).select(select).exec();
 };
 
+const findOneAndUpdateOtpRepo = async ({
+  filter,
+  updateSet,
+  options = {
+    upsert: false /* tao ban ghi moi */,
+    new: true,
+  },
+}) => {
+  return await OtpModel.findOneAndUpdate(filter, updateSet, options);
+};
+
 module.exports = {
   createOtpRepo,
   findOneOtpRepo,
+  findOneAndUpdateOtpRepo,
 };

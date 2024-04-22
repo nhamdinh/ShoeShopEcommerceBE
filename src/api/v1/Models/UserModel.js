@@ -1,5 +1,6 @@
 const { Schema, model } = require("mongoose"); // Erase if already required
 const bcrypt = require("bcrypt");
+const { AVATAR } = require("../utils/constant");
 const DOCUMENT_NAME = "User";
 const COLLECTION_NAME = "Users";
 
@@ -28,6 +29,13 @@ const userSchema = Schema(
       required: true,
       unique: false,
       trim: true,
+    },
+    avatar: {
+      type: String,
+      required: false,
+      unique: false,
+      trim: true,
+      default: AVATAR,
     },
     password: {
       type: String,

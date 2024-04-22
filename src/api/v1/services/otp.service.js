@@ -8,7 +8,10 @@ const { ForbiddenRequestError } = require("../core/errorResponse");
 
 const { convertToObjectId } = require("../utils/getInfo");
 const { findUserByEmailRepo } = require("../repositories/user.repo");
-const { createOtpRepo } = require("../repositories/otp.repo");
+const {
+  createOtpRepo,
+  findOneAndUpdateOtpRepo,
+} = require("../repositories/otp.repo");
 
 const { SENDER = "nhamnd.hmu@gmail.com" } = process.env;
 
@@ -60,7 +63,24 @@ class OtpServices {
       }
     });
 
-    await createOtpRepo({ otp_token: text, otp_email: email });
+    await findOneAndUpdateOtpRepo({
+      filter: {
+        otp_email: email,
+      },
+      updateSet: {
+        otp_token: text,
+        otp_email: email,
+        otp_expireAt: Date.now(),
+        otp_status: "pending",
+      },
+      options: {
+        upsert: true /* tao ban ghi moi */,
+        new: true,
+      },
+    });
+
+    // await createOtpRepo({ otp_token: text, otp_email: email });
+
     return true;
   };
 }

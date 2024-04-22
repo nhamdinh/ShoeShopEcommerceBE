@@ -23,7 +23,10 @@ const {
 } = require("../repositories/user.repo");
 const UserModel = require("../Models/UserModel");
 const ChatStory = require("../Models/ChatStoryModel");
-const { findOneOtpRepo } = require("../repositories/otp.repo");
+const {
+  findOneOtpRepo,
+  findOneAndUpdateOtpRepo,
+} = require("../repositories/otp.repo");
 
 const { SENDER = "nhamnd.hmu@gmail.com" } = process.env;
 
@@ -367,6 +370,16 @@ class UserServices {
 
     if (!otpExists) throw new ForbiddenRequestError("OTP wrong!");
 
+    await findOneAndUpdateOtpRepo({
+      filter: {
+        otp_email: email,
+        otp_token: otp,
+      },
+      updateSet: {
+        otp_status: "block",
+      },
+    });
+
     const newUser = await createUserRepo({
       name,
       email,
@@ -382,7 +395,6 @@ class UserServices {
         colors: false,
       })}`
     );
-
     /* create public key; private key; createKeyToken by key */
     const { publicKey, privateKey } = crypto.generateKeyPairSync("rsa", {
       modulusLength: 4096,
