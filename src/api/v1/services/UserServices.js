@@ -23,6 +23,7 @@ const {
 } = require("../repositories/user.repo");
 const UserModel = require("../Models/UserModel");
 const ChatStory = require("../Models/ChatStoryModel");
+const { findOneOtpRepo } = require("../repositories/otp.repo");
 
 const { SENDER = "nhamnd.hmu@gmail.com" } = process.env;
 
@@ -39,6 +40,7 @@ class UserServices {
           : "Invalid input sendEmail()",
         422
       );
+
     const transporter = nodemailer.createTransport({
       service: "Gmail",
       auth: {
@@ -71,6 +73,7 @@ class UserServices {
         return { message: "send email success" };
       }
     });
+
     return { message: "send email success" };
   };
 
@@ -348,11 +351,21 @@ class UserServices {
         422
       );
     }
-    const { name, email, password, phone, isAdmin } = req.body;
+
+    const { name, email, password, phone, isAdmin, otp } = req.body;
+
     const userExists = await findUserByEmailRepo({ email }); //giam size OBJECT, tra ve 1 obj js original, neu k trar ve nhieu thong tin hon
-    if (userExists) {
-      throw new ForbiddenRequestError("User already NOT exists");
-    }
+    if (userExists) throw new ForbiddenRequestError("User already EXISTS!");
+
+    const otpExists = await findOneOtpRepo({
+      filter: {
+        otp_email: email,
+        otp_token: otp,
+        otp_status: "pending",
+      },
+    });
+
+    if (!otpExists) throw new ForbiddenRequestError("OTP wrong!");
 
     const newUser = await createUserRepo({
       name,
@@ -361,9 +374,7 @@ class UserServices {
       password,
       isAdmin,
     });
-    if (!newUser) {
-      throw new ForbiddenRequestError("Invalid User Data");
-    }
+    if (!newUser) throw new ForbiddenRequestError("Invalid User Data");
     logger.info(
       `newUser register ::: ${util.inspect(newUser, {
         showHidden: false,
