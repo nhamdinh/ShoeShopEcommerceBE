@@ -265,13 +265,15 @@ class DiscountServices {
       discount_productIds,
     } = foundDiscount;
 
-    // if (
-    //   !discount_isActive ||
-    //   discount_quantity === 0 ||
-    //   new Date() > new Date(discount_end) ||
-    //   new Date() < new Date(discount_start)
-    // )
-    //   throw new ForbiddenRequestError(`Discount is out`);
+    /* check expire */
+    if (
+      !discount_isActive ||
+      discount_quantity === 0 ||
+      new Date() > new Date(discount_end) ||
+      new Date() < new Date(discount_start)
+    )
+      throw new ForbiddenRequestError(`Discount has been expired`);
+    /* check expire */
 
     if (discount_order_minValue <= 0)
       throw new ForbiddenRequestError(`discount_order_minValue <= 0`, 404);
