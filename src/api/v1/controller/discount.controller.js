@@ -19,7 +19,7 @@ class DiscountController {
     new OK({
       message: "getAllDiscountsByShop OK",
       metadata: await DiscountServices.getAllDiscountsByShop({
-        discount_shopId: req.query?.discount_shopId,
+        query: req.query,
         body: req.body,
       }),
     }).send(res);
@@ -47,7 +47,7 @@ class DiscountController {
 
   getDiscountsAmount = async (req, res) => {
     new OK({
-      message: "getDiscountsAmount OK", /* BO; dung de checkout cart */
+      message: "getDiscountsAmount OK" /* BO; dung de checkout cart */,
       metadata: await DiscountServices.getDiscountsAmount({
         discount_used_userId: req.user._id,
         discount_code: req.body.discount_code.toUpperCase(),

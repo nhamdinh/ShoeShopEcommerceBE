@@ -154,6 +154,66 @@ class DiscountServices {
     return foundDiscounts;
   };
 
+  static getAllDiscountsByShop = async ({
+    limit = 50,
+    sort = { _id: -1 },
+    page = 1,
+    filter = {
+      discount_isActive: true,
+    },
+    unSelect = ["__v"],
+    query,
+    body,
+  }) => {
+    const { discount_shopId } = query;
+
+    const foundDiscounts = await getAllDiscountsByShopRepo({
+      limit: +limit,
+      page: +page,
+      sort,
+      filter: {
+        ...filter,
+        discount_shopId: convertToObjectId(discount_shopId),
+      },
+      unSelect,
+    });
+
+    logger.info(
+      `foundDiscounts ::: ${util.inspect(foundDiscounts, {
+        showHidden: false,
+        depth: null,
+        colors: false,
+      })}`
+    );
+
+    const metadataProducts = await ProductServices.findAllPublishedByShop({
+      product_shop: convertToObjectId(discount_shopId),
+    });
+
+    const discounts = foundDiscounts?.discounts.map((item) => {
+      const final = { ...item };
+      const productsIds = item?.discount_productIds;
+
+      if (productsIds.length) {
+        const productsDiscount = [];
+
+        for (let i = 0; i < productsIds.length; i++) {
+          const _id = productsIds[i];
+
+          const product = metadataProducts.products.find(
+            (item) => item._id.toString() === _id
+          );
+          if (product) productsDiscount.push({ ...product, _id });
+        }
+
+        final.discount_productIds = productsDiscount;
+      }
+      return final;
+    });
+    
+    return { ...foundDiscounts, discounts };
+  };
+
   static DiscountStrategy = {
     products_special: (props) =>
       DiscountServices.discountStrategySpecial(props),

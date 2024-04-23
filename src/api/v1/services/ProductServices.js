@@ -102,7 +102,7 @@ class ProductFactory {
     // if (user._id?.toString() !== product_shop?.toString())
     //   throw new ForbiddenRequestError("You are not Owner!!");
 
-    const query = { product_shop, isPublished: true };
+    const query = { product_shop, isPublished: true, isDelete: false };
     return await findAllProductsByShopRepo({ query, limit, skip });
   };
 
