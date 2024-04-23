@@ -82,6 +82,10 @@ const userSchema = Schema(
       type: Array,
       default: [],
     },
+    user_clients: {
+      type: Array,
+      default: [],
+    },
     // passwordChangedAt: Date,
     // passwordResetToken: String,
     // passwordResetExpires: Date,

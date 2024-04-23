@@ -21,6 +21,7 @@ const {
   createUserRepo,
   findAllUsersRepo,
   findUserByIdRepo2,
+  findUsersRepo,
 } = require("../repositories/user.repo");
 const UserModel = require("../Models/UserModel");
 const ChatStory = require("../Models/ChatStoryModel");
@@ -341,16 +342,28 @@ class UserServices {
 
   static getProfile = async ({
     id,
-    unSelect = ["buyer", "password", "__v", "refreshToken"],
+    unSelect = ["buyer", "password", "__v", "refreshToken", "user_salt"],
   }) => {
     const user = await findUserByIdRepo2({ id, unSelect });
     if (!user) {
       throw new ForbiddenRequestError("User not Found");
     }
     const admins = await findAllAdminUsersRepo({
-      unSelect: [...unSelect, "_id", "countChat", "roles"],
+      // unSelect: [],
+      unSelect: [...unSelect, "_id", "countChat", "roles", "user_clients"],
     });
     // logger.info(`admins ::: ${admins}`);
+
+    const userIds = user.user_clients.map((id) => convertToObjectId(id));
+
+    const _user_clients = await findUsersRepo({
+      filter: {
+        _id: { $in: userIds },
+      },
+      unSelect: [...unSelect, "user_clients"],
+    });
+
+    user.user_clients = _user_clients;
     return {
       ...user,
       admins,

@@ -88,6 +88,19 @@ const findAllUsersOrdersRepo = async (filter) => {
   return await UserModel.find(filter).select({ _id: 1 }).lean();
 };
 
+const findUsersRepo = async ({ filter, unSelect = [] }) => {
+  return await UserModel.find(filter)
+    .select(getUnSelectData(unSelect))
+    // .populate("userId")
+    // .populate("shopId")
+    // .populate("cartId")
+    // .populate("shippingAddress")
+    .sort({
+      _id: -1,
+    })
+    .lean();
+};
+
 module.exports = {
   findUserByEmailRepo,
   findByIdAndUpdateTokenRepo,
@@ -98,4 +111,5 @@ module.exports = {
   findAllUsersOrdersRepo,
   findByIdAndUpdateUserRepo,
   findUserByIdRepo2,
+  findUsersRepo,
 };

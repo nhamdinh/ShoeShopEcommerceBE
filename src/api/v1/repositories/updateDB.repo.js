@@ -23,33 +23,48 @@ const updateAllRepo = async () => {
 
   const startTime = performance.now();
 
+  // const arr = await Promise.all(
+  //   models.map(async (mmm) => {
+  //     return mmm._id.toString();
+  //   })
+  // );
+
+  // logger.info(
+  //   `arr ::: ${util.inspect(arr, {
+  //     showHidden: false,
+  //     depth: null,
+  //     colors: false,
+  //   })}`
+  // );
+
   await Promise.all(
     models.map(async (mmm) => {
       //       mmm.product_slug = toNonAccentVietnamese(mmm.product_name).replaceAll(" ","-");
       //   const zz  =  +mmm.product_price * ( (Math.random() * (50 - 10) + 10) +100    )/100
-        // const quantity  =  Math.floor( (Math.random() * (505 - 10) + 11)    )
-        const salt = await bcrypt.genSalt(8);
-
-            // mmm.user_salt = salt
-            // mmm.password = await bcrypt.hash('123456', salt);
-            // await mmm.update(mmm);
-
-
-        //       const filter = {
-        //     inven_productId: convertToObjectId(mmm._id),
-        //   },
-        //   updateSet = {
-        //     inven_stock: quantity,
-        //   },
-        //   options = {
-        //     upsert: false,
-        //     new: true,
-        //   }; /* upsert: them moi(true); new: return du lieu moi */
-        // await Inventory.findOneAndUpdate(filter, updateSet, options);
+      // const quantity  =  Math.floor( (Math.random() * (505 - 10) + 11)    )
+    
+      
+      // mmm.user_salt = salt
+      // mmm.password = await bcrypt.hash('123456', salt);
+      // await mmm.update(mmm);
+     
+     
+      //       const filter = {
+      //     inven_productId: convertToObjectId(mmm._id),
+      //   },
+      //   updateSet = {
+      //     inven_stock: quantity,
+      //   },
+      //   options = {
+      //     upsert: false,
+      //     new: true,
+      //   }; /* upsert: them moi(true); new: return du lieu moi */
+      // await Inventory.findOneAndUpdate(filter, updateSet, options);
     })
   );
 
   const endTime = performance.now();
+
   logger.info(
     `endTime - startTime ::: ${util.inspect(endTime - startTime, {
       showHidden: false,
