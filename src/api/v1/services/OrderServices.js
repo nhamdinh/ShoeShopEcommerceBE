@@ -141,9 +141,10 @@ class OrderServices {
     });
 
     const orders = metadata.orders.map((od) => {
-      const itemProducts = od?.orderItems[0]?.itemProducts;
+      const itemProducts = od?.orderItems[0]?.itemProducts ?? od?.orderItems;
       return { ...od, itemProducts };
     });
+
     return {
       ...metadata,
       orders: await Promise.all(
@@ -206,12 +207,16 @@ class OrderServices {
     /* ADD  product TO user.buyer */
     const user = await findUserByIdRepo(order?.userId);
     const buyerArr = user?.buyer;
-    let orderItems = [];
-    order?.orderItems[0]?.itemProducts?.map((or) => {
-      orderItems.push(or?.product_id);
+    const productIds = [];
+
+    const itemProducts =
+      order?.orderItems[0]?.itemProducts ?? order?.orderItems;
+
+    itemProducts.map((or) => {
+      productIds.push(or?.product_id);
     });
 
-    const arr = Array.from(new Set([...buyerArr, ...orderItems]));
+    const arr = Array.from(new Set([...buyerArr, ...productIds]));
     user.buyer = [...arr];
     await user.save();
     // /* ADD  product TO user.buyer */
