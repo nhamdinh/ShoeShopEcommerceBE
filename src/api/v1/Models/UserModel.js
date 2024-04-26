@@ -65,6 +65,16 @@ const userSchema = Schema(
       required: false,
       default: [],
     },
+    user_follower: {
+      type: Array,
+      required: false,
+      default: [],
+    },
+    user_watching: {
+      type: Array,
+      required: false,
+      default: [],
+    },
     refreshToken: {
       type: String,
     },

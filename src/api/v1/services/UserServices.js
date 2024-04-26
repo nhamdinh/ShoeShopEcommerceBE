@@ -34,52 +34,87 @@ const { SENDER = "nhamnd.hmu@gmail.com" } = process.env;
 
 class UserServices {
   static sendEmail = async ({ request }) => {
-    const errors = validationResult(request);
+    // const errors = validationResult(request);
 
-    if (!errors.isEmpty())
-      throw new ForbiddenRequestError(
-        errors.array().length > 0
-          ? errors.array().reduce((acc, item) => {
-              return acc + item.msg + " ; ";
-            }, [])
-          : "Invalid input sendEmail()",
-        422
-      );
+    // if (!errors.isEmpty())
+    //   throw new ForbiddenRequestError(
+    //     errors.array().length > 0
+    //       ? errors.array().reduce((acc, item) => {
+    //           return acc + item.msg + " ; ";
+    //         }, [])
+    //       : "Invalid input sendEmail()",
+    //     422
+    //   );
+    const { body } = request;
+    const { email, id, productShopName, productShopId } = body;
 
-    const transporter = nodemailer.createTransport({
-      service: "Gmail",
-      auth: {
-        user: SENDER,
-        pass: "ylzumnpdvgxjmrzw",
-      },
-    });
+    let emailUserWatching = email;
+    let idUserWatching = undefined;
 
-    const mail_option = {
-      from: SENDER,
-      to: request.body?.email,
-      subject: "YOUR MESSAGE FROM BESTBUY SHOP",
-      //   text: (
-      //     Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000
-      //   ).toString(),
-      text: `Welcome to ${request.body?.productShopName}`,
-    };
+    if (id) {
+      /* update userWatching  */
+      const userWatching = await findUserByIdRepo(convertToObjectId(id));
 
-    transporter.sendMail(mail_option, (error, info) => {
-      if (error) {
-        logger.error(
-          `sendMail() ::: ${util.inspect(error, {
-            showHidden: false,
-            depth: null,
-            colors: false,
-          })}`
-        );
-        throw new ForbiddenRequestError("sendMail error");
-      } else {
-        return { message: "send email success" };
-      }
-    });
+      if (!userWatching) throw new ForbiddenRequestError("User not Found", 404);
 
-    return { message: "send email success" };
+      userWatching.user_watching = [
+        ...new Set([...userWatching.user_watching, productShopId]),
+      ];
+
+      await userWatching.save();
+
+      emailUserWatching = userWatching.email;
+      idUserWatching = userWatching._id.toString();
+
+      /* update userWatching  */
+    }
+
+    // const transporter = nodemailer.createTransport({
+    //   service: "Gmail",
+    //   auth: {
+    //     user: SENDER,
+    //     pass: "ylzumnpdvgxjmrzw",
+    //   },
+    // });
+
+    // const mail_option = {
+    //   from: SENDER,
+    //   to: emailUserWatching,
+    //   subject: `YOUR MESSAGE FROM ${productShopName} SHOP`,
+    //   //   text: (
+    //   //     Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000
+    //   //   ).toString(),
+    //   text: `Thank you for following ${productShopName}, You will receive information from us as soon as possible !`,
+    // };
+
+    // transporter.sendMail(mail_option, (error, info) => {
+    //   if (error) {
+    //     logger.error(
+    //       `sendMail() ::: ${util.inspect(error, {
+    //         showHidden: false,
+    //         depth: null,
+    //         colors: false,
+    //       })}`
+    //     );
+    //     throw new ForbiddenRequestError("sendMail error");
+    //   }
+    // });
+
+    /* update userFollower by productShopId*/
+    const userFollower = await findUserByIdRepo(
+      convertToObjectId(productShopId)
+    );
+    if (!userFollower) throw new ForbiddenRequestError("User not Found", 404);
+    userFollower.user_follower = [
+      ...new Set([
+        ...userFollower.user_follower,
+        idUserWatching ?? emailUserWatching,
+      ]),
+    ];
+    await userFollower.save();
+    /* userFollower */
+
+    return true;
   };
 
   static clearCountChat = async ({ req }) => {
@@ -196,8 +231,9 @@ class UserServices {
   static changePassword = async ({ body, id }) => {
     const { password, passwordOld } = body;
     const user = await findUserByIdRepo(convertToObjectId(id));
-    const zz =["user@example.com","admin@example.com"]
-    if(zz.includes(user.email)) throw new ForbiddenRequestError("this User do not allow change", 404);
+    const zz = ["user@example.com", "admin@example.com"];
+    if (zz.includes(user.email))
+      throw new ForbiddenRequestError("this User do not allow change", 404);
     if (!user) throw new ForbiddenRequestError("User not Found", 404);
 
     const match = await bcrypt.compare(passwordOld, user.password);
@@ -336,7 +372,14 @@ class UserServices {
     return {
       ...getInfoData({
         object: user,
-        fields: ["name", "email", "phone", "createdAt", "productShopName"],
+        fields: [
+          "name",
+          "email",
+          "phone",
+          "createdAt",
+          "productShopName",
+          "_id",
+        ],
       }),
     };
   };
