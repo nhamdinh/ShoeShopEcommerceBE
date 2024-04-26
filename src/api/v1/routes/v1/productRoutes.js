@@ -17,6 +17,13 @@ productRoute.put(
   asyncHandler(productController.createProduct)
 );
 
+// CREATE SPU PRODUCT
+productRoute.put(
+  "/create-spu",
+  protect,
+  asyncHandler(productController.createSpu)
+);
+
 // PUBLISHED PRODUCT
 productRoute.put(
   "/published/:id",

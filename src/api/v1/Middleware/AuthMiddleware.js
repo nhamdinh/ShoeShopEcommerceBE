@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 const asyncHandler = require("express-async-handler");
 const User = require("../Models/UserModel");
 const { ForbiddenRequestError } = require("../core/errorResponse");
+const { getUnSelectData } = require("../utils/getInfo");
 
 module.exports = {
   admin: (req, res, next) => {
@@ -28,7 +29,15 @@ module.exports = {
       if (!token)
         throw new ForbiddenRequestError("Not authorized, no token", 401);
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      req.user = await User.findById(decoded.id).select("-password");
+      req.user = await User.findById(decoded.id).select(
+        getUnSelectData([
+          "password",
+          "buyer",
+          "user_clients",
+          "user_follower",
+          "user_watching",
+        ])
+      );
 
       // logger.info(
       //   `req.user::: ${util.inspect(req.user, {

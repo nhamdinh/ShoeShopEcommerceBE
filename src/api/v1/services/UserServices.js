@@ -20,7 +20,7 @@ const {
   findAllAdminUsersRepo,
   createUserRepo,
   findAllUsersRepo,
-  findUserByIdRepo2,
+  findUserByIdLeanRepo,
   findUsersRepo,
 } = require("../repositories/user.repo");
 const UserModel = require("../Models/UserModel");
@@ -388,7 +388,7 @@ class UserServices {
     id,
     unSelect = ["buyer", "password", "__v", "refreshToken", "user_salt"],
   }) => {
-    const user = await findUserByIdRepo2({ id, unSelect });
+    const user = await findUserByIdLeanRepo({ id, unSelect });
     if (!user) {
       throw new ForbiddenRequestError("User not Found");
     }
