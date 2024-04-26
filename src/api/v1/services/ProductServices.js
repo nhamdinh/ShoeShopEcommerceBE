@@ -15,7 +15,10 @@ const {
   updateProductByIdRepo,
   findProductsByShopRepo,
 } = require("../repositories/product.repo");
-const { findUserByIdRepo } = require("../repositories/user.repo");
+const {
+  findUserByIdRepo,
+  findUserByIdLeanRepo,
+} = require("../repositories/user.repo");
 const {
   PRODUCT_TYPE,
   RD_EXPIRE,
@@ -44,15 +47,35 @@ class ProductFactory {
     ProductFactory.productTypeStrategy[type] = classRef;
   }
 
-  static createProductType = async (type, payload) => {
+  static createProductTypeFactory = async (type, payload) => {
     const productTypeClass =
       ProductFactory.productTypeStrategy[
         type
       ]; /* = class ClassRef extends Product */
     if (!productTypeClass)
       throw new ForbiddenRequestError(
-        `Invalid Product type createProductType ::: ${type}`
+        `Invalid Product type createProductTypeFactory ::: ${type}`
       );
+
+    const product_shop = payload.user._id;
+
+    const user = await findUserByIdLeanRepo({
+      id: convertToObjectId(product_shop),
+      unSelect: [
+        "buyer",
+        "password",
+        "__v",
+        "refreshToken",
+        "user_salt",
+        "user_clients",
+        "user_follower",
+        "user_watching",
+      ],
+    });
+
+    if (!user) throw new ForbiddenRequestError("User not Found");
+
+    payload.product_shop = product_shop;
 
     return new productTypeClass(payload).createProductType(); // create CON -> CHA
   };
@@ -578,11 +601,6 @@ const classRefStrategy = (type) => {
   return class ClassRef extends Product {
     // CON
     async createProductType() {
-      const user = await findUserByIdRepo(this.product_shop);
-
-      if (!user) {
-        throw new ForbiddenRequestError("User not Found");
-      }
 
       const newProductType = await createProductModelRepo(type, {
         ...this.product_attributes,

@@ -5,6 +5,7 @@ const logger = require("../log");
 const Product = require("../Models/ProductModel");
 const User = require("../Models/UserModel");
 const ProductServices = require("../services/ProductServices");
+const SpuServices = require("../services/spu.service");
 const { CREATED, OK } = require("../core/successResponse");
 
 // const getAllProduct = asyncHandler(async (req, res) => {
@@ -206,13 +207,24 @@ class ProductController {
     }).send(res);
   };
 
+  createSpu = async (req, res, next) => {
+    new CREATED({
+      message: "createSpu CREATED",
+      metadata: await SpuServices.createSpu({
+        body: req.body,
+        user: req.user,
+      }),
+    }).send(res);
+  };
+
   createProduct = async (req, res, next) => {
     new CREATED({
       message: "createProduct CREATED",
-      metadata: await ProductServices.createProductType(
+      metadata: await ProductServices.createProductTypeFactory(
         req.body?.product_type,
         {
           ...req.body,
+          user: req.user,
         }
       ),
     }).send(res);
