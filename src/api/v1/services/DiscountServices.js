@@ -178,14 +178,6 @@ class DiscountServices {
       unSelect,
     });
 
-    logger.info(
-      `foundDiscounts ::: ${util.inspect(foundDiscounts, {
-        showHidden: false,
-        depth: null,
-        colors: false,
-      })}`
-    );
-
     const metadataProducts = await ProductServices.findAllPublishedByShop({
       product_shop: convertToObjectId(discount_shopId),
     });

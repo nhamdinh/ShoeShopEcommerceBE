@@ -189,13 +189,15 @@ class ProductFactory {
 
   static findAllProducts = async ({ query }) => {
     let {
-      sort = { _id: -1 },
       page = +(query?.page ?? 1),
       limit = +(query?.limit ?? 50),
 
+      orderByKey = query?.orderByKey ?? "_id",
+      orderByValue = +(query?.orderByValue ?? -1),
       product_shop = query?.product_shop ?? "",
       keyword = query?.keyword ?? "",
       brand = query?.brand ?? "",
+      product_type = query?.product_type ?? "",
       select = [
         // "product_name",
         // "product_shop",
@@ -206,7 +208,18 @@ class ProductFactory {
         // "isPublished",
       ],
     } = query;
+    const sort = {};
+    sort[orderByKey] = +orderByValue;
     const keywords = keyword;
+
+    if (product_type) {
+      product_type = {
+        product_type,
+      };
+    } else {
+      product_type = {};
+    }
+
     if (product_shop) {
       product_shop = {
         product_shop: convertToObjectId(product_shop),
@@ -236,6 +249,7 @@ class ProductFactory {
     const filter = {
       isPublished: true,
       ...product_shop,
+      ...product_type,
       ...keyword,
       "product_attributes.brand": { $regex: regexSearchBrand },
     };
@@ -250,6 +264,7 @@ class ProductFactory {
       if (
         cachedDataFilter ===
         JSON.stringify({
+          sort,
           limit,
           page,
           filter,
@@ -288,6 +303,7 @@ class ProductFactory {
       await setAsync(
         RD_FILTER_PRODUCTS,
         JSON.stringify({
+          sort,
           limit,
           page,
           filter,
@@ -317,6 +333,7 @@ class ProductFactory {
     await setAsync(
       RD_FILTER_PRODUCTS,
       JSON.stringify({
+        sort,
         limit,
         page,
         filter,
