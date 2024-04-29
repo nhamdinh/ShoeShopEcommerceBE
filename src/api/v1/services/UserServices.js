@@ -233,10 +233,13 @@ class UserServices {
     const user = await findUserByIdRepo(convertToObjectId(id));
     const zz = ["user@example.com", "admin@example.com"];
     if (zz.includes(user.email))
-      throw new ForbiddenRequestError("this User do not allow change", 404);
+      throw new ForbiddenRequestError("this User do not allow to change", 404);
     if (!user) throw new ForbiddenRequestError("User not Found", 404);
 
-    const match = await bcrypt.compare(passwordOld, user.password);
+    const salt = user.user_salt;
+    const passwordHashed = await bcrypt.hash(passwordOld, salt);
+
+    const match = user.password === passwordHashed;
     if (!match) throw new ForbiddenRequestError("Wrong Old password ");
 
     if (password) user.password = password;
@@ -295,7 +298,6 @@ class UserServices {
 
     const { email, password } = req.body;
     const user = await findUserByEmailRepo({ email });
-    // console.log(`user ::: ${user}`);
     logger.info(
       `user login ::: ${util.inspect(user, {
         showHidden: false,
@@ -303,11 +305,13 @@ class UserServices {
         colors: false,
       })}`
     );
-    if (!user) {
-      throw new ForbiddenRequestError("Wrong Email or Password");
-    }
 
-    const match = await bcrypt.compare(password, user.password);
+    if (!user) throw new ForbiddenRequestError("Wrong Email or Password");
+
+    const salt = user.user_salt;
+    const passwordHashed = await bcrypt.hash(password, salt);
+
+    const match = user.password === passwordHashed;
     if (!match) throw new ForbiddenRequestError("Wrong Email or Password");
 
     const refreshToken = await generateRefreshToken(user?._id);

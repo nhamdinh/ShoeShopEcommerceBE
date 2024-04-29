@@ -41,7 +41,7 @@ const findUserByIdRepo = async (id) => {
   */
 };
 
-const findUserByIdRepo2 = async ({ id, unSelect = [] }) => {
+const findUserByIdLeanRepo = async ({ id, unSelect = [] }) => {
   return await UserModel.findById(id).select(getUnSelectData(unSelect)).lean();
   /* 
   lean(): giam size OBJECT, 
@@ -110,6 +110,6 @@ module.exports = {
   findAllUsersRepo,
   findAllUsersOrdersRepo,
   findByIdAndUpdateUserRepo,
-  findUserByIdRepo2,
+  findUserByIdLeanRepo,
   findUsersRepo,
 };

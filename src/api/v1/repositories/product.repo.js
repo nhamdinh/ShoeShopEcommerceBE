@@ -136,7 +136,6 @@ const findAllProductsRepo = async ({
   filter,
   select = [],
 }) => {
-
   const skip = (page < 1 ? 1 : page - 1) * limit;
   // const sortBy = sort === "ctime" ? { _id: -1 } : { _id: 1 };
   const sortBy = Object.keys(sort).length ? { ...sort } : { _id: -1 };
@@ -167,7 +166,19 @@ const findAllProductsRepo = async ({
     .sort(sortBy)
     .skip(skip)
     .limit(limit)
-    .populate({ path: "product_shop" })
+    .populate({
+      path: "product_shop",
+      select: getUnSelectData([
+        "buyer",
+        "password",
+        "__v",
+        "refreshToken",
+        "user_salt",
+        "user_clients",
+        "user_follower",
+        "user_watching",
+      ]),
+    })
     .select(getSelectData(select))
     .lean();
 
@@ -190,7 +201,6 @@ const findProductsByShopRepo = async ({
   filter,
   select = [],
 }) => {
-
   const skip = (page < 1 ? 1 : page - 1) * limit;
   // const sortBy = sort === "ctime" ? { _id: -1 } : { _id: 1 };
   const sortBy = Object.keys(sort).length ? { ...sort } : { _id: -1 };

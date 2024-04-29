@@ -19,6 +19,7 @@ const skusSchema = new Schema(
     sku_stock: { type: Number, default: 0 },
     sku_price: { type: Number, default: 0 },
     sku_slug: { type: String, default: "" },
+    sku_values: { type: Object, default: null },
     sku_default: { type: Boolean, default: false },
     sku_sort: { type: Number, default: 0 }, // ai trả tiền thì cho lên đầu
 

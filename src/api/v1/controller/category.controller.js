@@ -4,6 +4,8 @@ const Category = require("../Models/CategoryModel");
 const Brand = require("../Models/BrandModel");
 
 const { PAGE_SIZE } = require("../utils/constant");
+const CategoryServices = require("../services/category.service");
+const { OK } = require("../core/successResponse");
 
 const getAllCategory = asyncHandler(async (req, res) => {
   try {
@@ -81,17 +83,35 @@ const createCategory = asyncHandler(async (req, res) => {
 });
 /* --------------------------------------------------------------------------------------------------------------- */
 
-const getAllBrand = asyncHandler(async (req, res) => {
-  try {
-    const count = await Brand.countDocuments({});
-    const brands = await Brand.find({ deletedAt: null }).sort({
-      createdAt: -1,
-    });
-    res.json({ count, brands });
-  } catch (error) {
-    throw new Error(error);
-  }
-});
+const getAllBrandByCategories = async (req, res, next) => {
+  new OK({
+    message: "getAllBrandByCategories OK",
+    metadata: await CategoryServices.getAllBrandByCategories({
+      body: req.body,
+    }),
+  }).send(res);
+};
+
+const getAllBrand = async (req, res, next) => {
+  new OK({
+    message: "getAllBrand OK",
+    metadata: await CategoryServices.getAllBrand({
+      query: req.query,
+    }),
+  }).send(res);
+};
+
+// asyncHandler(async (req, res) => {
+//   try {
+//     const count = await Brand.countDocuments({});
+//     const brands = await Brand.find({ deletedAt: null }).sort({
+//       createdAt: -1,
+//     });
+//     res.json({ count, brands });
+//   } catch (error) {
+//     throw new Error(error);
+//   }
+// });
 
 const getAllBrandByAdmin = asyncHandler(async (req, res) => {
   try {
@@ -157,4 +177,5 @@ module.exports = {
   getAllBrandByAdmin,
   deleteBrandById,
   createBrand,
+  getAllBrandByCategories,
 };

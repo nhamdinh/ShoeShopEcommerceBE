@@ -220,13 +220,10 @@ class ProductController {
   createProduct = async (req, res, next) => {
     new CREATED({
       message: "createProduct CREATED",
-      metadata: await ProductServices.createProductTypeFactory(
-        req.body?.product_type,
-        {
-          ...req.body,
-          user: req.user,
-        }
-      ),
+      metadata: await ProductServices.createProductTypeFactory({
+        ...req.body,
+        user: req.user,
+      }),
     }).send(res);
   };
 

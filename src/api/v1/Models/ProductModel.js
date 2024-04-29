@@ -9,23 +9,31 @@ const COLLECTION_NAME = "Products";
 const productSchema = new Schema(
   {
     product_name: { type: String, required: true, trim: true },
-    product_sku: { type: String, required: false, trim: true },
-    // product_name_nonVi: { type: String, required: true, trim: true, },
     product_slug: String,
     product_thumb: { type: String, required: true },
-    product_thumb_small: { type: String, required: false, trim: true },
-    product_description: String,
-    product_original_price: { type: Number, required: true },
+    product_thumb_small: { type: String, trim: true },
+    product_description: { type: String, default: "" },
+    product_original_price: { type: Number, default: 0 },
     product_price: { type: Number, required: true },
     product_quantity: { type: Number, required: true },
-    product_sold: { type: Number, required: false, default: 0 },
-    product_type: {
-      type: String,
-      required: true,
-      enum: [...PRODUCT_TYPE],
-    },
+    product_sold: { type: Number, default: 0 },
+    // product_type: {
+    //   type: String,
+    //   required: true,
+    //   enum: [...PRODUCT_TYPE],
+    // },
     product_shop: { type: Schema.Types.ObjectId, ref: "User" },
-    product_attributes: { type: Schema.Types.Mixed, required: true },
+    product_attributes: { type: Array, default: [], required: false },
+    /* 
+    {
+        attribute_id:"abc123",
+        attribute_values:[
+            {
+                value_id:"value123"
+            }
+        ],
+    }
+     */
     product_ratings: {
       type: Number,
       default: 4.5,
@@ -36,6 +44,25 @@ const productSchema = new Schema(
       // },
     },
     product_variants: {
+      type: Array,
+      default: [],
+    },
+
+    /* 
+    tier_variants: [
+        {
+            images:[],
+            name:"color",
+            value:["red", "green", "blue"],
+        },
+        {
+            images:[],
+            name:"size",
+            value:["X", "M", "L"],
+        },
+    ]
+    */
+    product_categories: {
       type: Array,
       default: [],
     },

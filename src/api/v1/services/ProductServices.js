@@ -38,6 +38,7 @@ const {
 } = require("../utils/functionHelpers");
 const { setAsync, getAsync } = require("./redis.service");
 const { updateAllRepo } = require("../repositories/updateDB.repo");
+const SkuServices = require("./sku.service");
 
 class ProductFactory {
   static productTypeStrategy = {
@@ -47,38 +48,46 @@ class ProductFactory {
     ProductFactory.productTypeStrategy[type] = classRef;
   }
 
-  static createProductTypeFactory = async (type, payload) => {
-    const productTypeClass =
-      ProductFactory.productTypeStrategy[
-        type
-      ]; /* = class ClassRef extends Product */
-    if (!productTypeClass)
-      throw new ForbiddenRequestError(
-        `Invalid Product type createProductTypeFactory ::: ${type}`
-      );
-
+  static createProductTypeFactory = async (payload) => {
     const product_shop = payload.user._id;
-
-    const user = await findUserByIdLeanRepo({
-      id: convertToObjectId(product_shop),
-      unSelect: [
-        "buyer",
-        "password",
-        "__v",
-        "refreshToken",
-        "user_salt",
-        "user_clients",
-        "user_follower",
-        "user_watching",
-      ],
-    });
-
-    if (!user) throw new ForbiddenRequestError("User not Found");
 
     payload.product_shop = product_shop;
 
-    return new productTypeClass(payload).createProductType(); // create CON -> CHA
+    return new Product(payload).createProduct({ body: payload });
   };
+
+  // static createProductTypeFactory = async (type, payload) => {
+  //   const productTypeClass =
+  //     ProductFactory.productTypeStrategy[
+  //       type
+  //     ]; /* = class ClassRef extends Product */
+  //   if (!productTypeClass)
+  //     throw new ForbiddenRequestError(
+  //       `Invalid Product type createProductTypeFactory ::: ${type}`
+  //     );
+
+  //   const product_shop = payload.user._id;
+
+  //   const user = await findUserByIdLeanRepo({
+  //     id: convertToObjectId(product_shop),
+  //     unSelect: [
+  //       "buyer",
+  //       "password",
+  //       "__v",
+  //       "refreshToken",
+  //       "user_salt",
+  //       "user_clients",
+  //       "user_follower",
+  //       "user_watching",
+  //     ],
+  //   });
+
+  //   if (!user) throw new ForbiddenRequestError("User not Found");
+
+  //   payload.product_shop = product_shop;
+
+  //   return new productTypeClass(payload).createProductType(); // create CON -> CHA
+  // };
 
   static updateProductTypeById = async (type, product_id, payload) => {
     const productTypeClass = ProductFactory.productTypeStrategy[type];
@@ -567,9 +576,10 @@ class Product {
     product_type,
     product_shop,
     product_attributes,
+    product_categories,
+    product_variants,
   }) {
     this.product_name = product_name;
-    // this.product_name_nonVi = toNonAccentVietnamese(product_name);
     this.product_thumb = product_thumb;
     this.product_thumb_small = product_thumb_small;
     this.product_description = product_description;
@@ -579,12 +589,62 @@ class Product {
     this.product_type = product_type;
     this.product_shop = product_shop;
     this.product_attributes = product_attributes;
+    this.product_categories = product_categories;
+    this.product_variants = product_variants;
   }
 
-  async createProduct(product_id) {
+  async createProduct({ body }) {
+    const { sku_list = [] } = body;
+
+    // 1. check shop exists
+    const foundShop = await findUserByIdLeanRepo({
+      id: convertToObjectId(this.product_shop),
+      unSelect: [
+        "buyer",
+        "password",
+        "__v",
+        "refreshToken",
+        "user_salt",
+        "user_clients",
+        "user_follower",
+        "user_watching",
+      ],
+    });
+    if (!foundShop) throw new ForbiddenRequestError("Shop not Found");
+
+    // 2. create newSpu
+    const newProduct = await createProductRepo({ ...this });
+    if (!newProduct)
+      throw new ForbiddenRequestError("Wrong create new Product");
+
+    if (newProduct && sku_list.length) {
+      // 3.1. create new Skus
+      await SkuServices.createSkus({
+        sku_product_id: newProduct._id,
+        sku_list,
+        sku_slug: newProduct.product_slug,
+      });
+    }
+    // 3.2. create new Inventory
+    await InventoryServices.createInventory({
+      inven_productId: newProduct._id,
+      inven_shopId: newProduct.product_shop,
+      inven_product_slug: newProduct.product_slug,
+      inven_stock: newProduct.product_quantity,
+      inven_location: "unknown",
+    });
+
+    // 4. sycn data via elasticsearch
+
+    // 5. response
     await Product.resetFilter();
-    return await createProductRepo({ ...this, _id: product_id });
+    return newProduct;
   }
+
+  // async createProduct(product_id) {
+  //   await Product.resetFilter();
+  //   return await createProductRepo({ ...this, _id: product_id });
+  // }
 
   async updateProductById(product_id, bodyUpdate) {
     await Product.resetFilter();
@@ -601,7 +661,6 @@ const classRefStrategy = (type) => {
   return class ClassRef extends Product {
     // CON
     async createProductType() {
-
       const newProductType = await createProductModelRepo(type, {
         ...this.product_attributes,
         product_shop: this.product_shop,
@@ -620,9 +679,9 @@ const classRefStrategy = (type) => {
 
       await InventoryServices.createInventory({
         inven_productId: newProduct._id,
-        inven_shopId: this.product_shop,
-        inven_product_slug: this.product_slug,
-        inven_stock: this.product_quantity,
+        inven_shopId: newProduct.product_shop,
+        inven_product_slug: newProduct.product_slug,
+        inven_stock: newProduct.product_quantity,
         inven_location: "unknown",
       });
 

@@ -1,5 +1,6 @@
 const express = require("express");
 const { protect, admin } = require("./../../Middleware/AuthMiddleware");
+const asyncHandler = require("express-async-handler");
 
 const {
   getAllCategory,
@@ -10,6 +11,7 @@ const {
   getAllBrandByAdmin,
   deleteBrandById,
   createBrand,
+  getAllBrandByCategories,
 } = require("../../controller/category.controller");
 
 const categoryRoutes = express.Router();
@@ -28,7 +30,13 @@ categoryRoutes.post("/create", protect, admin, createCategory);
 
 /* --------------------------------------------------------------------------------------------------------------- */
 // GET ALL BRAND
-categoryRoutes.get("/get-all-brands", getAllBrand);
+categoryRoutes.get("/get-all-brands", asyncHandler(getAllBrand));
+
+// GET ALL BRAND BY CATEGORIES
+categoryRoutes.put(
+  "/get-all-brands-categories",
+  asyncHandler(getAllBrandByCategories)
+);
 
 // ADMIN GET ALL BRAND WITHOUT SEARCH AND PAGINATION
 categoryRoutes.get("/all-admin/brand", protect, admin, getAllBrandByAdmin);
