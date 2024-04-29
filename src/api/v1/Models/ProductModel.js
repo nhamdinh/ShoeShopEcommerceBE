@@ -22,7 +22,7 @@ const productSchema = new Schema(
     //   required: true,
     //   enum: [...PRODUCT_TYPE],
     // },
-    product_shop: { type: Schema.Types.ObjectId, ref: "User" },
+    product_shop: { type: Schema.Types.ObjectId, ref: "User", required: true },
     product_attributes: { type: Array, default: [], required: false },
     /* 
     {
@@ -65,6 +65,11 @@ const productSchema = new Schema(
     product_categories: {
       type: Array,
       default: [],
+    },
+    product_brand: {
+      type: Schema.Types.ObjectId,
+      ref: "Brand",
+      required: true,
     },
     isDraft: { type: Boolean, default: false, index: true },
     isDelete: { type: Boolean, default: false },

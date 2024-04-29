@@ -14,6 +14,7 @@ const {
   findProductByIdRepo,
   updateProductByIdRepo,
   findProductsByShopRepo,
+  findProductById1Repo,
 } = require("../repositories/product.repo");
 const {
   findUserByIdRepo,
@@ -39,6 +40,7 @@ const {
 const { setAsync, getAsync } = require("./redis.service");
 const { updateAllRepo } = require("../repositories/updateDB.repo");
 const SkuServices = require("./sku.service");
+const { findSkusRepo } = require("../repositories/sku.repo");
 
 class ProductFactory {
   static productTypeStrategy = {
@@ -106,16 +108,32 @@ class ProductFactory {
 
   static findProductById = async ({
     product_id,
-    unSelect = ["__v", "product_slug"],
+    unSelect = ["__v"],
+    query,
   }) => {
-    const foundProduct = await findProductByIdRepo({
+    const foundProduct = await findProductById1Repo({
       product_id: product_id,
       unSelect,
     });
 
-    if (!foundProduct) {
-      return null;
-    }
+    if (!foundProduct) throw new ForbiddenRequestError("Product not Found");
+
+    const limit = 50,
+      page = 1,
+      sort = { _id: -1 };
+
+    const filter = { sku_product_id: convertToObjectId(product_id) };
+
+    const metadata = await findSkusRepo({
+      sort,
+      limit,
+      page,
+      filter,
+      unSelect,
+    });
+
+    foundProduct.skus = metadata.skus;
+
     return foundProduct;
   };
 
@@ -176,11 +194,11 @@ class ProductFactory {
       ],
       isDelete,
       isPublished,
-      product_type,
+      // product_type,
       keyword,
     } = body;
 
-    // updateAllRepo()
+    // updateAllRepo();
 
     // if (user._id?.toString() !== product_shop?.toString())
     //   throw new ForbiddenRequestError("You are not Owner!!");
@@ -188,7 +206,7 @@ class ProductFactory {
     const filter = { product_shop };
     if (typeof isDelete === "boolean") filter.isDelete = isDelete;
     if (typeof isPublished === "boolean") filter.isPublished = isPublished;
-    if (product_type) filter.product_type = product_type;
+    // if (product_type) filter.product_type = product_type;
 
     if (keyword) {
       const regexSearch = new RegExp(
@@ -228,8 +246,8 @@ class ProductFactory {
       orderByValue = +(query?.orderByValue ?? -1),
       product_shop = query?.product_shop ?? "",
       keyword = query?.keyword ?? "",
-      brand = query?.brand ?? "",
-      product_type = query?.product_type ?? "",
+      // brand = query?.brand ?? "",
+      // product_type = query?.product_type ?? "",
       select = [
         // "product_name",
         // "product_shop",
@@ -244,13 +262,13 @@ class ProductFactory {
     sort[orderByKey] = +orderByValue;
     const keywords = keyword;
 
-    if (product_type) {
-      product_type = {
-        product_type,
-      };
-    } else {
-      product_type = {};
-    }
+    // if (product_type) {
+    //   product_type = {
+    //     product_type,
+    //   };
+    // } else {
+    //   product_type = {};
+    // }
 
     if (product_shop) {
       product_shop = {
@@ -273,17 +291,17 @@ class ProductFactory {
       keyword = {};
     }
 
-    const regexSearchBrand = new RegExp(
-      toNonAccentVietnamese(brand.toUpperCase() !== "ALL" ? brand : ""),
-      "i"
-    );
+    // const regexSearchBrand = new RegExp(
+    //   toNonAccentVietnamese(brand.toUpperCase() !== "ALL" ? brand : ""),
+    //   "i"
+    // );
 
     const filter = {
       isPublished: true,
       ...product_shop,
-      ...product_type,
+      // ...product_type,
       ...keyword,
-      "product_attributes.brand": { $regex: regexSearchBrand },
+      // "product_attributes.brand": { $regex: regexSearchBrand },
     };
 
     // const cachedData = await getAsync(RD_ALL_PRODUCTS);
@@ -301,7 +319,7 @@ class ProductFactory {
           page,
           filter,
           keywords: toNonAccentVietnamese(keywords),
-          brand,
+          // brand,
         })
       ) {
         logger.info(
@@ -340,7 +358,7 @@ class ProductFactory {
           page,
           filter,
           keywords: toNonAccentVietnamese(keywords),
-          brand,
+          // brand,
         }),
         "EX",
         RD_EXPIRE
@@ -370,7 +388,7 @@ class ProductFactory {
         page,
         filter,
         keywords: toNonAccentVietnamese(keywords),
-        brand,
+        // brand,
       }),
       "EX",
       RD_EXPIRE
@@ -573,10 +591,11 @@ class Product {
     product_price,
     product_original_price,
     product_quantity,
-    product_type,
+    // product_type,
     product_shop,
     product_attributes,
     product_categories,
+    product_brand,
     product_variants,
   }) {
     this.product_name = product_name;
@@ -586,10 +605,11 @@ class Product {
     this.product_price = product_price;
     this.product_original_price = product_original_price;
     this.product_quantity = product_quantity;
-    this.product_type = product_type;
+    // this.product_type = product_type;
     this.product_shop = product_shop;
     this.product_attributes = product_attributes;
     this.product_categories = product_categories;
+    this.product_brand = product_brand;
     this.product_variants = product_variants;
   }
 
@@ -710,12 +730,12 @@ const classRefStrategy = (type) => {
         throw new ForbiddenRequestError("You are not Owner", 401);
       }
 
-      const isModel =
-        foundProduct.product_type.toString() ===
-        objectParams.product_type.toString();
-      if (!isModel) {
-        throw new ForbiddenRequestError("Wrong product type");
-      }
+      // const isModel =
+      //   foundProduct.product_type.toString() ===
+      //   objectParams.product_type.toString();
+      // if (!isModel) {
+      //   throw new ForbiddenRequestError("Wrong product type");
+      // }
 
       if (objectParams.product_attributes) {
         await updateProductByIdRepo(type, {

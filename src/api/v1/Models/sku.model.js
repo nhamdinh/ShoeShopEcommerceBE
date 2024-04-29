@@ -10,7 +10,7 @@ const COLLECTION_NAME = "Skus";
 const skusSchema = new Schema(
   {
     sku_id: { type: String, required: true, unique: true }, //{sku_id}-{shop_id}
-    sku_product_id: { type: Schema.Types.ObjectId, ref: "Products" }, //ref Spu Products
+    sku_product_id: { type: Schema.Types.ObjectId, ref: "Product" }, //ref Spu Products
     sku_tier_index: { type: Array, default: [0] }, //[1,0] | [1,1]
     /* 
     color: ["black","blue"] => [0,1]
@@ -18,6 +18,7 @@ const skusSchema = new Schema(
         */
     sku_stock: { type: Number, default: 0 },
     sku_price: { type: Number, default: 0 },
+    sku_sold: { type: Number, default: 0 },
     sku_slug: { type: String, default: "" },
     sku_values: { type: Object, default: null },
     sku_default: { type: Boolean, default: false },
