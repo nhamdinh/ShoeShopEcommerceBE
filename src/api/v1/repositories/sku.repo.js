@@ -54,13 +54,6 @@ const updateSkuByIdRepo = async ({
   bodyUpdate,
   options = { upsert: false, new: true },
 }) => {
-  // logger.info(
-  //   `bodyUpdate Repo ::: ${util.inspect(bodyUpdate, {
-  //     showHidden: false,
-  //     depth: null,
-  //     colors: false,
-  //   })}`
-  // );
   return await SkuModel.findByIdAndUpdate(id, bodyUpdate, options);
 };
 

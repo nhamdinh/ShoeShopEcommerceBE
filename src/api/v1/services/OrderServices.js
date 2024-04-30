@@ -419,6 +419,7 @@ class OrderServices {
       throw new ForbiddenRequestError("User have Address YET", 400);
 
     const createAddress = addressArr[0];
+
     /* check product again */
     const cartsReviewed = await OrderServices.checkoutReviewCart({
       userId,
@@ -441,7 +442,9 @@ class OrderServices {
             product_id,
             quantity,
             checkCart.cartId,
-            sku_id
+            sku_id,
+            userId,
+            cartReviewed?.checkCart?.shopId
           );
           acquireProducts.push(keyLock ? true : false);
           acquireProductsItem.push(keyLock ? true : false);

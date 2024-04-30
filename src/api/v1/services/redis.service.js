@@ -8,6 +8,7 @@ const { reservationInventory } = require("./InventoryServices");
 const { updateProductByIdRepo } = require("../repositories/product.repo");
 const { convertToObjectId } = require("../utils/getInfo");
 const { updateSkuByIdRepo } = require("../repositories/sku.repo");
+const { findByIdAndUpdateUserRepo } = require("../repositories/user.repo");
 
 const redisClient = redis.createClient();
 
@@ -25,7 +26,14 @@ const setnxAsync = promisify(redisClient.SETNX).bind(redisClient);
 const getAsync = promisify(redisClient.GET).bind(redisClient);
 const setAsync = promisify(redisClient.SET).bind(redisClient);
 
-const acquireLock = async (productId, quantity, cartId, sku_id) => {
+const acquireLock = async (
+  productId,
+  quantity,
+  cartId,
+  sku_id,
+  userId,
+  shopId
+) => {
   const key = `lock_v2024_${sku_id}`;
   const retryTimes = 10;
   const expireTimer = 3000; // 3 seconds lock
@@ -65,6 +73,24 @@ const acquireLock = async (productId, quantity, cartId, sku_id) => {
       await updateSkuByIdRepo({
         id: convertToObjectId(sku_id),
         bodyUpdate: bodyUpdateSku,
+      });
+
+      await findByIdAndUpdateUserRepo({
+        id: convertToObjectId(userId),
+        updateSet: {
+          $push: {
+            buyer: productId.toString(),
+          },
+        },
+      });
+
+      await findByIdAndUpdateUserRepo({
+        id: convertToObjectId(shopId),
+        updateSet: {
+          $push: {
+            user_clients: userId.toString(),
+          },
+        },
       });
 
       await releaseLock(key); /* ko update dc Inventory */
