@@ -246,7 +246,8 @@ class ProductFactory {
       orderByValue = +(query?.orderByValue ?? -1),
       product_shop = query?.product_shop ?? "",
       keyword = query?.keyword ?? "",
-      // brand = query?.brand ?? "",
+      brand = query?.brand ?? "",
+      product_categories = query?.product_categories ?? "",
       // product_type = query?.product_type ?? "",
       select = [
         // "product_name",
@@ -291,6 +292,23 @@ class ProductFactory {
       keyword = {};
     }
 
+    if (brand) {
+      brand = {
+        product_brand: convertToObjectId(brand),
+      };
+    } else {
+      brand = {};
+    }
+
+    if (product_categories) {
+      const ids = product_categories.split(",");
+      product_categories = {
+        product_categories: { $in: ids },
+      };
+    } else {
+      product_categories = {};
+    }
+
     // const regexSearchBrand = new RegExp(
     //   toNonAccentVietnamese(brand.toUpperCase() !== "ALL" ? brand : ""),
     //   "i"
@@ -301,9 +319,17 @@ class ProductFactory {
       ...product_shop,
       // ...product_type,
       ...keyword,
+      ...brand,
+      ...product_categories,
       // "product_attributes.brand": { $regex: regexSearchBrand },
     };
-
+    logger.info(
+      `filter  ::: ${util.inspect(filter, {
+        showHidden: false,
+        depth: null,
+        colors: false,
+      })}`
+    );
     // const cachedData = await getAsync(RD_ALL_PRODUCTS);
 
     // if (cachedData) return JSON.parse(cachedData);
@@ -319,7 +345,8 @@ class ProductFactory {
           page,
           filter,
           keywords: toNonAccentVietnamese(keywords),
-          // brand,
+          brand,
+          product_categories,
         })
       ) {
         logger.info(
@@ -358,7 +385,8 @@ class ProductFactory {
           page,
           filter,
           keywords: toNonAccentVietnamese(keywords),
-          // brand,
+          brand,
+          product_categories,
         }),
         "EX",
         RD_EXPIRE
@@ -388,7 +416,8 @@ class ProductFactory {
         page,
         filter,
         keywords: toNonAccentVietnamese(keywords),
-        // brand,
+        brand,
+        product_categories,
       }),
       "EX",
       RD_EXPIRE
