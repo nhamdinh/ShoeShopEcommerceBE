@@ -18,6 +18,7 @@ const {
   findOneProductRepo,
 } = require("../repositories/product.repo");
 const { convertToObjectId } = require("../utils/getInfo");
+const { findSkuByIdRepo } = require("../repositories/sku.repo");
 
 /**
  * 1. add product to cart [User]
@@ -69,7 +70,7 @@ class CartServices {
     product = {},
     cart_userId = convertToObjectId(cart_userId),
   }) => {
-    const { cart_shopId, product_id, quantity, name, image } = product;
+    const { cart_shopId, product_id, quantity, name, image, sku_id } = product;
     const foundProduct = await findOneProductRepo({
       filter: {
         product_shop: convertToObjectId(cart_shopId),
@@ -77,14 +78,21 @@ class CartServices {
       },
     });
 
-    if (!foundProduct || quantity < 0) {
+    if (!foundProduct || quantity < 0)
       throw new ForbiddenRequestError("Product not found", 404);
-    }
 
     const cartsCurrent = await CartServices.getCurrentCart({
       cart_userId,
       cart_shopId,
     });
+
+    const sku = await findSkuByIdRepo({
+      id: convertToObjectId(sku_id),
+    });
+
+    if (!sku) throw new ForbiddenRequestError("Sku not found", 404);
+
+    const product_price = +sku.sku_price ?? +foundProduct.product_price;
 
     for (let i = 0; i < cartsCurrent.length; i++) {
       const cartCurrent = cartsCurrent[i];
@@ -93,17 +101,18 @@ class CartServices {
         throw new ForbiddenRequestError("Cart not found", 404);
 
       /* add new item */
-      const newProductOnCart = {
+      const newSkuOnCart = {
+        sku_id,
         product_id,
-        image:foundProduct.product_thumb,
-        name:foundProduct.product_name,
+        image: foundProduct.product_thumb,
+        name: foundProduct.product_name,
         quantity,
-        price: +foundProduct.product_price,
+        price: +product_price,
       };
       const { cart_products, cart_products_deleted } = cartCurrent;
 
       if (cart_products.length === 0 && quantity > 0) {
-        cartCurrent.cart_products = [newProductOnCart];
+        cartCurrent.cart_products = [newSkuOnCart];
 
         return await findByIdAndUpdateCartRepo({
           id: convertToObjectId(cartCurrent?._id),
@@ -112,12 +121,12 @@ class CartServices {
       }
       /* add new item */
 
-      const productObj = cart_products.find(
-        (product) => product.product_id === product_id
+      const skuObj = cart_products.find(
+        (product) => product.sku_id === sku_id
       );
       /* add new item */
-      if (!productObj && quantity > 0) {
-        cartCurrent.cart_products = [...cart_products, newProductOnCart];
+      if (!skuObj && quantity > 0) {
+        cartCurrent.cart_products = [...cart_products, newSkuOnCart];
         return await findByIdAndUpdateCartRepo({
           id: convertToObjectId(cartCurrent?._id),
           updateSet: cartCurrent,
@@ -129,17 +138,17 @@ class CartServices {
       if (quantity === 0) {
         //delete ; tracking
 
-        const productDeletedObj = cart_products_deleted.find(
-          (productId) => productId === product_id
+        const skuDeletedObj = cart_products_deleted.find(
+          (_sku_id) => _sku_id === sku_id
         );
-        if (!productDeletedObj) {
+        if (!skuDeletedObj) {
           cartCurrent.cart_products_deleted = [
             ...cart_products_deleted,
-            product_id,
+            sku_id,
           ];
         }
         cartCurrent.cart_products = cart_products.filter(
-          (product) => product.product_id !== product_id
+          (product) => product.sku_id !== sku_id
         );
 
         return await findByIdAndUpdateCartRepo({
@@ -149,9 +158,9 @@ class CartServices {
       }
 
       cart_products.map((product) => {
-        if (product.product_id === product_id) {
+        if (product.sku_id === sku_id) {
           product.quantity = quantity;
-          product.price = +foundProduct.product_price;
+          product.price = +product_price;
         }
       });
 

@@ -33,7 +33,15 @@ const findSkusRepo = async ({ limit, sort, page, filter, unSelect = [] }) => {
   };
 };
 
+const findSkuByIdRepo = async ({ id, unSelect = [] }) => {
+  return await SkuModel.findById(id)
+    // .populate({ path: "sku_product_id" })
+    .select(getUnSelectData(unSelect))
+    .lean();
+};
+
 module.exports = {
   createSkusRepo,
   findSkusRepo,
+  findSkuByIdRepo,
 };
