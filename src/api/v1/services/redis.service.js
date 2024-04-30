@@ -7,6 +7,7 @@ const { promisify } = require("util");
 const { reservationInventory } = require("./InventoryServices");
 const { updateProductByIdRepo } = require("../repositories/product.repo");
 const { convertToObjectId } = require("../utils/getInfo");
+const { updateSkuByIdRepo } = require("../repositories/sku.repo");
 
 const redisClient = redis.createClient();
 
@@ -24,8 +25,8 @@ const setnxAsync = promisify(redisClient.SETNX).bind(redisClient);
 const getAsync = promisify(redisClient.GET).bind(redisClient);
 const setAsync = promisify(redisClient.SET).bind(redisClient);
 
-const acquireLock = async (productId, quantity, cartId) => {
-  const key = `lock_v2024_${productId}`;
+const acquireLock = async (productId, quantity, cartId, sku_id) => {
+  const key = `lock_v2024_${sku_id}`;
   const retryTimes = 10;
   const expireTimer = 3000; // 3 seconds lock
   const waitTimer = 100;
@@ -49,9 +50,21 @@ const acquireLock = async (productId, quantity, cartId) => {
         },
       };
 
+      const bodyUpdateSku = {
+        $inc: {
+          sku_stock: -quantity,
+          sku_sold: +quantity,
+        },
+      };
+
       await updateProductByIdRepo("product", {
         product_id: convertToObjectId(productId),
         bodyUpdate,
+      });
+
+      await updateSkuByIdRepo({
+        id: convertToObjectId(sku_id),
+        bodyUpdate: bodyUpdateSku,
       });
 
       await releaseLock(key); /* ko update dc Inventory */

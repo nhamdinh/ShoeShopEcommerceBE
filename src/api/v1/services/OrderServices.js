@@ -411,12 +411,21 @@ class OrderServices {
     userId,
     cartsReview,
   }) => {
+    const addressArr = await findAddressByUserRepo({
+      userId: convertToObjectId(userId),
+    });
+
+    if (!addressArr.length)
+      throw new ForbiddenRequestError("User have Address YET", 400);
+
+    const createAddress = addressArr[0];
+    /* check product again */
     const cartsReviewed = await OrderServices.checkoutReviewCart({
       userId,
       cartsReview,
     });
 
-    /* check product again */
+    /* END check product again */
     // const checkedProducts = orderItemsNew.flatMap((order) => order.itemProducts);
     const acquireProducts = [];
     const ordersNew = await Promise.all(
@@ -426,12 +435,13 @@ class OrderServices {
 
         const acquireProductsItem = [];
         for (let i = 0; i < checkedProducts.length; i++) {
-          const { quantity, price, product_id } = checkedProducts[i];
+          const { quantity, price, product_id, sku_id } = checkedProducts[i];
 
           const keyLock = await acquireLock(
             product_id,
             quantity,
-            checkCart.cartId
+            checkCart.cartId,
+            sku_id
           );
           acquireProducts.push(keyLock ? true : false);
           acquireProductsItem.push(keyLock ? true : false);
@@ -440,18 +450,8 @@ class OrderServices {
 
         if (!acquireProductsItem.includes(false)) {
           /* create order */
-          const addressArr = await findAddressByUserRepo({
-            userId: convertToObjectId(userId),
-          });
 
-          let createAddress = {};
-          if (addressArr.length > 0) {
-            createAddress = addressArr[0];
-          } else {
-            throw new ForbiddenRequestError("User have Address YET", 400);
-          }
-
-          const newOrder = {
+          const orderObj = {
             userId: convertToObjectId(cartReviewed?.checkCart?.userId),
             shippingAddress: convertToObjectId(createAddress?._id),
             cartId: convertToObjectId(cartReviewed?.checkCart?.cartId),
@@ -467,7 +467,9 @@ class OrderServices {
             totalDiscount: cartReviewed?.checkCart?.totalDiscount,
           };
 
-          const orderNew = await createOrderRepo(newOrder);
+          const orderNew = await createOrderRepo(orderObj);
+          /* END create order */
+          /* update cart */
 
           if (orderNew) {
             const updateSet = {
@@ -478,43 +480,10 @@ class OrderServices {
               id: convertToObjectId(cartReviewed?.checkCart?.cartId),
               updateSet,
             });
-
-            return orderNew;
           }
+          return orderNew;
 
-          // const orders = await Promise.all(
-          //   cartsReviewed.map(async (cart) => {
-          //     const orderNew = await createOrderRepo({
-          //       userId: convertToObjectId(cart?.checkCart?.userId),
-          //       shippingAddress: createAddress?._id,
-          //       cartId: convertToObjectId(cart?.checkCart?.cartId),
-          //       shopId: convertToObjectId(cart?.orderItems[0]?.shopId),
-
-          //       orderItems: cart?.orderItems,
-          //       paymentMethod: "Paypal",
-          //       taxPrice: 0,
-          //       feeShip: cart?.checkCart?.feeShip,
-          //       totalAmount: cart?.checkCart?.totalAmount,
-          //       totalAmountPay: cart?.checkCart?.totalAmountPay,
-          //       totalDiscount: cart?.checkCart?.totalDiscount,
-          //     });
-
-          //     if (orderNew) {
-          //       const updateSet = {
-          //         completedAt: Date.now(),
-          //         cart_state: "completed",
-          //       };
-          //       await findByIdAndUpdateCartRepo({
-          //         id: convertToObjectId(cart?.checkCart?.cartId),
-          //         updateSet,
-          //       });
-
-          //       return orderNew;
-          //     }
-          //   })
-          // );
-
-          // return orders;
+          /* END update cart */
         }
       })
     );

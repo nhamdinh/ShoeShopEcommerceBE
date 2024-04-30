@@ -49,9 +49,25 @@ const findSkuByIdRepo = async ({ id, unSelect = [] }) => {
     .lean();
 };
 
+const updateSkuByIdRepo = async ({
+  id,
+  bodyUpdate,
+  options = { upsert: false, new: true },
+}) => {
+  // logger.info(
+  //   `bodyUpdate Repo ::: ${util.inspect(bodyUpdate, {
+  //     showHidden: false,
+  //     depth: null,
+  //     colors: false,
+  //   })}`
+  // );
+  return await SkuModel.findByIdAndUpdate(id, bodyUpdate, options);
+};
+
 module.exports = {
   createSkusRepo,
   findSkusRepo,
   findSkuRepo,
   findSkuByIdRepo,
+  updateSkuByIdRepo,
 };
