@@ -360,10 +360,9 @@ class OrderServices {
       if (calculateDiscounts.includes(undefined))
         throw new ForbiddenRequestError("Order Wrong!");
 
-      checkCart.totalDiscount = calculateDiscounts.reduce(
-        (acc, item) => +acc + +item.totalDiscountedForCoupon,
-        [0]
-      );
+      checkCart.totalDiscount = +calculateDiscounts
+        .reduce((acc, item) => +acc + +item.totalDiscountedForCoupon, [0])
+        .toFixed(2);
       const { totalAmount, totalDiscount } = checkCart;
       result.orderItemsNew = {
         shopId,
@@ -390,12 +389,11 @@ class OrderServices {
   }) => {
     const cartsReviewed = await Promise.all(
       cartsReview.map(async (cartReview) => {
-        const { cartId, orderItems, shopDiscounts, shopId } = cartReview;
+        const { cartId, shopDiscounts, shopId } = cartReview;
 
         const obj = await OrderServices.checkoutCartUtil({
           cartId,
           userId,
-          orderItems,
           shopDiscounts,
           shopId,
         });
@@ -453,7 +451,7 @@ class OrderServices {
             throw new ForbiddenRequestError("User have Address YET", 400);
           }
 
-          const zzz = {
+          const newOrder = {
             userId: convertToObjectId(cartReviewed?.checkCart?.userId),
             shippingAddress: convertToObjectId(createAddress?._id),
             cartId: convertToObjectId(cartReviewed?.checkCart?.cartId),
@@ -469,7 +467,7 @@ class OrderServices {
             totalDiscount: cartReviewed?.checkCart?.totalDiscount,
           };
 
-          const orderNew = await createOrderRepo(zzz);
+          const orderNew = await createOrderRepo(newOrder);
 
           if (orderNew) {
             const updateSet = {
@@ -523,7 +521,7 @@ class OrderServices {
     if (acquireProducts.includes(false)) {
       throw new ForbiddenRequestError(
         "Have been update product, please turn back cart",
-        401
+        403
       );
     }
     return ordersNew;

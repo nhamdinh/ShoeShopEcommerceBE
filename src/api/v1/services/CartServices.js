@@ -104,6 +104,7 @@ class CartServices {
       const newSkuOnCart = {
         sku_id,
         product_id,
+        sku_values: sku.sku_values,
         image: foundProduct.product_thumb,
         name: foundProduct.product_name,
         quantity,
@@ -121,9 +122,7 @@ class CartServices {
       }
       /* add new item */
 
-      const skuObj = cart_products.find(
-        (product) => product.sku_id === sku_id
-      );
+      const skuObj = cart_products.find((product) => product.sku_id === sku_id);
       /* add new item */
       if (!skuObj && quantity > 0) {
         cartCurrent.cart_products = [...cart_products, newSkuOnCart];

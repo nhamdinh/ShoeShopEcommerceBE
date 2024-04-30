@@ -7,6 +7,15 @@ const createSkusRepo = async (skus) => {
   return await SkuModel.create(skus);
 };
 
+const findSkuRepo = async ({ filter, unSelect = [] }) => {
+  const sku = await SkuModel.findOne(filter)
+    // .populate({ path: "sku_product_id" })
+    .select(getUnSelectData(unSelect))
+    .lean();
+
+  return sku;
+};
+
 const findSkusRepo = async ({ limit, sort, page, filter, unSelect = [] }) => {
   const skip = (page < 1 ? 1 : page - 1) * limit;
   // const sortBy = sort === "ctime" ? { _id: -1 } : { _id: 1 };
@@ -43,5 +52,6 @@ const findSkuByIdRepo = async ({ id, unSelect = [] }) => {
 module.exports = {
   createSkusRepo,
   findSkusRepo,
+  findSkuRepo,
   findSkuByIdRepo,
 };

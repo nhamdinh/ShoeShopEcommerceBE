@@ -12,6 +12,7 @@ const {
 } = require("../utils/getInfo");
 const { toNonAccentVietnamese } = require("../utils/functionHelpers");
 const InventoryServices = require("../services/InventoryServices");
+const { findSkuByIdRepo } = require("./sku.repo");
 
 const createProductRepo = async (product) => {
   return await ProductModel.product.create({ ...product });
@@ -300,10 +301,18 @@ const checkPriceProductsRepo = async (products) => {
         convertToObjectId(product?.product_id)
       );
 
+      const sku = await findSkuByIdRepo({
+        id: convertToObjectId(product?.sku_id),
+      });
+
+      if (!sku) throw new ForbiddenRequestError("Sku not found", 404);
+
+      const product_price = +sku.sku_price ?? +foundProduct.product_price;
+
       if (foundProduct) {
         return {
           ...product,
-          price: foundProduct?.product_price,
+          price: product_price,
           image: foundProduct?.product_thumb,
           name: foundProduct?.product_name,
         };
