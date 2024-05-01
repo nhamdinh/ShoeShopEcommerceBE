@@ -238,7 +238,7 @@ class ProductFactory {
   };
 
   static findAllProducts = async ({ query }) => {
-    let {
+    const {
       page = +(query?.page ?? 1),
       limit = +(query?.limit ?? 50),
 
@@ -261,177 +261,90 @@ class ProductFactory {
     } = query;
     const sort = {};
     sort[orderByKey] = +orderByValue;
-    const keywords = keyword;
 
-    // if (product_type) {
-    //   product_type = {
-    //     product_type,
-    //   };
-    // } else {
-    //   product_type = {};
-    // }
+    const filter = {
+      isPublished: true,
+      // "product_attributes.brand": { $regex: regexSearchBrand },
+    };
 
-    if (product_shop) {
-      product_shop = {
-        product_shop: convertToObjectId(product_shop),
-      };
-    } else {
-      product_shop = {};
-    }
+    if (product_shop) filter.product_shop = convertToObjectId(product_shop);
 
     if (keyword) {
       const regexSearch = new RegExp(
         toNonAccentVietnamese(keyword).replaceAll(" ", "-"),
         "i"
       );
-
-      keyword = {
-        product_slug: { $regex: regexSearch },
-      };
-    } else {
-      keyword = {};
+      filter.product_slug = { $regex: regexSearch };
     }
 
-    if (brand) {
-      brand = {
-        product_brand: convertToObjectId(brand),
-      };
-    } else {
-      brand = {};
-    }
+    if (brand) filter.product_brand = convertToObjectId(brand);
 
     if (product_categories) {
       const ids = product_categories.split(",");
-      product_categories = {
-        product_categories: { $in: ids },
-      };
-    } else {
-      product_categories = {};
+      filter.product_categories = { $in: ids };
     }
 
-    // const regexSearchBrand = new RegExp(
-    //   toNonAccentVietnamese(brand.toUpperCase() !== "ALL" ? brand : ""),
-    //   "i"
-    // );
-
-    const filter = {
-      isPublished: true,
-      ...product_shop,
-      // ...product_type,
-      ...keyword,
-      ...brand,
-      ...product_categories,
-      // "product_attributes.brand": { $regex: regexSearchBrand },
+    const cacheFilterObj = {
+      sort,
+      limit,
+      page,
+      filter,
+      keywords: toNonAccentVietnamese(keyword),
     };
-    logger.info(
-      `filter  ::: ${util.inspect(filter, {
-        showHidden: false,
-        depth: null,
-        colors: false,
-      })}`
-    );
-    // const cachedData = await getAsync(RD_ALL_PRODUCTS);
 
-    // if (cachedData) return JSON.parse(cachedData);
+    const cachedFilter = await getAsync(RD_FILTER_PRODUCTS);
 
-    const cachedDataFilter = await getAsync(RD_FILTER_PRODUCTS);
-
-    if (cachedDataFilter) {
-      if (
-        cachedDataFilter ===
-        JSON.stringify({
-          sort,
-          limit,
-          page,
-          filter,
-          keywords: toNonAccentVietnamese(keywords),
-          brand,
-          product_categories,
-        })
-      ) {
-        logger.info(
-          `findAllProducts GIONG ::: ${util.inspect(cachedDataFilter, {
-            showHidden: false,
-            depth: null,
-            colors: false,
-          })}`
-        );
-
-        const cachedData = await getAsync(RD_ALL_PRODUCTS);
-
-        if (cachedData) return JSON.parse(cachedData);
-
-        const metadata = await findAllProductsRepo({
-          sort,
-          limit,
-          page,
-          filter,
-          select,
-        });
-        await setAsync(
-          RD_ALL_PRODUCTS,
-          JSON.stringify(metadata),
-          "EX",
-          RD_EXPIRE
-        );
-        return metadata;
-      }
-
-      await setAsync(
-        RD_FILTER_PRODUCTS,
-        JSON.stringify({
-          sort,
-          limit,
-          page,
-          filter,
-          keywords: toNonAccentVietnamese(keywords),
-          brand,
-          product_categories,
-        }),
-        "EX",
-        RD_EXPIRE
+    if (cachedFilter && cachedFilter === JSON.stringify(cacheFilterObj)) {
+      // 1. exists cachedFilter and same cache
+      logger.info(
+        `cachedFilter ::: ${util.inspect(cachedFilter, {
+          showHidden: false,
+          depth: null,
+          colors: false,
+        })}`
       );
 
-      const metadata = await findAllProductsRepo({
+      const cachedData = await getAsync(RD_ALL_PRODUCTS);
+
+      // 2. exists cachedData
+      if (cachedData) return JSON.parse(cachedData);
+
+      // 3. NOT exists cachedData
+      return await ProductFactory.getAndSetProductsHelper({
         sort,
         limit,
         page,
         filter,
         select,
+        rdKey: RD_ALL_PRODUCTS,
       });
-      await setAsync(
-        RD_ALL_PRODUCTS,
-        JSON.stringify(metadata),
-        "EX",
-        RD_EXPIRE
-      );
-      return metadata;
     }
 
+    // 4. NOT exists cachedFilter
     await setAsync(
       RD_FILTER_PRODUCTS,
-      JSON.stringify({
-        sort,
-        limit,
-        page,
-        filter,
-        keywords: toNonAccentVietnamese(keywords),
-        brand,
-        product_categories,
-      }),
+      JSON.stringify(cacheFilterObj),
       "EX",
       RD_EXPIRE
     );
 
-    const metadata = await findAllProductsRepo({
+    return await ProductFactory.getAndSetProductsHelper({
       sort,
       limit,
       page,
       filter,
       select,
+      rdKey: RD_ALL_PRODUCTS,
     });
-    await setAsync(RD_ALL_PRODUCTS, JSON.stringify(metadata), "EX", RD_EXPIRE);
-    return metadata;
+    // const metadata = await findAllProductsRepo({
+    //   sort,
+    //   limit,
+    //   page,
+    //   filter,
+    //   select,
+    // });
+    // await setAsync(RD_ALL_PRODUCTS, JSON.stringify(metadata), "EX", RD_EXPIRE);
+    // return metadata;
   };
 
   static findAllProductsMax = async ({ query }) => {
@@ -454,74 +367,78 @@ class ProductFactory {
       isPublished: true,
     };
 
-    const cachedFilter = {
+    const cacheFilterObj = {
       limit,
       page,
       filter,
     };
 
-    const cachedDataFilter = await getAsync(RD_FILTER_PRODUCTS_MAX);
+    const cachedFilterMax = await getAsync(RD_FILTER_PRODUCTS_MAX);
 
-    if (cachedDataFilter) {
-      if (cachedDataFilter === JSON.stringify(cachedFilter)) {
-        logger.info(
-          `findAllProductsMax GIONG ::: ${util.inspect(cachedDataFilter, {
-            showHidden: false,
-            depth: null,
-            colors: false,
-          })}`
-        );
-
-        const cachedData = await getAsync(RD_ALL_PRODUCTS_MAX);
-
-        if (cachedData) return JSON.parse(cachedData);
-
-        const metadata = await findAllProductsRepo({
-          sort,
-          limit,
-          page,
-          filter,
-          select,
-        });
-        await setAsync(
-          RD_ALL_PRODUCTS_MAX,
-          JSON.stringify(metadata),
-          "EX",
-          RD_EXPIRE
-        );
-        return metadata;
-      }
-
-      await setAsync(
-        RD_FILTER_PRODUCTS_MAX,
-        JSON.stringify(cachedFilter),
-        "EX",
-        RD_EXPIRE
+    if (cachedFilterMax && cachedFilterMax === JSON.stringify(cacheFilterObj)) {
+      // 1. exists cachedFilter and same cache
+      logger.info(
+        `cachedFilter Max ::: ${util.inspect(cachedFilterMax, {
+          showHidden: false,
+          depth: null,
+          colors: false,
+        })}`
       );
+      const cachedData = await getAsync(RD_ALL_PRODUCTS_MAX);
 
-      const metadata = await findAllProductsRepo({
+      // 2. exists cachedData
+      if (cachedData) return JSON.parse(cachedData);
+      // 3. NOT exists cachedData
+      return await ProductFactory.getAndSetProductsHelper({
         sort,
         limit,
         page,
         filter,
         select,
+        rdKey: RD_ALL_PRODUCTS_MAX,
       });
-      await setAsync(
-        RD_ALL_PRODUCTS_MAX,
-        JSON.stringify(metadata),
-        "EX",
-        RD_EXPIRE
-      );
-      return metadata;
     }
-
+    // 4. NOT exists cachedFilter
     await setAsync(
       RD_FILTER_PRODUCTS_MAX,
-      JSON.stringify(cachedFilter),
+      JSON.stringify(cacheFilterObj),
       "EX",
       RD_EXPIRE
     );
 
+    return await ProductFactory.getAndSetProductsHelper({
+      sort,
+      limit,
+      page,
+      filter,
+      select,
+      rdKey: RD_ALL_PRODUCTS_MAX,
+    });
+
+    //   const metadata = await findAllProductsRepo({
+    //     sort,
+    //     limit,
+    //     page,
+    //     filter,
+    //     select,
+    //   });
+    //   await setAsync(
+    //     RD_ALL_PRODUCTS_MAX,
+    //     JSON.stringify(metadata),
+    //     "EX",
+    //     RD_EXPIRE
+    //   );
+    //   return metadata;
+  };
+
+  static getAndSetProductsHelper = async ({
+    sort,
+    limit,
+    page,
+    filter,
+    select,
+    rdKey,
+  }) => {
     const metadata = await findAllProductsRepo({
       sort,
       limit,
@@ -529,12 +446,7 @@ class ProductFactory {
       filter,
       select,
     });
-    await setAsync(
-      RD_ALL_PRODUCTS_MAX,
-      JSON.stringify(metadata),
-      "EX",
-      RD_EXPIRE
-    );
+    await setAsync(rdKey, JSON.stringify(metadata), "EX", RD_EXPIRE);
     return metadata;
   };
 
