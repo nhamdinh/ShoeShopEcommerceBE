@@ -196,6 +196,8 @@ class ProductFactory {
       isPublished,
       // product_type,
       keyword,
+      brand = "",
+      product_categories = "",
     } = body;
 
     // updateAllRepo();
@@ -214,6 +216,12 @@ class ProductFactory {
         "i"
       );
       filter.product_slug = { $regex: regexSearch };
+    }
+    if (brand) filter.product_brand = convertToObjectId(brand);
+
+    if (product_categories) {
+      const ids = product_categories.split(",");
+      filter.product_categories = { $in: ids };
     }
 
     return await findProductsByShopRepo({

@@ -72,6 +72,11 @@ const findOrdersByShopRepo = async ({
     isRefunded: true,
   });
 
+  const isNotPaid = await OrderModel.countDocuments({
+    shopId,
+    isPaid: false,
+  });
+
   const orders = await OrderModel.find(filter)
     .sort(sortBy)
     .skip(skip)
@@ -87,6 +92,7 @@ const findOrdersByShopRepo = async ({
     isPaid: +isPaid ?? 0,
     isCanceled: +isCanceled ?? 0,
     isRefunded: +isRefunded ?? 0,
+    isNotPaid: +isNotPaid ?? 0,
     totalPages: Math.ceil(count / limit),
     page: +page,
     limit: +limit,
