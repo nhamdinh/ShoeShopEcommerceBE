@@ -12,17 +12,12 @@ class ReviewServices {
       shopId,
       limit = 50,
       page = 1,
-      sort = { _id: -1 },
-      unSelect = [
-        // "product_name",
-        // "product_shop",
-        // "product_price",
-        // "product_original_price",
-        // "product_thumb",
-        // "isDraft",
-        // "isPublished",
-      ],
+      orderByKey = "_id",
+      orderByValue = -1,
+      select = [],
     } = query;
+    const sort = {};
+    sort[orderByKey] = +orderByValue;
 
     if (user?._id.toString() !== shopId?.toString())
       throw new ForbiddenRequestError("You are not Owner", 403);
@@ -40,7 +35,14 @@ class ReviewServices {
       limit,
       sort,
       page,
-      unSelect,
+      select,
+      selectProduct: [
+        "_id",
+        "product_name",
+        "product_price",
+        "product_thumb_small",
+        "product_thumb",
+      ],
     });
   };
   static getReviewsByProduct = async ({ productId, query }) => {
@@ -48,7 +50,7 @@ class ReviewServices {
       limit = 50,
       page = 1,
       sort = { _id: -1 },
-      unSelect = [
+      select = [
         // "product_name",
         // "product_shop",
         // "product_price",
@@ -64,7 +66,7 @@ class ReviewServices {
       limit,
       sort,
       page,
-      unSelect,
+      select,
     });
   };
 }

@@ -341,7 +341,11 @@ class ProductController {
   createProductReview = async (req, res, next) => {
     new CREATED({
       message: "createProductReview CREATED",
-      metadata: await ProductServices.createProductReview(req),
+      metadata: await ProductServices.createProductReview({
+        params: req.params,
+        body: req.body,
+        user: req.user,
+      }),
     }).send(res);
   };
 }

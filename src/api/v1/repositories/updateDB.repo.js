@@ -7,10 +7,13 @@ const bcrypt = require("bcrypt");
 const logger = require("../log");
 const { convertToObjectId } = require("../utils/getInfo");
 const SkuServices = require("../services/sku.service");
+const ProductServices = require("../services/ProductServices");
+const { createReviewRepo, findReviewsRepo } = require("./review.repo");
 
 const updateAllRepo = async () => {
   const Model = model("Product");
   const Inventory = model("Inventory");
+  const startTime = performance.now();
 
   const models = await Model.find({}).sort({
     _id: -1,
@@ -21,8 +24,6 @@ const updateAllRepo = async () => {
   //   item.product_slug = toNonAccentVietnamese(item.product_name).replaceAll(" ","-=");
   //   await item.update(item);
   // }
-
-  const startTime = performance.now();
 
   // const arr = await Promise.all(
   //   models.map(async (mmm) => {
@@ -39,10 +40,28 @@ const updateAllRepo = async () => {
   // );
 
   await Promise.all(
-    models.map(async (mmm) => {
+    models.map(async (mmm, index) => {
       //       mmm.product_slug = toNonAccentVietnamese(mmm.product_name).replaceAll(" ","-");
       //   const zz  =  +mmm.product_price * ( (Math.random() * (50 - 10) + 10) +100    )/100
       // const quantity = Math.floor(Math.random() * (505 - 10) + 11);
+      const metadataReviews = await findReviewsRepo({
+        filter: { productId: convertToObjectId(mmm._id) },
+        limit: 999,
+        sort: { _id: -1 },
+        page: 1,
+        select: ["_id", "rating"],
+      });
+
+      const { reviews = [], totalCount } = metadataReviews;
+
+      mmm.reviews = reviews;
+      mmm.numReviews = +totalCount;
+      mmm.product_ratings = +(
+        reviews.reduce((acc, item) => +acc + +item?.rating, 0) /
+          reviews?.length ?? 1
+      ).toFixed(1);
+
+      // await mmm.update(mmm);
 
       // mmm.user_salt = salt
       // mmm.password = await bcrypt.hash('123456', salt);

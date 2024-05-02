@@ -16,7 +16,7 @@ const reviewSchema = new Schema(
       //   Math.round(val * 10) / 10;
       // },
     },
-    comment: { type: String, required: true },
+    comment: { type: String, required: true, default: "" },
     userId: {
       type: Schema.Types.ObjectId,
       required: true,
@@ -32,6 +32,14 @@ const reviewSchema = new Schema(
       required: true,
       ref: "Product",
     },
+    cmt_parentId: {
+      type: Schema.Types.ObjectId,
+      ref: DOCUMENT_NAME,
+      default: null,
+    },
+    cmt_left: { type: Number, default: 0 },
+    cmt_right: { type: Number, default: 0 },
+    cmt_isDel: { type: Boolean, default: false },
   },
   {
     collection: COLLECTION_NAME,

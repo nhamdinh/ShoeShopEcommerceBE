@@ -30,7 +30,10 @@ const {
 } = require("../utils/constant");
 const { convertToObjectId } = require("../utils/getInfo");
 const InventoryServices = require("./InventoryServices");
-const { createReviewRepo } = require("../repositories/review.repo");
+const {
+  createReviewRepo,
+  findReviewsRepo,
+} = require("../repositories/review.repo");
 const ReviewServices = require("./ReviewServices");
 const {
   toNonAccentVietnamese,
@@ -471,61 +474,52 @@ class ProductFactory {
     return hasBuyer;
   };
 
-  static createProductReview = async (req) => {
-    const product = await findProductByIdRepo({
-      product_id: req.params?.id,
+  static createProductReview = async ({ params, body, user }) => {
+    const { id } = params;
+    const { rating = 5, comment } = body;
+
+    const product = await findProductById1Repo({
+      product_id: convertToObjectId(id),
     });
 
     if (!product) throw new ForbiddenRequestError("Product not Found");
 
-    const {
-      rating = +req.body?.rating ?? 5,
-      comment,
-      productId,
-      shopId,
-    } = req.body;
-
-    const productReviews = product?.reviews ?? [];
-
-    // logger.info(
-    //   `productReviews ::: ${util.inspect(productReviews, {
-    //     showHidden: false,
-    //     depth: null,
-    //     colors: false,
-    //   })}`
-    // );
-
-    const alreadyReviewed = productReviews.find(
-      (re) => re?.toString() === productId.toString()
-    );
-
-    if (alreadyReviewed) {
-      throw new ForbiddenRequestError("Product already Reviewed");
-    }
-
     const review = {
       rating: +rating,
       comment,
-      userId: convertToObjectId(req.user._id),
-      productId: convertToObjectId(productId),
-      shopId: convertToObjectId(shopId),
+      userId: convertToObjectId(user._id),
+      productId: convertToObjectId(id),
+      shopId: convertToObjectId(product?.product_shop),
     };
 
     const newReview = await createReviewRepo(review);
 
     if (!newReview) throw new ForbiddenRequestError("createReview Error");
 
-    const foundReviews = await ReviewServices.getReviewsByProduct({
-      productId: req.params?.id,
+    const metadataReviews = await findReviewsRepo({
+      filter: { productId: convertToObjectId(product._id) },
+      limit: 999,
+      sort: { _id: -1 },
+      page: 1,
+      select: ["_id", "rating"],
     });
-    product.reviews.push(productId);
-    product.numReviews = +foundReviews?.length ?? 1;
-    product.product_ratings = (
-      foundReviews.reduce((acc, item) => +acc + +item?.rating, 0) /
-        foundReviews?.length ?? 1
-    ).toFixed(1);
 
-    await product.save();
+    const { reviews = [], totalCount } = metadataReviews;
+
+    const bodyUpdate = {
+      reviews,
+      numReviews: +totalCount,
+      product_ratings: +((
+        reviews.reduce((acc, item) => +acc + +item?.rating, 0) /
+          reviews?.length ?? 1
+      ).toFixed(1)),
+    };
+
+    await updateProductByIdRepo("product", {
+      product_id: convertToObjectId(id),
+      bodyUpdate,
+    });
+
     return newReview;
   };
 }

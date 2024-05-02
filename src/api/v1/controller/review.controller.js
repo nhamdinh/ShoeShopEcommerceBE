@@ -18,6 +18,7 @@ class ReviewController {
       message: "getReviewsByProduct OK",
       metadata: await ReviewServices.getReviewsByProduct({
         productId: req.params?.id,
+        query:{}
       }),
     }).send(res);
   };
