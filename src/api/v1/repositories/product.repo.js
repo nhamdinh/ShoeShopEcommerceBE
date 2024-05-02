@@ -13,6 +13,7 @@ const {
 const { toNonAccentVietnamese } = require("../utils/functionHelpers");
 const InventoryServices = require("../services/InventoryServices");
 const { findSkuByIdRepo } = require("./sku.repo");
+const { UserUnSelectData } = require("../utils/constant");
 
 const createProductRepo = async (product) => {
   return await ProductModel.product.create({ ...product });
@@ -169,16 +170,7 @@ const findAllProductsRepo = async ({
     .limit(limit)
     .populate({
       path: "product_shop",
-      select: getUnSelectData([
-        "buyer",
-        "password",
-        "__v",
-        "refreshToken",
-        "user_salt",
-        "user_clients",
-        "user_follower",
-        "user_watching",
-      ]),
+      select: getUnSelectData(UserUnSelectData),
     })
     .select(getSelectData(select))
     .lean();

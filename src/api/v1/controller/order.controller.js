@@ -37,6 +37,7 @@ class OrderController {
       message: "getOrderById OK",
       metadata: await OrderServices.getOrderById({
         id: req.params.id,
+        user: req.user,
       }),
     }).send(res);
   };

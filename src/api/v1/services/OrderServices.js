@@ -244,12 +244,14 @@ class OrderServices {
     return updatedOrder;
   };
 
-  static getOrderById = async ({ id }) => {
+  static getOrderById = async ({ id, user }) => {
     const order = await getOrderByIdRepo(convertToObjectId(id));
-    if (order) {
-      return order;
-    }
-    throw new ForbiddenRequestError("order not found", 404);
+    if (!order) throw new ForbiddenRequestError("order not found", 404);
+
+    if (user?._id?.toString() !== order?.userId?._id?.toString())
+      throw new ForbiddenRequestError("You are not Owner", 403);
+
+    return order;
   };
 
   static getAllOrderByUser = async ({ userId }) => {

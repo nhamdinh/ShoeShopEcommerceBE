@@ -7,7 +7,8 @@ class ReviewController {
     new OK({
       message: "getReviewsByShop OK",
       metadata: await ReviewServices.getReviewsByShop({
-        shopId: req.user._id,
+        user: req.user,
+        query: req.query,
       }),
     }).send(res);
   };
