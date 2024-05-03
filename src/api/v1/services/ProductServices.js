@@ -94,19 +94,38 @@ class ProductFactory {
   //   return new productTypeClass(payload).createProductType(); // create CON -> CHA
   // };
 
-  static updateProductTypeById = async (type, product_id, payload) => {
-    const productTypeClass = ProductFactory.productTypeStrategy[type];
+  // static updateProductTypeById = async ({ type, product_id, payload }) => {
+  //   const productTypeClass = ProductFactory.productTypeStrategy[type];
 
-    if (!productTypeClass)
-      throw new ForbiddenRequestError(
-        `Invalid Product type updateProductTypeById ::: ${type}`
-      );
+  //   if (!productTypeClass)
+  //     throw new ForbiddenRequestError(
+  //       `Invalid Product type updateProductTypeById ::: ${type}`
+  //     );
 
-    return new productTypeClass(payload).updateProductTypeById(product_id);
-    /**
-     * const productModel = new productTypeClass(payload)
-     * update CON -> CHA
-     **/
+  //   return new productTypeClass(payload).updateProductTypeById(product_id);
+  //   /**
+  //    * const productModel = new productTypeClass(payload)
+  //    * update CON -> CHA
+  //    **/
+  // };
+
+  static updateProductTypeByIdFactory = async ({
+    type,
+    product_id,
+    payload,
+  }) => {
+    const foundProduct = await findProductById1Repo({
+      product_id,
+    });
+
+    if (!foundProduct)
+      throw new ForbiddenRequestError("Product not found", 404);
+
+    const isOwner =
+      foundProduct.product_shop.toString() === payload.product_shop.toString();
+    if (!isOwner) throw new ForbiddenRequestError("You are not Owner", 403);
+
+    return new Product(payload).updateProductById2(product_id);
   };
 
   static findProductById = async ({
@@ -509,10 +528,10 @@ class ProductFactory {
     const bodyUpdate = {
       reviews,
       numReviews: +totalCount,
-      product_ratings: +((
+      product_ratings: +(
         reviews.reduce((acc, item) => +acc + +item?.rating, 0) /
           reviews?.length ?? 1
-      ).toFixed(1)),
+      ).toFixed(1),
     };
 
     await updateProductByIdRepo("product", {
@@ -609,6 +628,35 @@ class Product {
   //   return await createProductRepo({ ...this, _id: product_id });
   // }
 
+  async updateProductById2(product_id) {
+    const objectParams = removeNullObject(this);
+
+    if (objectParams?.product_name)
+      objectParams.product_slug = toNonAccentVietnamese(
+        objectParams.product_name
+      ).replaceAll(" ", "-");
+      
+    delete objectParams["product_shop"];
+
+    const updatedProduct = await updateProductByIdRepo("product", {
+      product_id,
+      bodyUpdate: updateNestedObjectParser(objectParams),
+    });
+
+    await InventoryServices.findOneAndUpdateInventory({
+      filter: { inven_productId: convertToObjectId(updatedProduct._id) },
+      updateSet: {
+        inven_product_slug: updatedProduct.product_slug,
+      },
+    });
+
+    await Product.resetFilter();
+
+    return updatedProduct;
+    // await Product.resetFilter();
+    // return await updateProductByIdRepo("product", { product_id, bodyUpdate });
+  }
+
   async updateProductById(product_id, bodyUpdate) {
     await Product.resetFilter();
     return await updateProductByIdRepo("product", { product_id, bodyUpdate });
@@ -653,26 +701,23 @@ const classRefStrategy = (type) => {
 
     async updateProductTypeById(product_id) {
       const objectParams = removeNullObject(this);
-      if (objectParams?.product_name)
-        objectParams.product_slug = toNonAccentVietnamese(
-          objectParams.product_name
-        ).replaceAll(" ", "-");
 
       const foundProduct = await findProductByIdRepo({
         product_id,
       });
 
-      if (!foundProduct) {
+      if (!foundProduct)
         throw new ForbiddenRequestError("Product not found", 404);
-      }
 
       const isOwner =
         foundProduct.product_shop.toString() ===
         objectParams.product_shop.toString();
-      if (!isOwner) {
-        throw new ForbiddenRequestError("You are not Owner", 401);
-      }
+      if (!isOwner) throw new ForbiddenRequestError("You are not Owner", 403);
 
+      if (objectParams?.product_name)
+        objectParams.product_slug = toNonAccentVietnamese(
+          objectParams.product_name
+        ).replaceAll(" ", "-");
       // const isModel =
       //   foundProduct.product_type.toString() ===
       //   objectParams.product_type.toString();
@@ -680,14 +725,15 @@ const classRefStrategy = (type) => {
       //   throw new ForbiddenRequestError("Wrong product type");
       // }
 
-      if (objectParams.product_attributes) {
-        await updateProductByIdRepo(type, {
-          product_id,
-          bodyUpdate: updateNestedObjectParser(objectParams.product_attributes),
-        });
-      }
+      // if (objectParams.product_attributes) {
+      //   await updateProductByIdRepo(type, {
+      //     product_id,
+      //     bodyUpdate: updateNestedObjectParser(objectParams.product_attributes),
+      //   });
+      // }
 
       delete objectParams["product_shop"];
+
       const updatedProduct = await super.updateProductById(
         product_id,
         updateNestedObjectParser(objectParams)

@@ -196,14 +196,14 @@ class ProductController {
   updateProductById = async (req, res, next) => {
     new OK({
       message: "updateProductById OK",
-      metadata: await ProductServices.updateProductTypeById(
-        req.body?.product_type,
-        req.params.product_id,
-        {
+      metadata: await ProductServices.updateProductTypeByIdFactory({
+        type: req.body?.product_type,
+        product_id: req.params.product_id,
+        payload: {
           ...req.body,
           product_shop: req.user._id,
-        }
-      ),
+        },
+      }),
     }).send(res);
   };
 
