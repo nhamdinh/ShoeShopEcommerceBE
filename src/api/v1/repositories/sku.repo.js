@@ -57,10 +57,23 @@ const updateSkuByIdRepo = async ({
   return await SkuModel.findByIdAndUpdate(id, bodyUpdate, options);
 };
 
+const findSkusRepo1 = async ({ sort, filter, unSelect = [] }) => {
+  const sortBy = Object.keys(sort).length ? { ...sort } : { _id: -1 };
+
+  const skus = await SkuModel.find(filter)
+    .sort(sortBy)
+    // .populate({ path: "sku_product_id" })
+    .select(getUnSelectData(unSelect))
+    .lean();
+
+  return skus;
+};
+
 module.exports = {
   createSkusRepo,
   findSkusRepo,
   findSkuRepo,
   findSkuByIdRepo,
   updateSkuByIdRepo,
+  findSkusRepo1,
 };

@@ -125,7 +125,9 @@ class ProductFactory {
       foundProduct.product_shop.toString() === payload.product_shop.toString();
     if (!isOwner) throw new ForbiddenRequestError("You are not Owner", 403);
 
-    return new Product(payload).updateProductById2(product_id);
+    return new Product(payload).updateProductById2(product_id, {
+      body: payload,
+    });
   };
 
   static findProductById = async ({
@@ -144,7 +146,10 @@ class ProductFactory {
       page = 1,
       sort = { _id: -1 };
 
-    const filter = { sku_product_id: convertToObjectId(product_id) };
+    const filter = {
+      sku_product_id: convertToObjectId(product_id),
+      isDelete: false,
+    };
 
     const metadata = await findSkusRepo({
       sort,
@@ -628,14 +633,16 @@ class Product {
   //   return await createProductRepo({ ...this, _id: product_id });
   // }
 
-  async updateProductById2(product_id) {
+  async updateProductById2(product_id, { body }) {
+    const { sku_list = [] } = body;
+
     const objectParams = removeNullObject(this);
 
     if (objectParams?.product_name)
       objectParams.product_slug = toNonAccentVietnamese(
         objectParams.product_name
       ).replaceAll(" ", "-");
-      
+
     delete objectParams["product_shop"];
 
     const updatedProduct = await updateProductByIdRepo("product", {
@@ -643,18 +650,25 @@ class Product {
       bodyUpdate: updateNestedObjectParser(objectParams),
     });
 
+    if (updatedProduct && sku_list.length) {
+      // 1. update Skus
+      await SkuServices.updateSkus({
+        sku_product_id: updatedProduct._id,
+        sku_list,
+        sku_slug: updatedProduct.product_slug,
+      });
+    }
+
     await InventoryServices.findOneAndUpdateInventory({
       filter: { inven_productId: convertToObjectId(updatedProduct._id) },
       updateSet: {
         inven_product_slug: updatedProduct.product_slug,
+        inven_stock: updatedProduct.product_quantity,
       },
     });
 
     await Product.resetFilter();
-
     return updatedProduct;
-    // await Product.resetFilter();
-    // return await updateProductByIdRepo("product", { product_id, bodyUpdate });
   }
 
   async updateProductById(product_id, bodyUpdate) {
