@@ -230,15 +230,16 @@ const findProductsByShopRepo = async ({
     .skip(skip)
     .limit(limit)
     .populate({ path: "product_shop" })
+    .populate({ path: "product_brand" })
     .select(getSelectData(select))
     .lean();
 
   return {
     countAll: +countAll ?? 0,
-    totalCount: +count ?? 0,
     isDelete: +isDelete ?? 0,
     isPublished: +isPublished ?? 0,
     isDraft: +isDraft ?? 0,
+    totalCount: +count ?? 0,
     totalPages: Math.ceil(count / limit),
     page: +page,
     limit: +limit,

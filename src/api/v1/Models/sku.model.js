@@ -11,6 +11,7 @@ const skusSchema = new Schema(
   {
     sku_id: { type: String, required: true, unique: true }, //{sku_id}-{shop_id}
     sku_product_id: { type: Schema.Types.ObjectId, ref: "Product" }, //ref Spu Products
+    sku_product_shop: { type: Schema.Types.ObjectId, ref: "User" },
     sku_tier_index: { type: Array, default: [0] }, //[1,0] | [1,1]
     /* 
     color: ["black","blue"] => [0,1]

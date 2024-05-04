@@ -270,7 +270,7 @@ class ProductController {
         body: req.body,
       }),
       options: {
-        product_shop: req.body.product_shop,
+        // product_shop: req.body.product_shop,
       },
     }).send(res);
   };

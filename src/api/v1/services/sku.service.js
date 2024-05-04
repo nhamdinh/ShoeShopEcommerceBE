@@ -13,11 +13,17 @@ const {
 const { randomName } = require("../utils/functionHelpers");
 
 class SkuServices {
-  static createSkus = async ({ sku_product_id, sku_list = [], sku_slug }) => {
+  static createSkus = async ({
+    sku_product_id,
+    sku_product_shop,
+    sku_list = [],
+    sku_slug,
+  }) => {
     const convert_sku_list = sku_list.map((sku, index) => {
       return {
         ...sku,
         sku_product_id: sku_product_id,
+        sku_product_shop,
         sku_id: sku_product_id.toString() + "." + randomName() + index,
         sku_slug,
       };
@@ -26,7 +32,12 @@ class SkuServices {
     return newSkus;
   };
 
-  static updateSkus = async ({ sku_product_id, sku_list = [], sku_slug }) => {
+  static updateSkus = async ({
+    sku_product_id,
+    sku_product_shop,
+    sku_list = [],
+    sku_slug,
+  }) => {
     const convert_sku_list = sku_list.map((sku) => {
       return {
         ...sku,
@@ -104,6 +115,7 @@ class SkuServices {
         return {
           ...sku,
           sku_product_id: sku_product_id,
+          sku_product_shop,
           sku_id: sku_product_id.toString() + "." + randomName() + index,
           sku_slug,
         };

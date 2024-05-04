@@ -187,8 +187,8 @@ class ProductFactory {
     const { product_shop, bodyUpdate, ids } = body;
     // updateAllRepo()
 
-    // if (user._id?.toString() !== product_shop?.toString())
-    //   throw new ForbiddenRequestError("You are not Owner!!");
+    if (user._id?.toString() !== product_shop?.toString())
+      throw new ForbiddenRequestError("You are not Owner!!");
 
     if (!ids.length) return false;
 
@@ -608,6 +608,7 @@ class Product {
       // 3.1. create new Skus
       await SkuServices.createSkus({
         sku_product_id: newProduct._id,
+        sku_product_shop: newProduct.product_shop,
         sku_list,
         sku_slug: newProduct.product_slug,
       });
@@ -654,6 +655,7 @@ class Product {
       // 1. update Skus
       await SkuServices.updateSkus({
         sku_product_id: updatedProduct._id,
+        sku_product_shop: updatedProduct.product_shop,
         sku_list,
         sku_slug: updatedProduct.product_slug,
       });

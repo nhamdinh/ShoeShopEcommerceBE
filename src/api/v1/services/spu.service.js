@@ -74,6 +74,7 @@ class SpuServices {
       // 3. create new Skus
       await SkuServices.createSkus({
         sku_product_id: newSpu._id,
+        sku_product_shop: newSpu.product_shop,
         sku_list,
       });
     }

@@ -61,7 +61,7 @@ productRoute.put(
 // UPDATE-STATUS-PRODUCTS-BY-SHOP
 productRoute.put(
   "/update-status-products-by-shop",
-  // protect,
+  protect,
   asyncHandler(productController.updateStatusProductsByShop)
 );
 

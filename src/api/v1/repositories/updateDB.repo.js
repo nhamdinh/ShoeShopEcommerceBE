@@ -17,7 +17,16 @@ const updateAllRepo = async () => {
 
   const models = await Model.find({}).sort({
     _id: -1,
-  });
+  })
+  // .populate({
+  //   path: "sku_product_id",
+  //   select: getSelectData(["_id", "product_shop"]),
+  //         // match: { product_price: { $gte: 50 } },
+  //     // populate: {
+  //     //   path: "product_shop",
+  //     //   select: getSelectData(["_id", "email"]),
+  //     // },
+  // });;
 
   // for (let i = 0; i < models.length; i++) {
   //   const item = models[i];
