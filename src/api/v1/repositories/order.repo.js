@@ -52,9 +52,15 @@ const findOrdersByShopRepo = async ({
     shopId,
   });
 
+  const isNotPaid = await OrderModel.countDocuments({
+    shopId,
+    isPaid: false,
+  });
+
   const isPaid = await OrderModel.countDocuments({
     shopId,
     isPaid: true,
+    isDelivered: false,
   });
 
   const isDelivered = await OrderModel.countDocuments({
@@ -70,11 +76,6 @@ const findOrdersByShopRepo = async ({
   const isRefunded = await OrderModel.countDocuments({
     shopId,
     isRefunded: true,
-  });
-
-  const isNotPaid = await OrderModel.countDocuments({
-    shopId,
-    isPaid: false,
   });
 
   const orders = await OrderModel.find(filter)

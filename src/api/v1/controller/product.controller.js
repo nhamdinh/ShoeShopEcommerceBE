@@ -230,18 +230,24 @@ class ProductController {
   findAllDaftByShop = async (req, res, next) => {
     new OK({
       message: "findAllDaftByShop OK",
-      metadata: await ProductServices.findAllDaftByShop({
-        product_shop: req.query.product_shop,
+      metadata: await ProductServices.findProductsByShop({
+        user: req.user,
+        queryShop: req.query,
+        isDraft: true,
       }),
+      options: {
+        product_shop: req.query.product_shop,
+      },
     }).send(res);
   };
 
   findAllPublishedByShop = async (req, res, next) => {
     new OK({
       message: "findAllPublishedByShop OK",
-      metadata: await ProductServices.findAllPublishedByShop({
-        product_shop: req.query.product_shop,
+      metadata: await ProductServices.findProductsByShop({
         user: req.user,
+        queryShop: req.query,
+        isPublished: true,
       }),
       options: {
         product_shop: req.query.product_shop,

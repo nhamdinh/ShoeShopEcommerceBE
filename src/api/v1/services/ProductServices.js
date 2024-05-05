@@ -164,23 +164,61 @@ class ProductFactory {
     return foundProduct;
   };
 
-  static findAllDaftByShop = async ({ product_shop, limit = 50, skip = 0 }) => {
-    const query = { product_shop, isDraft: true };
-    return await findAllProductsByShopRepo({ query, limit, skip });
-  };
-
-  static findAllPublishedByShop = async ({
-    product_shop,
-    limit = 50,
-    skip = 0,
+  static findProductsByShop = async ({
     user,
+    queryShop,
+    isDraft,
+    isPublished,
   }) => {
-    // updateAllRepo()
+    const {
+      product_shop,
+      limit = 50,
+      page = 1,
+      orderByKey = "_id",
+      orderByValue = -1,
+      select = [
+        // "product_name",
+        // "product_shop",
+        // "product_price",
+        // "product_original_price",
+        // "product_thumb",
+        // "isDraft",
+        // "isPublished",
+      ],
+      keyword,
+      brand = "",
+      product_categories = "",
+    } = queryShop;
+    const sort = {};
+    sort[orderByKey] = orderByValue;
     // if (user._id?.toString() !== product_shop?.toString())
     //   throw new ForbiddenRequestError("You are not Owner!!");
 
-    const query = { product_shop, isPublished: true, isDelete: false };
-    return await findAllProductsByShopRepo({ query, limit, skip });
+    const filter = { product_shop, isDelete: false };
+    if (typeof isDraft === "boolean") filter.isDraft = isDraft;
+    if (typeof isPublished === "boolean") filter.isPublished = isPublished;
+
+    if (keyword) {
+      const regexSearch = new RegExp(
+        toNonAccentVietnamese(keyword).replaceAll(" ", "-"),
+        "i"
+      );
+      filter.product_slug = { $regex: regexSearch };
+    }
+    if (brand) filter.product_brand = convertToObjectId(brand);
+
+    if (product_categories) {
+      const ids = product_categories.split(",");
+      filter.product_categories = { $in: ids };
+    }
+
+    return await findProductsByShopRepo({
+      sort,
+      limit,
+      page,
+      filter,
+      select,
+    });
   };
 
   static updateStatusProductsByShop = async ({ user, body }) => {

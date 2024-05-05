@@ -44,7 +44,7 @@ orderRoute.put("/:id/pay", protect, asyncHandler(orderController.orderIsPaid));
 orderRoute.put(
   "/:id/delivered",
   protect,
-  admin,
+  // admin,
   asyncHandler(orderController.orderIsDelivered)
 );
 

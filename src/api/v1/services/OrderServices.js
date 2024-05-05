@@ -169,9 +169,10 @@ class OrderServices {
   static orderIsDelivered = async ({ id }) => {
     const order = await OrderModel.findById(convertToObjectId(id));
 
-    if (!order) {
-      throw new ForbiddenRequestError("Order not found", 404);
-    }
+    if (!order) throw new ForbiddenRequestError("Order not found", 404);
+
+    if (!order.isPaid) throw new ForbiddenRequestError("Order did not pay", 403);
+
     order.isDelivered = true;
     order.deliveredAt = Date.now();
 
@@ -180,18 +181,21 @@ class OrderServices {
   };
 
   static orderIsPaid = async ({ id, body }) => {
+    const { status, update_time, email_address } = body;
+
     const order = await OrderModel.findById(convertToObjectId(id));
 
-    if (!order) {
-      throw new ForbiddenRequestError("Order not found", 404);
-    }
+    if (!order) throw new ForbiddenRequestError("Order not found", 404);
+    if (!body.id) throw new ForbiddenRequestError("You are not Owner", 403);
+    if (order.isPaid) throw new ForbiddenRequestError("Order Paid", 403);
+
     order.isPaid = true;
     order.paidAt = Date.now();
     order.paymentResult = {
-      id: body.id,
-      status: body.status,
-      update_time: body.update_time,
-      email_address: body.email_address,
+      id: body?.id,
+      status,
+      update_time,
+      email_address,
     };
 
     const updatedOrder = await order.save();
