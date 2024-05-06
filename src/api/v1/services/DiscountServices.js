@@ -178,8 +178,9 @@ class DiscountServices {
       unSelect,
     });
 
-    const metadataProducts = await ProductServices.findAllPublishedByShop({
-      product_shop: convertToObjectId(discount_shopId),
+    const metadataProducts = await ProductServices.findProductsByShop({
+      queryShop: { product_shop: convertToObjectId(discount_shopId) },
+      isPublished: true,
     });
 
     const discounts = foundDiscounts?.discounts.map((item) => {
@@ -202,7 +203,7 @@ class DiscountServices {
       }
       return final;
     });
-    
+
     return { ...foundDiscounts, discounts };
   };
 
