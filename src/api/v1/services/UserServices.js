@@ -231,7 +231,7 @@ class UserServices {
   static changePassword = async ({ body, id }) => {
     const { password, passwordOld } = body;
     const user = await findUserByIdRepo(convertToObjectId(id));
-    const zz = ["user@example.com", "admin@example.com"];
+    const zz = ["user@example.com", "admin@example.com", "usermoi@example.com"];
     if (zz.includes(user.email))
       throw new ForbiddenRequestError("this User do not allow to change", 404);
     if (!user) throw new ForbiddenRequestError("User not Found", 404);
