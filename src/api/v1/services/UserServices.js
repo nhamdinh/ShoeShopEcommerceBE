@@ -402,7 +402,7 @@ class UserServices {
     });
     // logger.info(`admins ::: ${admins}`);
 
-    const userIds = user.user_clients.map((id) => convertToObjectId(id));
+    const userIds = [...new Set(user.user_clients.map((id) => id))];
 
     const _user_clients = await findUsersRepo({
       filter: {

@@ -95,6 +95,15 @@ class UserController {
     }).send(res);
   };
 
+  getUserClients = async (req, res) => {
+    new OK({
+      message: "getUserClients OK",
+      metadata: await UserServices.getProfile({
+        id: req.user._id,
+      }),
+    }).send(res);
+  };
+
   login = async (req, res) => {
     new OK({
       message: "login OK",

@@ -28,6 +28,9 @@ userRouter.post(
 // PROFILE
 userRouter.get("/profile", protect, asyncHandler(userController.getProfile));
 
+// USER CLIENTS
+userRouter.get("/clients", protect, asyncHandler(userController.getUserClients));
+
 // PROFILE
 userRouter.get("/profile-shop", asyncHandler(userController.getProfileShop));
 

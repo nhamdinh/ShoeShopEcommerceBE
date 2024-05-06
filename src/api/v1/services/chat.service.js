@@ -11,6 +11,8 @@ const {
 const {
   findUserByEmailRepo,
   findByIdAndUpdateUserRepo,
+  findAllUsersOrdersRepo,
+  findUserByIdLeanRepo,
 } = require("../repositories/user.repo");
 
 class SocketServices {
@@ -72,12 +74,59 @@ class SocketServices {
     // );
 
     if (chatStories?.length === 0) {
-      await createChatStoryRepo({
+      logger.info(
+        `chatStories ::: ${util.inspect(chatStories, {
+          showHidden: false,
+          depth: null,
+          colors: false,
+        })}`
+      );
+
+      const newChat = await createChatStoryRepo({
         fromTo: [data?.sendFrom, data?.to],
         story: [{ ...data }],
       });
+
+      const fromTo = newChat?.fromTo ?? [];
+      const idsObj = await findAllUsersOrdersRepo({
+        email: {
+          $in: fromTo,
+        },
+      });
+
+      await Promise.all(
+        idsObj.map(async (obj) => {
+          const userF = await findUserByIdLeanRepo({
+            id: obj?._id,
+            unSelect: [
+              "buyer",
+              "password",
+              "__v",
+              "refreshToken",
+              "user_salt",
+              "user_follower",
+              "user_watching",
+            ],
+          });
+
+          const user_clients = [
+            ...new Set([
+              ...userF.user_clients,
+              ...idsObj.map((item) => item?._id.toString()),
+            ]),
+          ];
+
+          await findByIdAndUpdateUserRepo({
+            id: convertToObjectId(obj._id),
+            updateSet: {
+              user_clients,
+            },
+          });
+        })
+      );
     } else {
       const chatStory = chatStories[0];
+
       const story = [...chatStory.story, data];
 
       await findByIdAndUpdateChatRepo({
