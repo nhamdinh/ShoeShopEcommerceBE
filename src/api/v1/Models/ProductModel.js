@@ -10,6 +10,7 @@ const productSchema = new Schema(
   {
     product_name: { type: String, required: true, trim: true },
     product_slug: String,
+    product_images: { type: Array, default: [] },
     product_thumb: { type: String, required: true },
     product_thumb_small: { type: String, trim: true },
     product_description: { type: String, default: "" },

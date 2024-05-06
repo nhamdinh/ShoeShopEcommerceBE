@@ -590,6 +590,7 @@ class Product {
   // CHA
   constructor({
     /* = payload */ product_name,
+    product_images,
     product_thumb,
     product_thumb_small,
     product_description,
@@ -604,6 +605,7 @@ class Product {
     product_variants,
   }) {
     this.product_name = product_name;
+    this.product_images = product_images;
     this.product_thumb = product_thumb;
     this.product_thumb_small = product_thumb_small;
     this.product_description = product_description;
