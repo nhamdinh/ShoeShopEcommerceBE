@@ -380,9 +380,9 @@ class OrderServices {
     }
     const { totalAmount, totalDiscount, feeShip } = checkCart;
 
-    checkCart.totalAmountPay = checkNumber(
+    checkCart.totalAmountPay = +(checkNumber(
       totalAmount - totalDiscount - feeShip
-    );
+    ).toFixed(2));
     result.checkedProducts = checkedProducts;
     return result;
   };
@@ -472,7 +472,7 @@ class OrderServices {
             taxPrice: 0,
             feeShip: cartReviewed?.checkCart?.feeShip,
             totalAmount: cartReviewed?.checkCart?.totalAmount,
-            totalAmountPay: cartReviewed?.checkCart?.totalAmountPay,
+            totalAmountPay: +(cartReviewed?.checkCart?.totalAmountPay.toFixed(2)),
             totalDiscount: cartReviewed?.checkCart?.totalDiscount,
           };
 
