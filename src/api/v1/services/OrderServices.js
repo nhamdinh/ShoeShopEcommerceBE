@@ -381,7 +381,7 @@ class OrderServices {
     const { totalAmount, totalDiscount, feeShip } = checkCart;
 
     checkCart.totalAmountPay = +(checkNumber(
-      totalAmount - totalDiscount - feeShip
+      totalAmount - totalDiscount + feeShip
     ).toFixed(2));
     result.checkedProducts = checkedProducts;
     return result;
