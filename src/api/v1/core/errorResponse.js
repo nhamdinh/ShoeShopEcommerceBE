@@ -17,6 +17,7 @@ class ErrorResponse extends Error {
   constructor(message, statusCode) {
     super(message);
     this.status = statusCode;
+    this.now = Date.now();
     // logger.error(
     //   `user login ::: ${util.inspect(statusCode, {
     //     showHidden: false,
@@ -24,7 +25,7 @@ class ErrorResponse extends Error {
     //     colors: false,
     //   })}`
     // );
-    logger.error(`${this.status + " ::: " + this.message}`);
+    logger.error(`${this.status + "KKK ::: " + this.message}`);
   }
 }
 class ConflictRequestError extends ErrorResponse {

@@ -3,10 +3,11 @@ const http = require("http");
 const helmet = require("helmet");
 const morgan = require("morgan");
 const compression = require("compression");
-
+const { uid } = require("uid");
+const util = require("util");
+const logger = require("./src/api/v1/log");
 const cors = require("cors");
 const path = require("path");
-
 const {
   notFound,
   errorHandler,
@@ -92,8 +93,28 @@ app.use((req, res, next) => {
 
 /* middleware */
 
-/* API */
+app.use((req, res, next) => {
+  const reqId = req.headers["x-request-id"] ?? uid();
+  req.reqId = reqId;
+  logger.info(
+    `input :::  ${util.inspect(
+      {
+        reqId,
+        path: req.path,
+        body: req.body,
+        query: req.query,
+      },
+      {
+        showHidden: false,
+        depth: null,
+        colors: false,
+      }
+    )}`
+  );
+  next();
+});
 
+/* API */
 app.get("/", (req, res, next) => {
   // const strCompression = "hello world 33";
   res.status(200).json({
