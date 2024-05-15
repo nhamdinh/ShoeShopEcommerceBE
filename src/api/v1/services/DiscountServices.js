@@ -2,7 +2,10 @@
 const util = require("util");
 const logger = require("../log");
 
-const { ForbiddenRequestError } = require("../core/errorResponse");
+const {
+  ForbiddenRequestError,
+  NotFoundRequestError,
+} = require("../core/errorResponse");
 const {
   createDiscountRepo,
   findOneDiscountRepo,
@@ -52,7 +55,7 @@ class DiscountServices {
     const foundDiscount = await findOneDiscountRepo(filterDiscount);
 
     if (!foundDiscount || !foundDiscount.discount_isActive)
-      throw new ForbiddenRequestError(`Discount is not exist OR expire`, 404);
+      throw new NotFoundRequestError(`Discount is not exist OR expire`);
 
     const { discount_applyTo, discount_productIds } = foundDiscount;
 
@@ -118,9 +121,8 @@ class DiscountServices {
     );
 
     foundDiscounts.map((checkDiscount, index) => {
-      if (!checkDiscount) {
-        throw new ForbiddenRequestError(`Discount is not exist`, 404);
-      }
+      if (!checkDiscount)
+        throw new NotFoundRequestError(`Discount is not exist`);
     });
 
     // const metadataProducts = await ProductServices.findAllPublishedByShop({
@@ -300,8 +302,7 @@ class DiscountServices {
       discount_shopId: convertToObjectId(discount_shopId),
       discount_isActive: true,
     });
-    if (!foundDiscount)
-      throw new ForbiddenRequestError(`Discount is not exist`, 404);
+    if (!foundDiscount) throw new NotFoundRequestError(`Discount is not exist`);
 
     const {
       discount_isActive,
@@ -329,7 +330,7 @@ class DiscountServices {
     /* check expire */
 
     if (discount_order_minValue <= 0)
-      throw new ForbiddenRequestError(`discount_order_minValue <= 0`, 404);
+      throw new ForbiddenRequestError(`discount_order_minValue <= 0`);
     {
       /* check Your turn */
       if (discount_useMax_user > 0) {

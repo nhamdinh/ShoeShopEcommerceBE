@@ -1,14 +1,16 @@
 "use strict";
+const StatusCode = require("./statusCode/statusCode");
+const ReasonStatusCode = require("./statusCode/reasonMessage");
 
-const StatusCode = {
-  OK: 200,
-  CREATED: 201,
-};
+// const StatusCode = {
+//   OK: 200,
+//   CREATED: 201,
+// };
 
-const ReasonStatusCode = {
-  OK: "Success !!",
-  CREATED: "Created !!",
-};
+// const ReasonStatusCode = {
+//   OK: "Success !!",
+//   CREATED: "Created !!",
+// };
 
 class SuccessResponse {
   constructor({

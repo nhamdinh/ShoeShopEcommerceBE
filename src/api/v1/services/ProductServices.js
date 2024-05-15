@@ -2,7 +2,10 @@
 const util = require("util");
 const logger = require("../log");
 
-const { ForbiddenRequestError } = require("../core/errorResponse");
+const {
+  ForbiddenRequestError,
+  NotFoundRequestError,
+} = require("../core/errorResponse");
 const {
   createProductRepo,
   createProductModelRepo,
@@ -118,8 +121,7 @@ class ProductFactory {
       product_id,
     });
 
-    if (!foundProduct)
-      throw new ForbiddenRequestError("Product not found", 404);
+    if (!foundProduct) throw new NotFoundRequestError("Product not found");
 
     const isOwner =
       foundProduct.product_shop.toString() === payload.product_shop.toString();
@@ -762,8 +764,7 @@ const classRefStrategy = (type) => {
         product_id,
       });
 
-      if (!foundProduct)
-        throw new ForbiddenRequestError("Product not found", 404);
+      if (!foundProduct) throw new NotFoundRequestError("Product not found");
 
       const isOwner =
         foundProduct.product_shop.toString() ===

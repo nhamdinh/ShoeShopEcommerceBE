@@ -1,7 +1,10 @@
 "use strict";
 const util = require("util");
 const logger = require("../log");
-const { ForbiddenRequestError } = require("../core/errorResponse");
+const {
+  ForbiddenRequestError,
+  NotFoundRequestError,
+} = require("../core/errorResponse");
 const {
   findCartsRepo,
   findByIdAndUpdateCartRepo,
@@ -169,9 +172,9 @@ class OrderServices {
   static orderIsDelivered = async ({ id }) => {
     const order = await OrderModel.findById(convertToObjectId(id));
 
-    if (!order) throw new ForbiddenRequestError("Order not found", 404);
+    if (!order) throw new NotFoundRequestError("Order not found");
 
-    if (!order.isPaid) throw new ForbiddenRequestError("Order did not pay", 403);
+    if (!order.isPaid) throw new ForbiddenRequestError("Order did not pay");
 
     order.isDelivered = true;
     order.deliveredAt = Date.now();
@@ -185,9 +188,9 @@ class OrderServices {
 
     const order = await OrderModel.findById(convertToObjectId(id));
 
-    if (!order) throw new ForbiddenRequestError("Order not found", 404);
-    if (!body.id) throw new ForbiddenRequestError("You are not Owner", 403);
-    if (order.isPaid) throw new ForbiddenRequestError("Order Paid", 403);
+    if (!order) throw new NotFoundRequestError("Order not found");
+    if (!body.id) throw new ForbiddenRequestError("You are not Owner");
+    if (order.isPaid) throw new ForbiddenRequestError("Order Paid");
 
     order.isPaid = true;
     order.paidAt = Date.now();
@@ -250,7 +253,7 @@ class OrderServices {
 
   static getOrderById = async ({ id, user }) => {
     const order = await getOrderByIdRepo(convertToObjectId(id));
-    if (!order) throw new ForbiddenRequestError("order not found", 404);
+    if (!order) throw new NotFoundRequestError("order not found");
 
     if (user?._id?.toString() !== order?.userId?._id?.toString())
       throw new ForbiddenRequestError("You are not Owner", 403);
@@ -263,9 +266,7 @@ class OrderServices {
       _id: -1,
     });
 
-    if (orders.length === 0) {
-      throw new ForbiddenRequestError("orders not found", 404);
-    }
+    if (!orders.length) throw new NotFoundRequestError("orders not found");
 
     return orders;
   };
@@ -311,9 +312,7 @@ class OrderServices {
         cart_state: "active",
       },
     });
-    if (!foundCarts.length) {
-      throw new ForbiddenRequestError("Cart not found", 404);
-    }
+    if (!foundCarts.length) throw new NotFoundRequestError("Cart not found");
 
     const objCart = foundCarts[0];
 
@@ -380,9 +379,9 @@ class OrderServices {
     }
     const { totalAmount, totalDiscount, feeShip } = checkCart;
 
-    checkCart.totalAmountPay = +(checkNumber(
+    checkCart.totalAmountPay = +checkNumber(
       totalAmount - totalDiscount + feeShip
-    ).toFixed(2));
+    ).toFixed(2);
     result.checkedProducts = checkedProducts;
     return result;
   };
@@ -472,7 +471,7 @@ class OrderServices {
             taxPrice: 0,
             feeShip: cartReviewed?.checkCart?.feeShip,
             totalAmount: cartReviewed?.checkCart?.totalAmount,
-            totalAmountPay: +(cartReviewed?.checkCart?.totalAmountPay.toFixed(2)),
+            totalAmountPay: +cartReviewed?.checkCart?.totalAmountPay.toFixed(2),
             totalDiscount: cartReviewed?.checkCart?.totalDiscount,
           };
 

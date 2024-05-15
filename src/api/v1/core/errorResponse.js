@@ -3,15 +3,18 @@
 const logger = require("../log");
 const util = require("util");
 
-const StatusCode = {
-  FORBIDDEN: 403,
-  CONFLICT: 409,
-};
+const StatusCode = require("./statusCode/statusCode");
+const ReasonStatusCode = require("./statusCode/reasonMessage");
 
-const ReasonStatusCode = {
-  FORBIDDEN: "Bad Request error",
-  CONFLICT: "Conflict error",
-};
+// const StatusCode = {
+//   FORBIDDEN: 403,
+//   CONFLICT: 409,
+// };
+
+// const ReasonStatusCode = {
+//   FORBIDDEN: "Bad Request error",
+//   CONFLICT: "Conflict error",
+// };
 
 class ErrorResponse extends Error {
   constructor(message, statusCode) {
@@ -44,5 +47,17 @@ class ForbiddenRequestError extends ErrorResponse {
     super(message, statusCode);
   }
 }
+class NotFoundRequestError extends ErrorResponse {
+  constructor(
+    message = ReasonStatusCode.NOT_FOUND,
+    statusCode = StatusCode.NOT_FOUND
+  ) {
+    super(message, statusCode);
+  }
+}
 
-module.exports = { ConflictRequestError, ForbiddenRequestError };
+module.exports = {
+  ConflictRequestError,
+  ForbiddenRequestError,
+  NotFoundRequestError,
+};

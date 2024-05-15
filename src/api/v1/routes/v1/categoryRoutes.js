@@ -39,7 +39,7 @@ categoryRoutes.put(
 );
 
 // ADMIN GET ALL BRAND WITHOUT SEARCH AND PAGINATION
-categoryRoutes.get("/all-admin/brand", protect, admin, getAllBrandByAdmin);
+categoryRoutes.get("/all-admin/brand", getAllBrandByAdmin);
 
 // DELETE BRAND
 categoryRoutes.post("/delete/:id/brand", protect, admin, deleteBrandById);

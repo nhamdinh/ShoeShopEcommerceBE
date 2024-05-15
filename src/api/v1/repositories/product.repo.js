@@ -14,6 +14,7 @@ const { toNonAccentVietnamese } = require("../utils/functionHelpers");
 const InventoryServices = require("../services/InventoryServices");
 const { findSkuByIdRepo } = require("./sku.repo");
 const { UserUnSelectData } = require("../utils/constant");
+const { NotFoundRequestError } = require("../core/errorResponse");
 
 const createProductRepo = async (product) => {
   return await ProductModel.product.create({ ...product });
@@ -301,7 +302,7 @@ const checkPriceProductsRepo = async (products) => {
         id: convertToObjectId(product?.sku_id),
       });
 
-      if (!sku) throw new ForbiddenRequestError("Sku not found", 404);
+      if (!sku) throw new NotFoundRequestError("Sku not found");
 
       const product_price = +sku.sku_price ?? +foundProduct.product_price;
 

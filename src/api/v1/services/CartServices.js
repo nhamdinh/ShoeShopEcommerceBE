@@ -2,7 +2,10 @@
 const util = require("util");
 const logger = require("../log");
 
-const { ForbiddenRequestError } = require("../core/errorResponse");
+const {
+  ForbiddenRequestError,
+  NotFoundRequestError,
+} = require("../core/errorResponse");
 const {
   findOneAndUpdateRepo,
   findOneRepo,
@@ -79,7 +82,7 @@ class CartServices {
     });
 
     if (!foundProduct || quantity < 0)
-      throw new ForbiddenRequestError("Product not found", 404);
+      throw new NotFoundRequestError("Product not found");
 
     const cartsCurrent = await CartServices.getCurrentCart({
       cart_userId,
@@ -90,7 +93,7 @@ class CartServices {
       id: convertToObjectId(sku_id),
     });
 
-    if (!sku) throw new ForbiddenRequestError("Sku not found", 404);
+    if (!sku) throw new NotFoundRequestError("Sku not found");
 
     const product_price = +sku.sku_price ?? +foundProduct.product_price;
 
@@ -98,7 +101,7 @@ class CartServices {
       const cartCurrent = cartsCurrent[i];
 
       if (cartCurrent?.cart_shopId._id.toString() !== cart_shopId)
-        throw new ForbiddenRequestError("Cart not found", 404);
+        throw new NotFoundRequestError("Cart not found");
 
       /* add new item */
       const newSkuOnCart = {
@@ -252,9 +255,9 @@ class CartServices {
         cart_state: "active",
       },
     });
-    if (foundCarts.length === 0) {
-      throw new ForbiddenRequestError("Cart delete not found", 404);
-    }
+    if (!foundCarts.length)
+      throw new NotFoundRequestError("Cart delete not found");
+
     const foundCart = foundCarts[0];
     foundCart.cart_state = "failed";
 

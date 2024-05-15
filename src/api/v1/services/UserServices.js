@@ -7,7 +7,10 @@ const { validationResult } = require("express-validator");
 const crypto = require("node:crypto");
 const bcrypt = require("bcrypt");
 
-const { ForbiddenRequestError } = require("../core/errorResponse");
+const {
+  ForbiddenRequestError,
+  NotFoundRequestError,
+} = require("../core/errorResponse");
 const KeyTokenServices = require("./KeyTokenServices");
 const { getInfoData, convertToObjectId } = require("../utils/getInfo");
 const { createToken } = require("../utils/authUtils");
@@ -55,7 +58,7 @@ class UserServices {
       /* update userWatching  */
       const userWatching = await findUserByIdRepo(convertToObjectId(id));
 
-      if (!userWatching) throw new ForbiddenRequestError("User not Found", 404);
+      if (!userWatching) throw new NotFoundRequestError("User not Found");
 
       userWatching.user_watching = [
         ...new Set([...userWatching.user_watching, productShopId]),
@@ -104,7 +107,7 @@ class UserServices {
     const userFollower = await findUserByIdRepo(
       convertToObjectId(productShopId)
     );
-    if (!userFollower) throw new ForbiddenRequestError("User not Found", 404);
+    if (!userFollower) throw new NotFoundRequestError("User not Found");
     userFollower.user_follower = [
       ...new Set([
         ...userFollower.user_follower,
@@ -130,7 +133,7 @@ class UserServices {
       return { user };
     } catch (error) {
       console.error(error);
-      throw new ForbiddenRequestError("User not Found", 404);
+      throw new NotFoundRequestError("User not Found");
     }
   };
 
@@ -153,7 +156,7 @@ class UserServices {
       }
     } catch (error) {
       console.error(error);
-      throw new ForbiddenRequestError("chatStories not Found", 404);
+      throw new NotFoundRequestError("chatStories not Found");
     }
   };
 
@@ -187,14 +190,14 @@ class UserServices {
         .sort({ createdAt: -1 });
       return { count, users };
     } catch (error) {
-      throw new ForbiddenRequestError("Users not Found", 404);
+      throw new NotFoundRequestError("Users not Found");
     }
   };
 
   static updateIsShop = async ({ id, productShopName }) => {
     const user = await findUserByIdRepo(id);
 
-    if (!user) throw new ForbiddenRequestError("User not Found", 404);
+    if (!user) throw new NotFoundRequestError("User not Found");
     user.isShop = !user.isShop;
     user.isAdmin = true;
     user.productShopName = productShopName;
@@ -211,7 +214,7 @@ class UserServices {
   static updateProfile = async ({ body, id }) => {
     const user = await findUserByIdRepo(convertToObjectId(id));
 
-    if (!user) throw new ForbiddenRequestError("User not Found", 404);
+    if (!user) throw new NotFoundRequestError("User not Found");
 
     const { name, phone, avatar } = body;
     user.name = name ?? user.name;
@@ -233,8 +236,8 @@ class UserServices {
     const user = await findUserByIdRepo(convertToObjectId(id));
     const zz = ["user@example.com", "admin@example.com", "usermoi@example.com"];
     if (zz.includes(user.email))
-      throw new ForbiddenRequestError("this User do not allow to change", 404);
-    if (!user) throw new ForbiddenRequestError("User not Found", 404);
+      throw new ForbiddenRequestError("this User do not allow to change");
+    if (!user) throw new NotFoundRequestError("User not Found");
 
     const salt = user.user_salt;
     const passwordHashed = await bcrypt.hash(passwordOld, salt);
@@ -369,9 +372,8 @@ class UserServices {
 
   static getProfileShop = async ({ id }) => {
     const user = await findUserByIdRepo(id);
-    if (!user) {
-      throw new ForbiddenRequestError("User not Found");
-    }
+    if (!user) throw new NotFoundRequestError("User not Found");
+
     // logger.info(`admins ::: ${admins}`);
     return {
       ...getInfoData({
@@ -393,9 +395,8 @@ class UserServices {
     unSelect = ["buyer", "password", "__v", "refreshToken", "user_salt"],
   }) => {
     const user = await findUserByIdLeanRepo({ id, unSelect });
-    if (!user) {
-      throw new ForbiddenRequestError("User not Found");
-    }
+    if (!user) throw new NotFoundRequestError("User not Found");
+
     const admins = await findAllAdminUsersRepo({
       // unSelect: [],
       unSelect: [...unSelect, "_id", "countChat", "roles", "user_clients"],

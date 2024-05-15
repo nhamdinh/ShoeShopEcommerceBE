@@ -2,7 +2,10 @@
 const util = require("util");
 const logger = require("../log");
 
-const { ForbiddenRequestError } = require("../core/errorResponse");
+const {
+  ForbiddenRequestError,
+  NotFoundRequestError,
+} = require("../core/errorResponse");
 const {
   createCommentRepo,
   getAllInventoriesRepo,
@@ -41,7 +44,7 @@ class CommentServices {
         convertToObjectId(cmt_parentId)
       );
 
-      if (!parentComment) throw new ForbiddenRequestError("Comment not Found", 404);
+      if (!parentComment) throw new NotFoundRequestError("Comment not Found");
 
       rightVal = parentComment.cmt_right;
 
@@ -95,7 +98,7 @@ class CommentServices {
         convertToObjectId(cmt_parentId)
       );
 
-      if (!parentComment) throw new ForbiddenRequestError("Comment not Found", 404);
+      if (!parentComment) throw new NotFoundRequestError("Comment not Found");
 
       const metadata = await findCommentsRepo({
         limit,
@@ -146,14 +149,14 @@ class CommentServices {
       },
     });
 
-    if (!foundComment) throw new ForbiddenRequestError("Comment not Found", 404);
-    logger.info(
-      `foundComment ::: ${util.inspect(foundComment, {
-        showHidden: false,
-        depth: null,
-        colors: false,
-      })}`
-    );
+    if (!foundComment) throw new NotFoundRequestError("Comment not Found");
+    // logger.info(
+    //   `foundComment ::: ${util.inspect(foundComment, {
+    //     showHidden: false,
+    //     depth: null,
+    //     colors: false,
+    //   })}`
+    // );
     // 1. xac dinh left va right
     const rightVal = foundComment.cmt_right;
     const leftVal = foundComment.cmt_left;
