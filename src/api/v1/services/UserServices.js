@@ -349,7 +349,7 @@ class UserServices {
         object: user,
         fields: ["_id", "name", "email", "phone", "isAdmin", "createdAt"],
       }),
-      refreshToken: refreshToken,
+      refreshToken,
       token: await generateToken(user._id),
     };
   };

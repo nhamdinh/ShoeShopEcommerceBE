@@ -20,6 +20,7 @@ class ThuDungGioController {
         skip: req.query.skip ?? 0,
         isPaid: req.query.isPaid ?? 0,
         keySearch: req.query.keySearch ?? "",
+        user: req?.user,
       }),
     }).send(res);
   };

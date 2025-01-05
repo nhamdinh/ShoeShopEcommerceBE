@@ -14,6 +14,7 @@ const {
   removeNullObject,
   toNonAccentVietnamese,
 } = require("../utils/functionHelpers");
+const { updateAllRepo } = require("../repositories/updateDB.repo");
 
 class ThuDungGioServices {
   static findThuDungGioById = async ({ id }) => {
@@ -43,6 +44,7 @@ class ThuDungGioServices {
     skip = 0,
     isPaid = 0,
     keySearch,
+    user,
   }) => {
     const regexSearch = new RegExp(toNonAccentVietnamese(keySearch), "i");
     // logger.info(
@@ -59,6 +61,8 @@ class ThuDungGioServices {
         $in: +isPaid === 1 ? [true] : +isPaid === -1 ? [false] : [true, false],
       },
       buyNameEng: { $regex: regexSearch },
+      createdBy: convertToObjectId(user._id),
+      createdAt: { $gt: '2024-03-05T13:46:58.600+00:00' },
     };
 
     return await getAllThuDungGiosRepo({
@@ -70,6 +74,9 @@ class ThuDungGioServices {
 
   static createThuDungGio = async (req) => {
     const { newModel } = req.body;
+    const { user } = req;
+
+    if (!user?._id) throw new ForbiddenRequestError("Invalid ThuDungGio Data");
 
     const {
       buyName,
@@ -84,6 +91,7 @@ class ThuDungGioServices {
       isGif,
       discount,
     } = newModel;
+
     const newThuDungGio = await createThuDungGioRepo({
       buyName,
       sellDate,
@@ -97,10 +105,11 @@ class ThuDungGioServices {
       isGif,
       discount,
       buyNameEng: toNonAccentVietnamese(buyName),
+      createdBy: convertToObjectId(user?._id),
     });
-    if (!newThuDungGio) {
+
+    if (!newThuDungGio)
       throw new ForbiddenRequestError("Invalid ThuDungGio Data");
-    }
 
     // logger.info(
     //   `newThuDungGio register ::: ${util.inspect(newThuDungGio, {

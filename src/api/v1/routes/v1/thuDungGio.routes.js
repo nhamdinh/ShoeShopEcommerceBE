@@ -42,14 +42,14 @@ thuDungGioRouter.put(
 thuDungGioRouter.get(
   "/all-admin",
   protect,
-  thuDungGioController.getAllThuDungGios
+  asyncHandler(thuDungGioController.getAllThuDungGios)
 );
 
 // GET ALL ThuDungGio
 thuDungGioRouter.get(
   "/get-all",
   protect,
-  thuDungGioController.getAllThuDungGios
+  asyncHandler(thuDungGioController.getAllThuDungGios)
 );
 
 module.exports = thuDungGioRouter;

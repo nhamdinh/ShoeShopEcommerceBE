@@ -22,7 +22,7 @@ module.exports = {
   DIRNAME_IMG_CATEGORYS: "public/images/categorys",
 
   AVATAR:
-    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTPYWi23AJDPw9hwCYw9TbBTS_VXSI_bVHoIj8S4XN19A&s",
+    "https://scontent.fhan17-1.fna.fbcdn.net/v/t1.6435-9/71115912_956605934677285_1746585709759692800_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=833d8c&_nc_eui2=AeHBXHfpCHEU67K-24MM3JNYyvKi533cI-fK8qLnfdwj5zLztEBScftIL_NqbpR1YwxrYZSd9_IEvXiVY87ITUz1&_nc_ohc=BxPLtJOlUo4Q7kNvgFP-WbV&_nc_oc=Adj2Zzo6Fm0NtxA-JaLrdA9rmBxeAJXafPYikLQafMGbj_CNBp2xEjVdCYChIVoVAIM&_nc_zt=23&_nc_ht=scontent.fhan17-1.fna&_nc_gid=AjM0HyA1wl7EtaRl8i0P_JO&oh=00_AYBNMHsuwfSXXWRhVRbCyRpcurc_D6ZMKPltG5xqZFd2_A&oe=67A206B5",
   PATH_IMG_AVATAR: "avatar",
   UserUnSelectData: [
     "buyer",

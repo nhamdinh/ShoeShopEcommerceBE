@@ -37,6 +37,7 @@ class DataBase {
       mongoose.set("debug", { color: true });
     }
     try {
+      mongoose.set('strictQuery', false);
       await mongoose.connect(
         connectString,
         { useNewUrlParser: true, useUnifiedTopology: true, maxPoolSize: 100 },

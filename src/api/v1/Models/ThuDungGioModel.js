@@ -61,6 +61,10 @@ const thuDungGioSchema = Schema(
       required: true,
       default: true,
     },
+    createdBy: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+    }
   },
   {
     collection: COLLECTION_NAME,
