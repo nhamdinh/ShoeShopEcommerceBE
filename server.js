@@ -19,9 +19,9 @@ const {
   UV_THREADPOOL_SIZE,
 } = process.env;
 
-socketServer.listen(SOCKET_PORT, () => {
-  logger.info(`Server socketIo run in port ${SOCKET_PORT}`);
-});
+// socketServer.listen(SOCKET_PORT, () => {
+//   logger.info(`Server socketIo run in port ${SOCKET_PORT}`);
+// });
 
 app.listen(PORT, () => {
   logger.info(`server run in port ${PORT} ::: NODE_ENV ${NODE_ENV}`);
@@ -29,8 +29,8 @@ app.listen(PORT, () => {
   logger.info(`Number of UV_THREADPOOL_SIZE ::: ${UV_THREADPOOL_SIZE}`);
 });
 
-process.on("SIGINT", () => {
-  socketServer.close(() => {
-    logger.info(`socketServer shutdown`);
-  });
-});
+// process.on("SIGINT", () => {
+//   socketServer.close(() => {
+//     logger.info(`socketServer shutdown`);
+//   });
+// });
