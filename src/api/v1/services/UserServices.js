@@ -2,6 +2,8 @@
 const util = require("util");
 const logger = require("../log");
 const nodemailer = require("nodemailer");
+const moment = require("moment");
+const JWT = require("jsonwebtoken");
 
 const { validationResult } = require("express-validator");
 const crypto = require("node:crypto");
@@ -15,7 +17,7 @@ const KeyTokenServices = require("./KeyTokenServices");
 const { getInfoData, convertToObjectId } = require("../utils/getInfo");
 const { createToken } = require("../utils/authUtils");
 const generateRefreshToken = require("../utils/generateRefreshToken");
-const generateToken = require("../utils/generateToken");
+const generateAccessToken = require("../utils/generateAccessToken");
 const {
   findUserByEmailRepo,
   findByIdAndUpdateTokenRepo,
@@ -32,6 +34,7 @@ const {
   findOneOtpRepo,
   findOneAndUpdateOtpRepo,
 } = require("../repositories/otp.repo");
+const { COOKIE_REFRESH_TOKEN, MILLISECOND } = require("../utils/constant");
 
 const { SENDER = "nhamnd.hmu@gmail.com" } = process.env;
 
@@ -286,7 +289,51 @@ class UserServices {
     });
   };
 
-  static login = async (req) => {
+  static logout = async (req, res) => {
+    // const cookie = req.headers?.cookie;
+    // const cookie = req.cookies[COOKIE_REFRESH_TOKEN];
+    // const cookies = parseCookies(req);
+
+    // const list = {};
+    // // const cookieHeader = req.headers?.cookie;
+    // const cookieHeader = req.signedCookies;
+
+    // if (!cookieHeader) throw new Error("No Refresh Token in Cookies");
+
+    // cookieHeader.split(`;`).forEach(function (cookie) {
+    //   let [name, ...rest] = cookie.split(`=`);
+    //   name = name?.trim();
+    //   if (!name) return;
+    //   const value = rest.join(`=`).trim();
+    //   if (!value) return;
+    //   list[name] = decodeURIComponent(value);
+    // });
+    // // logger.info("cookie ::: " + list[COOKIE_REFRESH_TOKEN]);
+
+    // const refreshToken = list?.refreshToken;
+    // const user = await User.findOne({ refreshToken });
+    // if (!user) {
+    //   res.clearCookie(COOKIE_REFRESH_TOKEN, {
+    //     httpOnly: true,
+    //     secure: true,
+    //   });
+    //   res.status(200); // forbidden
+    // }
+    // await User.findOneAndUpdate(refreshToken, {
+    //   refreshToken: "",
+    // });
+
+    res.clearCookie(COOKIE_REFRESH_TOKEN, {
+      httpOnly: true,
+      secure: true,
+    });
+
+    return {
+      message: "Logged out successfully",
+    };
+  };
+
+  static login = async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       throw new ForbiddenRequestError(
@@ -301,13 +348,13 @@ class UserServices {
 
     const { email, password } = req.body;
     const user = await findUserByEmailRepo({ email });
-    logger.info(
-      `user login ::: ${util.inspect(user, {
-        showHidden: false,
-        depth: null,
-        colors: false,
-      })}`
-    );
+    // logger.info(
+    //   `user logged ::: ${util.inspect(user, {
+    //     showHidden: false,
+    //     depth: null,
+    //     colors: false,
+    //   })}`
+    // );
 
     if (!user) throw new ForbiddenRequestError("Wrong Email or Password");
 
@@ -318,39 +365,56 @@ class UserServices {
     if (!match) throw new ForbiddenRequestError("Wrong Email or Password");
 
     const refreshToken = await generateRefreshToken(user?._id);
+    const token = await generateAccessToken(user._id);
 
     const userUpdate = await findByIdAndUpdateTokenRepo(user._id, refreshToken);
-    if (!userUpdate) {
-      throw new ForbiddenRequestError("Wrong userUpdate");
-    }
-    // res.cookie(COOKIE_REFRESH_TOKEN, refreshToken, {
-    //   httpOnly: true,
-    //   maxAge: 72 * 60 * 60 * 1000,
-    //   signed: true,
-    // });
-    // res.cookie(COOKIE_REFRESH_TOKEN,`encrypted cookie string Value`);
 
-    // res.cookie('cookieName', 'cookieValue') // options is optional
-    // res.send('')
+    if (!userUpdate) throw new ForbiddenRequestError("Wrong userUpdate");
 
     // logger.info(
-    //   `refreshToken 11::: ${util.inspect(refreshToken, {
+    //   `refreshToken ::: ${util.inspect(refreshToken, {
     //     showHidden: false,
     //     depth: null,
     //     colors: false,
     //   })}`
     // );
-    // res
-    //   .cookie("access_token", "token")
-    //   .json({ message: "Logged in successfully 😊 👌" });
 
+    const Cookie_refreshToken = req.cookies[COOKIE_REFRESH_TOKEN];
+    // if (!Cookie_refreshToken) throw new ForbiddenRequestError("Wrong Cookie_refreshToken");
+
+    if (Cookie_refreshToken) {
+      const decoded = JWT.verify(Cookie_refreshToken, process.env.JWT_SECRET);
+      const token2 = await generateAccessToken(decoded?.id);
+      logger.info(
+        `decoded logged ::: ${util.inspect(decoded.id, {
+          showHidden: false,
+          depth: null,
+          colors: false,
+        })}`
+      );
+    }
+
+    res.cookie(
+      COOKIE_REFRESH_TOKEN,
+      // moment(Date.now()).format("YYYYMMDD HHmmss") + refreshToken,
+      refreshToken,
+      {
+        httpOnly: true, // Bảo mật: Chỉ truy cập được qua HTTP, tránh JavaScript đọc cookie
+        secure: false, // Để test trên HTTP (Dùng true nếu chạy trên HTTPS)
+        maxAge: 10000 * MILLISECOND, // Thời gian hết hạn: 1 ngày (ms)
+        sameSite: "Strict", // Chống tấn công CSRF
+        //   signed: true,
+      }
+    );
+
+    // res.clearCookie();
     return {
       ...getInfoData({
         object: user,
         fields: ["_id", "name", "email", "phone", "isAdmin", "createdAt"],
       }),
       refreshToken,
-      token: await generateToken(user._id),
+      token,
     };
   };
   // function parseCookies(request) {
@@ -506,9 +570,7 @@ class UserServices {
       privateKey,
     });
 
-    if (!publicKeyString) {
-      throw new ForbiddenRequestError("publicKey Error");
-    }
+    if (!publicKeyString) throw new ForbiddenRequestError("publicKey Error");
     // console.log(" newUser._id .toString()::::::", newUser._id.toString());
     // const { token, refreshToken } = await createToken(
     //   {
@@ -521,8 +583,7 @@ class UserServices {
     /* create public key; private key; createKeyToken by key */
 
     const refreshToken = await generateRefreshToken(newUser?._id);
-    const token = await generateToken(newUser?._id);
-
+    const token = await generateAccessToken(newUser._id);
     return {
       ...getInfoData({
         object: newUser,

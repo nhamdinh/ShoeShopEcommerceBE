@@ -15,8 +15,8 @@ userRouter.post(
   asyncHandler(userController.login)
 );
 
-// // LOGOUT
-// userRouter.post("/logout", logout);
+// LOGOUT
+userRouter.post("/logout", asyncHandler(userController.logout));
 
 // REGISTER
 userRouter.post(

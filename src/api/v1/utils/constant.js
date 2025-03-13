@@ -1,6 +1,7 @@
 "use strict";
 module.exports = {
   PAGE_SIZE: 6,
+  MILLISECOND: 1000,
   strCompression: "hello world 444",
   URL_SERVER: process.env.URL_SERVER,
   COOKIE_REFRESH_TOKEN: "refreshToken",

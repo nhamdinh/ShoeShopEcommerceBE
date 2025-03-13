@@ -1,7 +1,7 @@
 "use strict";
 const util = require("util");
 const logger = require("../log");
-const jwt = require("jsonwebtoken");
+const JWT = require("jsonwebtoken");
 const asyncHandler = require("express-async-handler");
 const User = require("../Models/UserModel");
 const { ForbiddenRequestError } = require("../core/errorResponse");
@@ -18,17 +18,18 @@ module.exports = {
   },
 
   protect: asyncHandler(async (req, res, next) => {
-    let token;
-    // console.log("protect  xxx =====================================");
+    // console.log("authenticateToken  xxx =====================================");
 
     if (
       req.headers.authorization &&
       req.headers.authorization.startsWith("Bearer")
     ) {
-      token = req.headers.authorization.split(" ")[1];
+      const token = req.headers.authorization.split(" ")[1];
       if (!token)
         throw new ForbiddenRequestError("Not authorized, no token", 401);
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+      const decoded = JWT.verify(token, process.env.JWT_SECRET);
+      
       req.user = await User.findById(decoded.id).select(
         getUnSelectData([
           "password",
@@ -48,8 +49,7 @@ module.exports = {
       // );
 
       next();
-    } else {
-      throw new ForbiddenRequestError("Not authorized, token failed", 401);
     }
+    throw new ForbiddenRequestError("Not authorized, token failed", 401);
   }),
 };

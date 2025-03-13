@@ -70,6 +70,13 @@ const { CREATED, OK } = require("../core/successResponse");
 // };
 
 class UserController {
+  logout = async (req, res) => {
+    new OK({
+      message: "logout OK",
+      metadata: await UserServices.logout(req, res),
+    }).send(res);
+  };
+
   register = async (req, res) => {
     new CREATED({
       message: "register CREATED",
@@ -107,7 +114,7 @@ class UserController {
   login = async (req, res) => {
     new OK({
       message: "login OK",
-      metadata: await UserServices.login(req),
+      metadata: await UserServices.login(req, res),
     }).send(res);
   };
 
